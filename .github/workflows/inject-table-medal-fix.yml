@@ -1,0 +1,31 @@
+name: Inject top-three table fix
+on:
+  push:
+    paths:
+      - '.github/workflows/inject-table-medal-fix.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          tag='<script src="/table-medal-fix.js?v=20260820-1"></script>'
+          if tag not in s:
+              s=s.replace('</body>',tag+'\n</body>')
+              p.write_text(s)
+          PY
+          rm .github/workflows/inject-table-medal-fix.yml
+      - name: Commit
+        run: |
+          git config user.name "ChatGPT"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Enable top-three standings fix" || exit 0
+          git push
