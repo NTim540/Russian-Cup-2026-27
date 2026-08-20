@@ -6,16 +6,34 @@
     html td.team.logo-ready .team-logo-img{margin-right:8px;vertical-align:middle}
     html .upcoming-team>span:first-child.logo-ready,html .match-team.logo-ready{display:flex!important;align-items:center;gap:9px}
     html .match-team.away.logo-ready{justify-content:flex-end}
+    html #overallTable tbody tr:nth-child(1) td.place,
+    html #overallTable tbody tr:nth-child(2) td.place,
+    html #overallTable tbody tr:nth-child(3) td.place{
+      display:table-cell!important;
+      margin:0!important;
+      border-radius:0!important;
+      text-align:center!important;
+      vertical-align:middle!important;
+    }
+    html #overallTable td.place .place-medal{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;font-weight:950;line-height:1}
+    html #overallTable tbody tr:nth-child(1) td.place .place-medal{background:rgba(215,176,54,.18);color:#f2ce67}
+    html #overallTable tbody tr:nth-child(2) td.place .place-medal{background:rgba(166,181,197,.16);color:#d7e0e9}
+    html #overallTable tbody tr:nth-child(3) td.place .place-medal{background:rgba(180,116,72,.17);color:#dca477}
+    html[data-theme="light"] #overallTable tbody tr:nth-child(1) td.place .place-medal{background:rgba(215,176,54,.16);color:#a77d00}
+    html[data-theme="light"] #overallTable tbody tr:nth-child(2) td.place .place-medal{background:rgba(108,126,145,.13);color:#65717e}
+    html[data-theme="light"] #overallTable tbody tr:nth-child(3) td.place .place-medal{background:rgba(180,116,72,.14);color:#a8663f}
     @media(max-width:760px){
       html .table-wrap{overflow-x:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain}
       html .table-wrap table{min-width:760px!important;width:760px!important;table-layout:auto!important;border-collapse:separate;border-spacing:0}
       html .table-wrap th,html .table-wrap td{padding:9px 7px!important;font-size:10px!important;height:auto!important;min-height:0!important;line-height:1.25!important}
       html .table-wrap th.team,html .table-wrap td.team{min-width:175px!important;width:175px!important}
       html .table-wrap .team-logo-img{width:22px!important;height:22px!important;margin-right:6px!important}
-      html .table-wrap th:first-child,html .table-wrap td:first-child{position:sticky;left:0;z-index:4;min-width:40px;width:40px;background:var(--panel)!important}
+      html .table-wrap th:first-child,html .table-wrap td:first-child{position:sticky;left:0;z-index:4;min-width:40px!important;width:40px!important;background:var(--panel)!important}
       html .table-wrap th.team,html .table-wrap td.team{position:sticky;left:40px;z-index:3;background:var(--panel)!important;box-shadow:1px 0 0 var(--line)}
       html .table-wrap thead th:first-child,html .table-wrap thead th.team{z-index:6}
-      html #overallTable tbody tr:nth-child(1) .place,html #overallTable tbody tr:nth-child(2) .place,html #overallTable tbody tr:nth-child(3) .place{display:inline-grid!important;min-width:24px!important;width:24px!important;height:24px!important;margin:0!important}
+      html #overallTable tbody tr:nth-child(1) td.place,
+      html #overallTable tbody tr:nth-child(2) td.place,
+      html #overallTable tbody tr:nth-child(3) td.place{display:table-cell!important;min-width:40px!important;width:40px!important;height:auto!important;margin:0!important}
     }
   `;
   document.head.appendChild(style);
@@ -56,8 +74,20 @@
       el.setAttribute('aria-label',`Открыть матч-центр: ${tn(m.home_team_id)} — ${tn(m.away_team_id)}`);
     }
   }
+  function fixMedals(){
+    document.querySelectorAll('#overallTable tbody tr:nth-child(-n+3) td.place').forEach(td=>{
+      if(td.querySelector('.place-medal'))return;
+      const value=(td.textContent||'').trim();
+      td.textContent='';
+      const span=document.createElement('span');
+      span.className='place-medal';
+      span.textContent=value;
+      td.appendChild(span);
+    });
+  }
   function fixAll(){
     document.querySelectorAll('#upcomingGrid .upcoming-card,#matchList .match-row').forEach(fixElement);
+    fixMedals();
   }
   document.addEventListener('click',e=>{
     const el=e.target.closest?.('.match-center-clickable');if(el)fixElement(el);
