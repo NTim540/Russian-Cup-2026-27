@@ -1,0 +1,35 @@
+name: Fix match center escaping
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-h2h-escape.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix escaping and bump asset
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('logos.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("'\"':'&quot'", "'\"':'&quot;'")
+          p.write_text(s,encoding='utf-8')
+          i=Path('index.html')
+          x=i.read_text(encoding='utf-8').replace('/logos.js?v=20260820-3','/logos.js?v=20260820-4')
+          i.write_text(x,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          rm .github/workflows/fix-h2h-escape.yml
+          git config user.name "ChatGPT"
+          git config user.email "actions@users.noreply.github.com"
+          git add logos.js index.html .github/workflows/fix-h2h-escape.yml
+          git commit -m "Finalize head-to-head match center"
+          git push
