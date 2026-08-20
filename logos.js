@@ -55,7 +55,7 @@
   document.head.appendChild(style);
 
   function img(src,cls,alt){const i=document.createElement('img');i.src=src;i.className=cls;i.alt=alt;i.loading='lazy';i.decoding='async';return i}
-  function escHtml(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
+  function escHtml(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
   function cleanName(el){return (el.dataset.teamName||el.textContent||'').trim()}
   function decorate(el,away=false){
     if(!el||el.dataset.logoApplied==='1')return;

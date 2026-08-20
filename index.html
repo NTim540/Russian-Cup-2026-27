@@ -194,6 +194,6 @@ async function loadData(slug,sid){D=await j('/api/data?tournament_slug='+encodeU
 function activateReveal(){const els=document.querySelectorAll('.reveal:not(.observed)');const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}}),{threshold:.08});els.forEach(el=>{el.classList.add('observed');io.observe(el)})}
 $('#tournament').onchange=e=>loadStages(e.target.value);$('#stage').onchange=e=>loadData($('#tournament').value,e.target.value);$('#gf').onchange=renderMatches;$('#sf').onchange=renderMatches;loadCatalog().catch(e=>$('#status').textContent='Ошибка загрузки: '+e.message);setInterval(()=>{if(D)loadData(D.tournament.slug,D.stage.id)},15000);activateReveal();
 </script>
-<script src="/logos.js?v=20260820-3"></script>
+<script src="/logos.js?v=20260820-4"></script>
 </body>
 </html>
