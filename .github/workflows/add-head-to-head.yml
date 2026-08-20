@@ -1,0 +1,108 @@
+name: Add head-to-head match center
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-head-to-head.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add head-to-head section
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('logos.js')
+          s=p.read_text(encoding='utf-8')
+
+          css='''    .mc-h2h-summary{display:grid;grid-template-columns:1fr 120px 1fr;align-items:center;gap:12px;padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.025)}
+    .mc-h2h-side{display:flex;align-items:center;gap:10px;min-width:0}.mc-h2h-side.away{justify-content:flex-end;text-align:right}.mc-h2h-side img{width:40px;height:40px;object-fit:contain;flex:0 0 auto}.mc-h2h-name{min-width:0}.mc-h2h-name span{display:block;color:#91a0b4;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.mc-h2h-name strong{display:block;font-size:14px;margin-top:3px}.mc-h2h-total{text-align:center}.mc-h2h-total strong{display:block;font-size:30px;line-height:1}.mc-h2h-total span{display:block;color:#91a0b4;font-size:10px;line-height:1.3;margin-top:5px;text-transform:uppercase;letter-spacing:.06em}
+    .mc-h2h-list{display:grid;gap:7px;margin-top:10px}.mc-h2h-row{display:grid;grid-template-columns:minmax(120px,1fr) 90px 110px;gap:10px;align-items:center;padding:10px 12px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.018)}.mc-h2h-row-main{font-size:12px;font-weight:800}.mc-h2h-row-main small{display:block;color:#8797aa;font-size:10px;font-weight:500;margin-top:3px}.mc-h2h-score{text-align:center;font-size:17px;font-weight:950}.mc-h2h-finish{text-align:right;color:#91a0b4;font-size:10px}
+    @media(max-width:760px){.mc-h2h-summary{grid-template-columns:1fr 72px 1fr;padding:12px 9px;gap:7px}.mc-h2h-side{display:grid;justify-items:center;text-align:center;gap:6px}.mc-h2h-side.away{justify-content:stretch;text-align:center}.mc-h2h-side img{width:34px;height:34px}.mc-h2h-name strong{font-size:11px}.mc-h2h-total strong{font-size:25px}.mc-h2h-total span{font-size:8px}.mc-h2h-row{grid-template-columns:1fr 54px;padding:9px}.mc-h2h-finish{display:none}.mc-h2h-score{text-align:right}}
+'''
+          marker='    @media(max-width:760px){.team-logo-img'
+          if '.mc-h2h-summary{' not in s:
+              if marker not in s: raise SystemExit('CSS marker not found')
+              s=s.replace(marker,css+marker,1)
+
+          funcs=r'''  const H2H_TTL=15000,h2hCache=new Map();
+  function ruCount(n,one,few,many){n=Math.abs(Number(n)||0)%100;const n1=n%10;if(n>10&&n<20)return many;if(n1>1&&n1<5)return few;if(n1===1)return one;return many}
+  async function allTournamentMatches(){
+    const slug=D?.tournament?.slug||'';
+    const now=Date.now(),cached=h2hCache.get(slug);
+    if(cached&&now-cached.time<H2H_TTL)return cached.promise;
+    const promise=(async()=>{
+      const stages=(typeof C!=='undefined'&&Array.isArray(C?.stages)?C.stages.filter(s=>Number(s.tournament_id)===Number(D.tournament.id)):[]);
+      const source=stages.length?stages:[D.stage];
+      const chunks=await Promise.all(source.map(async s=>{
+        if(Number(s.id)===Number(D.stage.id))return (D.matches||[]).map(m=>({...m,_stage_name:D.stage.name||s.name||'',_stage_id:s.id}));
+        try{
+          const r=await fetch(API+'/api/data?tournament_slug='+encodeURIComponent(slug)+'&stage_id='+encodeURIComponent(s.id),{cache:'no-store'});
+          if(!r.ok)throw Error('HTTP '+r.status);
+          const data=await r.json();
+          return (data.matches||[]).map(m=>({...m,_stage_name:data.stage?.name||s.name||'',_stage_id:s.id}));
+        }catch{return []}
+      }));
+      const uniq=new Map();for(const m of chunks.flat())uniq.set(Number(m.id),m);return [...uniq.values()];
+    })();
+    h2hCache.set(slug,{time:now,promise});return promise;
+  }
+  async function renderHeadToHead(m){
+    const box=overlay.querySelector('#mcH2H');if(!box)return;
+    try{
+      const all=await allTournamentMatches();
+      const a=Number(m.home_team_id),b=Number(m.away_team_id);
+      const pair=all.filter(x=>isDone(x)&&((Number(x.home_team_id)===a&&Number(x.away_team_id)===b)||(Number(x.home_team_id)===b&&Number(x.away_team_id)===a))).sort((x,y)=>String(x.game_date||'').localeCompare(String(y.game_date||''))||String(x.start_time||'').localeCompare(String(y.start_time||''))||((x.game_no||0)-(y.game_no||0)));
+      const target=overlay.querySelector('#mcH2H');if(!target||Number(target.dataset.matchId)!==Number(m.id))return;
+      if(!pair.length){target.innerHTML='<div class="mc-empty">На этом турнире команды ещё не встречались.</div>';return}
+      let hw=0,aw=0;for(const x of pair){const winner=Number(x.home_score)>Number(x.away_score)?Number(x.home_team_id):Number(x.away_team_id);if(winner===a)hw++;else if(winner===b)aw++}
+      const home=teamNameById(a),away=teamNameById(b);
+      const rows=pair.slice().reverse().map(x=>{
+        const same=Number(x.home_team_id)===a,hs=same?x.home_score:x.away_score,as=same?x.away_score:x.home_score;
+        const info=[x._stage_name,prettyDate(x.game_date)].filter(Boolean).join(' · ');
+        return `<div class="mc-h2h-row"><div class="mc-h2h-row-main">${escHtml(home)} — ${escHtml(away)}<small>${escHtml(info)}</small></div><div class="mc-h2h-score">${hs}:${as}</div><div class="mc-h2h-finish">${escHtml(finishText(x.finish_type))}</div></div>`;
+      }).join('');
+      target.innerHTML=`<div class="mc-h2h-summary"><div class="mc-h2h-side">${teamLogoHtml(a)}<div class="mc-h2h-name"><span>${escHtml(home)}</span><strong>${hw} ${ruCount(hw,'победа','победы','побед')}</strong></div></div><div class="mc-h2h-total"><strong>${pair.length}</strong><span>${ruCount(pair.length,'очная встреча','очные встречи','очных встреч')}<br>на турнире</span></div><div class="mc-h2h-side away"><div class="mc-h2h-name"><span>${escHtml(away)}</span><strong>${aw} ${ruCount(aw,'победа','победы','побед')}</strong></div>${teamLogoHtml(b)}</div></div><div class="mc-h2h-list">${rows}</div>`;
+    }catch{const target=overlay.querySelector('#mcH2H');if(target&&Number(target.dataset.matchId)===Number(m.id))target.innerHTML='<div class="mc-empty">Не удалось загрузить историю очных встреч.</div>'}
+  }
+'''
+          marker2='  function openMatch(id,pushUrl=true){'
+          if 'async function renderHeadToHead' not in s:
+              if marker2 not in s: raise SystemExit('openMatch marker not found')
+              s=s.replace(marker2,funcs+marker2,1)
+
+          old='''      <section class="mc-section"><h3>Счёт по периодам</h3>${periodTable}</section>
+      <section class="mc-section"><h3>Протокол матча</h3><div class="mc-protocol">${renderProtocol(m)}</div></section>`;'''
+          new='''      <section class="mc-section"><h3>Счёт по периодам</h3>${periodTable}</section>
+      <section class="mc-section"><h3>Очные встречи</h3><div id="mcH2H" class="mc-h2h" data-match-id="${m.id}"><div class="mc-empty">Загружаем историю очных встреч…</div></div></section>
+      <section class="mc-section"><h3>Протокол матча</h3><div class="mc-protocol">${renderProtocol(m)}</div></section>`;'''
+          if 'id="mcH2H"' not in s:
+              if old not in s: raise SystemExit('match center template marker not found')
+              s=s.replace(old,new,1)
+
+          old2="    overlay.classList.add('open');document.body.style.overflow='hidden';\n    if(pushUrl){"
+          new2="    overlay.classList.add('open');document.body.style.overflow='hidden';\n    renderHeadToHead(m);\n    if(pushUrl){"
+          if '    renderHeadToHead(m);' not in s:
+              if old2 not in s: raise SystemExit('open overlay marker not found')
+              s=s.replace(old2,new2,1)
+
+          p.write_text(s,encoding='utf-8')
+
+          idx=Path('index.html')
+          x=idx.read_text(encoding='utf-8')
+          x=x.replace('/logos.js?v=20260820-2','/logos.js?v=20260820-3')
+          idx.write_text(x,encoding='utf-8')
+          PY
+      - name: Clean workflow and commit
+        run: |
+          rm .github/workflows/add-head-to-head.yml
+          git config user.name "ChatGPT"
+          git config user.email "actions@users.noreply.github.com"
+          git add logos.js index.html .github/workflows/add-head-to-head.yml
+          git commit -m "Add tournament head-to-head history to match center"
+          git push
