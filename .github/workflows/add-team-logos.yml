@@ -1,0 +1,159 @@
+name: Add logos to public site
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-team-logos.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  add-logos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download logo assets from Google Drive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/logos
+          download() {
+            local id="$1"
+            local out="$2"
+            curl -fL --retry 3 --retry-delay 2 "https://drive.google.com/uc?export=download&id=${id}" -o "assets/logos/${out}"
+          }
+
+          download "1y6CZfZSXYDVqCAjOvv6xB_7Fwu1AQwvn" "avangard.png"
+          download "1jacKiYae_KVBld-D01jWit-QBV3TLEtS" "admiral.png"
+          download "1NmPj1OwI3C1yuNmgt2XX57HbEiiDauB7" "akm.png"
+          download "1I09r6XwD-9L4r5ojPGKCHsJ5WGUyOFy1" "ak-bars.png"
+          download "14XZX2FRyR5x_aVkU2SMLhW-Emk0RUkTo" "armiya-ska.png"
+          download "1I3KuJZEajmksDKtoBsdj4h_75fU0e_KY" "dinamo-moskva.png"
+          download "1x4KaAFMJ_qfmi26oVjnsc-huKpWtqBbh" "dinamo-spb.png"
+          download "1qATM0WxWDCgYfemDQvhdy30Ub0sWSWWV" "krasnaya-mashina-yunior.png"
+          download "1n6ViHZhkRvq_R_Ul1PEHnFnX7HVNk6-p" "krylya-sovetov.png"
+          download "15mcwMoXT7OaH46jj8w90PCeTtJY54UAF" "lada.png"
+          download "1D6wJnaawN4kMt-1ZWTSvf-trYkslzyKi" "lokomotiv.png"
+          download "1sq7UHtBq_xiexekxmzWawF3yVTaEl-J-" "lokomotiv-2004.png"
+          download "1Veii4NYgKc06nRtxKmCRQv1YCE164YZP" "mah.png"
+          download "1csEdtjesEvgAFSsfnfhmWUnUE23Tnqeg" "neftekhimik.png"
+          download "10xBTOFy_ps1G3LNaHV3WpbQkuZ74pjRn" "severstal.png"
+          download "1Xul8VXC7juk2NHQfb28Cl9Jt_Kj0Obw-" "sibir.png"
+          download "1DH_sKpyVZsh6vnt8Q1_ovBpDuVkPHrNh" "ska-strelna.png"
+          download "19kJ3uz-yyb1Z2y8qvRbFwuw_2kjUUD2f" "spartak.png"
+          download "17NYLCFaSrX6q4g0T7jhBnmidrI1JzKl9" "torpedo.png"
+          download "1qWTRWy-p36RDSMlAy4AqA60PrrUTaczd" "traktor.png"
+          download "1bT6o4afTqonyA05keLbe_nfQ78sAmNda" "cska.png"
+          download "1hwFp1ukBAQ_Qd-nI5okdiejSRlUrfLeB" "russian-cup.png"
+          download "1nFMK_7IvAoiHPbC7z9k_eLlwsrw3Bcmx" "fhr.png"
+
+          python - <<'PY'
+          from pathlib import Path
+          sig = b'\x89PNG\r\n\x1a\n'
+          for p in Path('assets/logos').glob('*.png'):
+              if p.read_bytes()[:8] != sig:
+                  raise SystemExit(f'{p} is not a valid PNG download')
+          print('Validated', len(list(Path('assets/logos').glob('*.png'))), 'PNG files')
+          PY
+
+      - name: Add logos to the public interface
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          css = r'''
+    /* Logo system */
+    .brand-mark{overflow:hidden}
+    .brand-mark img{width:30px;height:30px;object-fit:contain;display:block}
+    .team-cell,.upcoming-team-main,.match-team-inner{display:flex;align-items:center;gap:10px;min-width:0}
+    .team-logo{width:28px;height:28px;object-fit:contain;flex:0 0 auto;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.22))}
+    .upcoming-team-main .team-logo,.match-team-inner .team-logo{width:34px;height:34px}
+    .match-team.away .match-team-inner{justify-content:flex-end}
+    .organizer-mark{overflow:hidden}
+    .organizer-mark img{width:56px;height:56px;object-fit:contain;display:block}
+    .winner-logo{width:84px;height:84px;object-fit:contain;display:block}
+    @media(max-width:760px){.team-logo{width:24px;height:24px}.upcoming-team-main .team-logo,.match-team-inner .team-logo{width:28px;height:28px}.team-cell,.upcoming-team-main,.match-team-inner{gap:7px}.brand-mark img{width:26px;height:26px}}
+'''
+
+          if '/* Logo system */' not in s:
+              if '  </style>' not in s:
+                  raise SystemExit('Style closing tag not found')
+              s = s.replace('  </style>', css + '  </style>', 1)
+
+          old = '<span class="brand-mark">U16</span>'
+          new = '<span class="brand-mark"><img src="/assets/logos/russian-cup.png" alt="Кубок России U16"></span>'
+          if old in s:
+              s = s.replace(old, new, 1)
+
+          old = '<article class="card organizer"><div class="organizer-mark">ФХР</div><div class="organizer-copy">'
+          new = '<article class="card organizer"><div class="organizer-mark"><img src="/assets/logos/fhr.png" alt="Федерация хоккея России"></div><div class="organizer-copy">'
+          if old in s:
+              s = s.replace(old, new, 1)
+
+          helper = r'''const TEAM_LOGOS={1:'/assets/logos/dinamo-moskva.png',2:'/assets/logos/mah.png',3:'/assets/logos/torpedo.png',4:'/assets/logos/lokomotiv.png',5:'/assets/logos/avangard.png',6:'/assets/logos/lokomotiv-2004.png',7:'/assets/logos/krylya-sovetov.png',8:'/assets/logos/sibir.png',9:'/assets/logos/lada.png',10:'/assets/logos/traktor.png',11:'/assets/logos/ak-bars.png',12:'/assets/logos/spartak.png',13:'/assets/logos/dinamo-spb.png',14:'/assets/logos/ska-strelna.png',15:'/assets/logos/akm.png',16:'/assets/logos/cska.png',17:'/assets/logos/armiya-ska.png',18:'/assets/logos/neftekhimik.png',19:'/assets/logos/severstal.png',20:'/assets/logos/krasnaya-mashina-yunior.png'};
+function logoPath(teamId){return TEAM_LOGOS[Number(teamId)]||''}
+function logoImg(teamId,name,cls='team-logo'){const src=logoPath(teamId);return src?'<img class="'+cls+'" src="'+src+'" alt="Логотип '+esc(name)+'" loading="lazy" decoding="async">':''}
+function teamVisual(teamId,name,cls='team-cell',away=false){const img=logoImg(teamId,name),text=esc(name);return'<span class="'+cls+'">'+(away?text+img:img+text)+'</span>'}
+'''
+          anchor = 'function table(rows,compact=false){'
+          if 'const TEAM_LOGOS=' not in s:
+              if anchor not in s:
+                  raise SystemExit('Table function anchor not found')
+              s = s.replace(anchor, helper + anchor, 1)
+
+          old = '<td class="team">\'+esc(r.team)+\'</td>'
+          new = '<td class="team">\'+teamVisual(r.team_id,r.team,\'team-cell\')+\'</td>'
+          if old not in s:
+              raise SystemExit('Team cell render target not found')
+          s = s.replace(old, new, 1)
+
+          old = '<div class="upcoming-team"><span>\'+esc(teamName(m.home_team_id))+\'</span><span>ХОЗ</span></div>'
+          new = '<div class="upcoming-team">\'+teamVisual(m.home_team_id,teamName(m.home_team_id),\'upcoming-team-main\')+\'<span>ХОЗ</span></div>'
+          if old not in s:
+              raise SystemExit('Upcoming home team target not found')
+          s = s.replace(old, new, 1)
+
+          old = '<div class="upcoming-team"><span>\'+esc(teamName(m.away_team_id))+\'</span><span>ГОСТ</span></div>'
+          new = '<div class="upcoming-team">\'+teamVisual(m.away_team_id,teamName(m.away_team_id),\'upcoming-team-main\')+\'<span>ГОСТ</span></div>'
+          if old not in s:
+              raise SystemExit('Upcoming away team target not found')
+          s = s.replace(old, new, 1)
+
+          old = '<div class="match-team">\'+esc(teamName(m.home_team_id))+\'</div>'
+          new = '<div class="match-team">\'+teamVisual(m.home_team_id,teamName(m.home_team_id),\'match-team-inner\')+\'</div>'
+          if old not in s:
+              raise SystemExit('Match home team target not found')
+          s = s.replace(old, new, 1)
+
+          old = '<div class="match-team away">\'+esc(teamName(m.away_team_id))+\'</div>'
+          new = '<div class="match-team away">\'+teamVisual(m.away_team_id,teamName(m.away_team_id),\'match-team-inner\',true)+\'</div>'
+          if old not in s:
+              raise SystemExit('Match away team target not found')
+          s = s.replace(old, new, 1)
+
+          old = "const w=rows[0];card.classList.add('show');"
+          new = "const w=rows[0];const mark=card.querySelector('.winner-mark');if(mark)mark.innerHTML=logoImg(w.team_id,w.team,'winner-logo')||'U16';card.classList.add('show');"
+          if old not in s:
+              raise SystemExit('Winner render target not found')
+          s = s.replace(old, new, 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Remove temporary workflow
+        run: rm .github/workflows/add-team-logos.yml
+
+      - name: Commit logos and interface changes
+        run: |
+          git config user.name "ChatGPT"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html assets/logos .github/workflows/add-team-logos.yml
+          git commit -m "Add team and tournament logos"
+          git push
