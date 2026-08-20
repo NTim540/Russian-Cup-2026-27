@@ -30,8 +30,8 @@
       #tournament-countdown .countdown-label{display:block;margin-top:8px;color:#8193a8;font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
       #tournament-countdown .first-match{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;margin-top:22px;padding-top:22px;border-top:1px solid rgba(255,255,255,.09)}
       #tournament-countdown .first-match-label{color:#e85a65;font-size:9px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
-      #tournament-countdown .first-match-teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px}
-      #tournament-countdown .first-team{display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:0;font-size:clamp(18px,2.2vw,28px);font-weight:950;letter-spacing:-.025em}
+      #tournament-countdown .first-match-teams{display:flex;align-items:center;justify-content:flex-start;gap:16px;flex-wrap:wrap}
+      #tournament-countdown .first-team{display:flex;align-items:center;justify-content:flex-start;gap:12px;min-width:0;font-size:clamp(18px,2.2vw,28px);font-weight:950;letter-spacing:-.025em}
       #tournament-countdown .first-team.away{justify-content:flex-start;text-align:left}
       #tournament-countdown .first-team-logo{width:58px;height:58px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
       #tournament-countdown .first-team-name{min-width:0}
