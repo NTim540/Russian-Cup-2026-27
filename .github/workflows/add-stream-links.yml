@@ -1,0 +1,42 @@
+name: Wire broadcast link scripts
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-stream-links.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add broadcast scripts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('admin.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="/admin-stream.js?v=20260820-1"></script>'
+          if tag not in s:
+              s=s.replace('<script src="/admin-protocol.js?v=20260820-1"></script>', '<script src="/admin-protocol.js?v=20260820-1"></script>\n'+tag, 1)
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="/stream.js?v=20260820-1"></script>'
+          if tag not in s:
+              s=s.replace('<script src="/theme.js?v=20260820-1"></script>', tag+'\n<script src="/theme.js?v=20260820-1"></script>', 1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          rm .github/workflows/add-stream-links.yml
+          git config user.name "ChatGPT"
+          git config user.email "actions@users.noreply.github.com"
+          git add admin.html index.html .github/workflows/add-stream-links.yml
+          git commit -m "Enable broadcast links for matches"
+          git push
