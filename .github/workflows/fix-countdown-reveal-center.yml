@@ -1,0 +1,52 @@
+name: Fix countdown reveal and center
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-countdown-reveal-center.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Apply countdown fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('contacts.js')
+          s = p.read_text(encoding='utf-8')
+          replacements = [
+            (
+              "#tournament-countdown .first-team{display:flex;align-items:center;gap:12px;min-width:0;font-size:clamp(18px,2.2vw,28px);font-weight:950;letter-spacing:-.025em}",
+              "#tournament-countdown .first-team{display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:0;font-size:clamp(18px,2.2vw,28px);font-weight:950;letter-spacing:-.025em}"
+            ),
+            (
+              "#tournament-countdown .first-team{display:grid;justify-items:center;text-align:center;gap:7px;font-size:13px}",
+              "#tournament-countdown .first-team{display:grid;justify-content:stretch;justify-items:center;text-align:center;gap:7px;font-size:13px}"
+            ),
+            (
+              "section.id='tournament-countdown';\n    section.className='wrap reveal';",
+              "section.id='tournament-countdown';\n    section.className='wrap reveal visible';"
+            )
+          ]
+          for old, new in replacements:
+              if old not in s:
+                  raise SystemExit(f'Expected snippet not found: {old[:100]}')
+              s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Remove temporary workflow
+        run: rm .github/workflows/fix-countdown-reveal-center.yml
+      - name: Commit changes
+        run: |
+          git config user.name "ChatGPT/actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add contacts.js .github/workflows/fix-countdown-reveal-center.yml
+          git commit -m "Fix countdown reveal and center matchup separator"
+          git push
