@@ -1,6 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/", "destination": "/enhanced.html" },
+    { "source": "/base-source", "destination": "/index.html" },
     { "source": "/admin", "destination": "/admin.html" }
   ]
 }
