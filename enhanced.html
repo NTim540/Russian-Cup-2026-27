@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>КУБОК РОССИИ U16</title>
+  <style>html,body{margin:0;min-height:100%;background:#07111f;color:#fff;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}.boot{min-height:100vh;display:grid;place-items:center;color:#91a0b4;font-size:13px}</style>
+</head>
+<body>
+  <div class="boot">Загрузка турнира…</div>
+  <script>
+    fetch('/base-source',{cache:'no-store'})
+      .then(r=>{if(!r.ok)throw new Error('Не удалось загрузить страницу');return r.text()})
+      .then(html=>{
+        const injection='<scr'+'ipt src="/logos-enhance.js"></scr'+'ipt>';
+        html=html.replace('</body>',injection+'</body>');
+        document.open();document.write(html);document.close();
+      })
+      .catch(err=>{document.querySelector('.boot').textContent='Ошибка загрузки: '+err.message});
+  </script>
+</body>
+</html>
