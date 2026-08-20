@@ -59,5 +59,6 @@ async function deleteTournament(){if(!confirm('Удалить турнир це�
 $('#loginBtn').onclick=login;$('#pw').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('#logout').onclick=()=>location.reload();$('#tournament').onchange=e=>loadStages(e.target.value);$('#stage').onchange=e=>loadData($('#tournament').value,Number(e.target.value));$('#newTournament').onclick=newTournament;$('#newStage').onclick=newStage;$('#addGroup').onclick=addGroup;$('#addMatch').onclick=addMatch;$('#saveSettings').onclick=saveSettings;$('#saveTournament').onclick=saveTournament;$('#deleteTournament').onclick=deleteTournament;document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));['groups','matches','settings'].forEach(x=>$('#tab-'+x).classList.toggle('hidden',x!==b.dataset.tab))});
 </script>
 <script src="/admin-protocol.js?v=20260820-1"></script>
+<script src="/admin-stream.js?v=20260820-1"></script>
 </body>
 </html>
