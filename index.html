@@ -195,5 +195,6 @@ function activateReveal(){const els=document.querySelectorAll('.reveal:not(.obse
 $('#tournament').onchange=e=>loadStages(e.target.value);$('#stage').onchange=e=>loadData($('#tournament').value,e.target.value);$('#gf').onchange=renderMatches;$('#sf').onchange=renderMatches;loadCatalog().catch(e=>$('#status').textContent='Ошибка загрузки: '+e.message);setInterval(()=>{if(D)loadData(D.tournament.slug,D.stage.id)},15000);activateReveal();
 </script>
 <script src="/logos.js?v=20260820-4"></script>
+<script src="/theme.js?v=20260820-1"></script>
 </body>
 </html>
