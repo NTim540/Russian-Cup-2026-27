@@ -1,0 +1,37 @@
+name: Fix countdown mobile layout
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-countdown-mobile-layout.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch mobile countdown CSS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('contacts.js')
+          s=p.read_text()
+          old="#tournament-countdown .first-match-teams{gap:8px}#tournament-countdown .first-team{display:grid;justify-content:stretch;justify-items:center;text-align:center;gap:7px;font-size:13px}#tournament-countdown .first-team.away{justify-content:stretch;text-align:center}#tournament-countdown .first-team-logo{width:48px;height:48px}#tournament-countdown .first-match-date{width:100%;min-width:0}#tournament-countdown .first-match-date strong{font-size:18px}#tournament-countdown .first-match-date span{font-size:26px}#tournament-countdown .first-match-meta{font-size:12px}"
+          new="#tournament-countdown .first-match-teams{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);gap:10px;align-items:center}#tournament-countdown .first-team{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:7px;font-size:13px}#tournament-countdown .first-team.away{justify-content:flex-start;text-align:center}#tournament-countdown .first-team.away .first-team-logo{order:-1}#tournament-countdown .first-match-vs{display:grid;place-items:center;align-self:center;font-size:22px}#tournament-countdown .first-team-logo{width:48px;height:48px}#tournament-countdown .first-match-date{width:100%;min-width:0}#tournament-countdown .first-match-date strong{font-size:18px}#tournament-countdown .first-match-date span{font-size:26px}#tournament-countdown .first-match-meta{text-align:center;font-size:12px}"
+          if old not in s:
+              raise SystemExit('target CSS snippet not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "ChatGPT/actions"
+          git config user.email "actions@users.noreply.github.com"
+          rm .github/workflows/fix-countdown-mobile-layout.yml
+          git add contacts.js .github/workflows/fix-countdown-mobile-layout.yml
+          git commit -m "Fix countdown mobile matchup layout"
+          git push
