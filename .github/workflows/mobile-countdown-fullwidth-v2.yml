@@ -1,0 +1,32 @@
+name: Mobile countdown full width v2
+on:
+  push:
+    paths:
+      - '.github/workflows/mobile-countdown-fullwidth-v2.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix mobile matchup width
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('contacts.js')
+          s=p.read_text()
+          old="#tournament-countdown .first-match-teams{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);gap:10px;align-items:center}#tournament-countdown .first-team{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:7px;font-size:13px}"
+          new="#tournament-countdown .first-match-teams{display:grid!important;width:100%;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);gap:10px;align-items:center}#tournament-countdown .first-team{width:100%;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;font-size:13px}"
+          if old not in s:
+              raise SystemExit('mobile matchup target not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          rm -f .github/workflows/mobile-countdown-fullwidth.yml
+          rm .github/workflows/mobile-countdown-fullwidth-v2.yml
+          git config user.name 'ChatGPT/actions'
+          git config user.email 'actions@users.noreply.github.com'
+          git add contacts.js .github/workflows/mobile-countdown-fullwidth.yml .github/workflows/mobile-countdown-fullwidth-v2.yml || true
+          git commit -m 'Stretch countdown teams across mobile width'
+          git push
