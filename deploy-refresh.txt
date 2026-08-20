@@ -1,0 +1,1 @@
+Deployment refresh marker — 2026-08-20. The production site should use the latest main branch commit containing the U16 title, subtitle, tooltip help icons, and table places without equals signs.
