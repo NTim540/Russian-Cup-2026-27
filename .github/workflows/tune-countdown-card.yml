@@ -1,0 +1,56 @@
+name: Tune countdown card
+
+on:
+  push:
+    paths:
+      - '.github/workflows/tune-countdown-card.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  tune:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tune countdown card
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('contacts.js')
+          s = p.read_text(encoding='utf-8')
+          replacements = [
+            ("#tournament-countdown .first-match-teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px}",
+             "#tournament-countdown .first-match-teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px}"),
+            ("#tournament-countdown .first-team.away{justify-content:flex-end;text-align:right}",
+             "#tournament-countdown .first-team.away{justify-content:flex-start;text-align:left}"),
+            ("#tournament-countdown .first-match-vs{color:#6f8197;font-size:11px;font-weight:950;letter-spacing:.12em}",
+             "#tournament-countdown .first-match-vs{color:#6f8197;font-size:20px;font-weight:950;letter-spacing:0;line-height:1}"),
+            ("#tournament-countdown .first-match-meta{margin-top:12px;color:#8fa0b5;font-size:11px;line-height:1.5}",
+             "#tournament-countdown .first-match-meta{margin-top:12px;color:#8fa0b5;font-size:13px;font-weight:700;line-height:1.5}"),
+            ("#tournament-countdown .first-match-date strong{display:block;font-size:clamp(22px,2.6vw,34px);line-height:1;font-weight:950;letter-spacing:-.035em;text-transform:uppercase}",
+             "#tournament-countdown .first-match-date strong{display:block;font-size:clamp(19px,2.2vw,28px);line-height:1;font-weight:950;letter-spacing:-.035em;text-transform:uppercase}"),
+            ("#tournament-countdown .first-match-date span{display:block;margin-top:8px;font-size:clamp(24px,3.2vw,40px);line-height:1;font-weight:950;font-variant-numeric:tabular-nums}",
+             "#tournament-countdown .first-match-date span{display:block;margin-top:7px;font-size:clamp(22px,2.7vw,34px);line-height:1;font-weight:950;font-variant-numeric:tabular-nums}"),
+            ("#tournament-countdown .first-match-date strong{font-size:20px}#tournament-countdown .first-match-date span{font-size:30px}",
+             "#tournament-countdown .first-match-date strong{font-size:18px}#tournament-countdown .first-match-date span{font-size:26px}#tournament-countdown .first-match-meta{font-size:12px}"),
+            ("<div class=\"first-match-vs\">VS</div>",
+             "<div class=\"first-match-vs\">—</div>")
+          ]
+          for old, new in replacements:
+              if old not in s:
+                  raise SystemExit(f'Expected snippet not found: {old[:90]}')
+              s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Remove temporary workflow
+        run: rm .github/workflows/tune-countdown-card.yml
+      - name: Commit changes
+        run: |
+          git config user.name "ChatGPT/actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add contacts.js .github/workflows/tune-countdown-card.yml
+          git commit -m "Polish first match countdown card"
+          git push
