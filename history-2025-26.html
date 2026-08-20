@@ -89,4 +89,5 @@ leaders('#scorers',scorers);leaders('#plusminus',plusminus);leaders('#penalties'
 const root=document.documentElement,btn=document.querySelector('#themeBtn');const saved=localStorage.getItem('russian-cup-theme')||'dark';function setTheme(t){root.dataset.theme=t;btn.textContent=t==='dark'?'☀︎':'☾';document.querySelector('meta[name="theme-color"]').content=t==='dark'?'#06101b':'#eef3f8'}setTheme(saved);btn.onclick=()=>{const t=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('russian-cup-theme',t);setTheme(t)};
 </script>
 <script src="/history-polish.js?v=20260820-1"></script>
+<script src="/analytics.js?v=20260820-1"></script>
 </body></html>
