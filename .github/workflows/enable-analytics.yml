@@ -1,0 +1,33 @@
+name: Enable analytics integration
+on:
+  push:
+    paths:
+      - '.github/workflows/enable-analytics.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wire analytics scripts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def inject(path, tag):
+              p=Path(path)
+              s=p.read_text()
+              if tag in s:
+                  return
+              s=s.replace('</body>', tag+'\n</body>')
+              p.write_text(s)
+          inject('index.html','<script src="/analytics.js?v=20260820-1"></script>')
+          inject('history-2025-26.html','<script src="/analytics.js?v=20260820-1"></script>')
+          inject('admin.html','<script src="/admin-analytics.js?v=20260820-1"></script>')
+          PY
+          rm .github/workflows/enable-analytics.yml
+          git config user.name 'ChatGPT'
+          git config user.email 'actions@users.noreply.github.com'
+          git add index.html history-2025-26.html admin.html .github/workflows/enable-analytics.yml
+          git commit -m 'Enable site analytics dashboard'
+          git push
