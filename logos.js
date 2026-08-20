@@ -47,12 +47,15 @@
     .mc-meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:13px}.mc-chip{padding:7px 10px;border:1px solid rgba(255,255,255,.09);border-radius:999px;background:rgba(255,255,255,.035);color:#aebccc;font-size:11px}
     .mc-section{margin-top:22px}.mc-section h3{margin:0 0 11px;font-size:18px}.mc-periods{overflow:auto;border:1px solid rgba(255,255,255,.08);border-radius:16px}.mc-periods table{min-width:560px}.mc-periods th,.mc-periods td{padding:12px 11px}.mc-periods td:first-child,.mc-periods th:first-child{text-align:left;min-width:180px}.mc-period-team{display:flex;align-items:center;gap:9px;font-weight:800}.mc-period-team img{width:27px;height:27px;object-fit:contain}.mc-final{font-weight:950;color:#fff}
     .mc-protocol{display:grid;gap:14px}.mc-period-block{border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden}.mc-period-title{padding:10px 13px;background:rgba(255,255,255,.035);color:#b8c7d9;font-size:11px;text-transform:uppercase;letter-spacing:.11em;font-weight:900}.mc-event{display:grid;grid-template-columns:62px 34px minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px 13px;border-top:1px solid rgba(255,255,255,.06)}.mc-event:first-of-type{border-top:0}.mc-event-time{font-weight:900;color:#dbe8f7}.mc-event-logo{width:30px;height:30px;object-fit:contain}.mc-event-main strong{display:block;font-size:13px}.mc-event-main span{display:block;color:#8fa0b5;font-size:11px;line-height:1.45;margin-top:2px}.mc-event-score{font-weight:950;font-size:14px}.mc-event-type{display:inline-block;margin-right:6px;color:#7fc6ff}.mc-event.penalty .mc-event-type{color:#ff9ca4}.mc-empty{padding:22px;border:1px dashed rgba(255,255,255,.11);border-radius:16px;color:#8fa0b5;text-align:center;font-size:12px;line-height:1.55}
-    @media(max-width:760px){.team-logo-img{width:24px;height:24px}td.team.logo-ready,.upcoming-team>span:first-child.logo-ready,.match-team.logo-ready{gap:7px}.site-logo-img{width:26px;height:26px}.mc-overlay{padding:0;align-items:flex-end}.mc-dialog{width:100%;max-height:94vh;border-radius:22px 22px 0 0}.mc-body{padding:14px}.mc-scoreboard{grid-template-columns:1fr 100px 1fr;gap:9px;padding:16px 10px}.mc-team{font-size:13px}.mc-team img{width:58px;height:58px;margin-bottom:8px}.mc-score strong{font-size:36px}.mc-event{grid-template-columns:48px 28px minmax(0,1fr) auto;padding:11px 10px;gap:8px}.mc-event-logo{width:25px;height:25px}.mc-meta{justify-content:flex-start}}
+    .mc-h2h-summary{display:grid;grid-template-columns:1fr 120px 1fr;align-items:center;gap:12px;padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.025)}
+    .mc-h2h-side{display:flex;align-items:center;gap:10px;min-width:0}.mc-h2h-side.away{justify-content:flex-end;text-align:right}.mc-h2h-side img{width:40px;height:40px;object-fit:contain;flex:0 0 auto}.mc-h2h-name{min-width:0}.mc-h2h-name span{display:block;color:#91a0b4;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.mc-h2h-name strong{display:block;font-size:14px;margin-top:3px}.mc-h2h-total{text-align:center}.mc-h2h-total strong{display:block;font-size:30px;line-height:1}.mc-h2h-total span{display:block;color:#91a0b4;font-size:10px;line-height:1.3;margin-top:5px;text-transform:uppercase;letter-spacing:.06em}
+    .mc-h2h-list{display:grid;gap:7px;margin-top:10px}.mc-h2h-row{display:grid;grid-template-columns:minmax(120px,1fr) 90px 110px;gap:10px;align-items:center;padding:10px 12px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.018)}.mc-h2h-row-main{font-size:12px;font-weight:800}.mc-h2h-row-main small{display:block;color:#8797aa;font-size:10px;font-weight:500;margin-top:3px}.mc-h2h-score{text-align:center;font-size:17px;font-weight:950}.mc-h2h-finish{text-align:right;color:#91a0b4;font-size:10px}
+    @media(max-width:760px){.team-logo-img{width:24px;height:24px}td.team.logo-ready,.upcoming-team>span:first-child.logo-ready,.match-team.logo-ready{gap:7px}.site-logo-img{width:26px;height:26px}.mc-overlay{padding:0;align-items:flex-end}.mc-dialog{width:100%;max-height:94vh;border-radius:22px 22px 0 0}.mc-body{padding:14px}.mc-scoreboard{grid-template-columns:1fr 100px 1fr;gap:9px;padding:16px 10px}.mc-team{font-size:13px}.mc-team img{width:58px;height:58px;margin-bottom:8px}.mc-score strong{font-size:36px}.mc-event{grid-template-columns:48px 28px minmax(0,1fr) auto;padding:11px 10px;gap:8px}.mc-event-logo{width:25px;height:25px}.mc-meta{justify-content:flex-start}.mc-h2h-summary{grid-template-columns:1fr 72px 1fr;padding:12px 9px;gap:7px}.mc-h2h-side{display:grid;justify-items:center;text-align:center;gap:6px}.mc-h2h-side.away{justify-content:stretch;text-align:center}.mc-h2h-side img{width:34px;height:34px}.mc-h2h-name strong{font-size:11px}.mc-h2h-total strong{font-size:25px}.mc-h2h-total span{font-size:8px}.mc-h2h-row{grid-template-columns:1fr 54px;padding:9px}.mc-h2h-finish{display:none}.mc-h2h-score{text-align:right}}
   `;
   document.head.appendChild(style);
 
   function img(src,cls,alt){const i=document.createElement('img');i.src=src;i.className=cls;i.alt=alt;i.loading='lazy';i.decoding='async';return i}
-  function escHtml(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function escHtml(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
   function cleanName(el){return (el.dataset.teamName||el.textContent||'').trim()}
   function decorate(el,away=false){
     if(!el||el.dataset.logoApplied==='1')return;
@@ -103,6 +106,48 @@
       }).join('')}</div>`;
     }).join('');
   }
+
+  const H2H_TTL=15000,h2hCache=new Map();
+  function ruCount(n,one,few,many){n=Math.abs(Number(n)||0)%100;const n1=n%10;if(n>10&&n<20)return many;if(n1>1&&n1<5)return few;if(n1===1)return one;return many}
+  async function allTournamentMatches(){
+    const slug=D?.tournament?.slug||'';
+    const now=Date.now(),cached=h2hCache.get(slug);
+    if(cached&&now-cached.time<H2H_TTL)return cached.promise;
+    const promise=(async()=>{
+      const stages=(typeof C!=='undefined'&&Array.isArray(C?.stages)?C.stages.filter(s=>Number(s.tournament_id)===Number(D.tournament.id)):[]);
+      const source=stages.length?stages:[D.stage];
+      const chunks=await Promise.all(source.map(async s=>{
+        if(Number(s.id)===Number(D.stage.id))return (D.matches||[]).map(m=>({...m,_stage_name:D.stage.name||s.name||'',_stage_id:s.id}));
+        try{
+          const r=await fetch(API+'/api/data?tournament_slug='+encodeURIComponent(slug)+'&stage_id='+encodeURIComponent(s.id),{cache:'no-store'});
+          if(!r.ok)throw Error('HTTP '+r.status);
+          const data=await r.json();
+          return (data.matches||[]).map(m=>({...m,_stage_name:data.stage?.name||s.name||'',_stage_id:s.id}));
+        }catch{return []}
+      }));
+      const uniq=new Map();for(const m of chunks.flat())uniq.set(Number(m.id),m);return [...uniq.values()];
+    })();
+    h2hCache.set(slug,{time:now,promise});return promise;
+  }
+  async function renderHeadToHead(m){
+    const box=overlay.querySelector('#mcH2H');if(!box)return;
+    try{
+      const all=await allTournamentMatches();
+      const a=Number(m.home_team_id),b=Number(m.away_team_id);
+      const pair=all.filter(x=>isDone(x)&&((Number(x.home_team_id)===a&&Number(x.away_team_id)===b)||(Number(x.home_team_id)===b&&Number(x.away_team_id)===a))).sort((x,y)=>String(x.game_date||'').localeCompare(String(y.game_date||''))||String(x.start_time||'').localeCompare(String(y.start_time||''))||((x.game_no||0)-(y.game_no||0)));
+      const target=overlay.querySelector('#mcH2H');if(!target||Number(target.dataset.matchId)!==Number(m.id))return;
+      if(!pair.length){target.innerHTML='<div class="mc-empty">На этом турнире команды ещё не встречались.</div>';return}
+      let hw=0,aw=0;for(const x of pair){const winner=Number(x.home_score)>Number(x.away_score)?Number(x.home_team_id):Number(x.away_team_id);if(winner===a)hw++;else if(winner===b)aw++}
+      const home=teamNameById(a),away=teamNameById(b);
+      const rows=pair.slice().reverse().map(x=>{
+        const same=Number(x.home_team_id)===a,hs=same?x.home_score:x.away_score,as=same?x.away_score:x.home_score;
+        const info=[x._stage_name,prettyDate(x.game_date)].filter(Boolean).join(' · ');
+        return `<div class="mc-h2h-row"><div class="mc-h2h-row-main">${escHtml(home)} — ${escHtml(away)}<small>${escHtml(info)}</small></div><div class="mc-h2h-score">${hs}:${as}</div><div class="mc-h2h-finish">${escHtml(finishText(x.finish_type))}</div></div>`;
+      }).join('');
+      target.innerHTML=`<div class="mc-h2h-summary"><div class="mc-h2h-side">${teamLogoHtml(a)}<div class="mc-h2h-name"><span>${escHtml(home)}</span><strong>${hw} ${ruCount(hw,'победа','победы','побед')}</strong></div></div><div class="mc-h2h-total"><strong>${pair.length}</strong><span>${ruCount(pair.length,'очная встреча','очные встречи','очных встреч')}<br>на турнире</span></div><div class="mc-h2h-side away"><div class="mc-h2h-name"><span>${escHtml(away)}</span><strong>${aw} ${ruCount(aw,'победа','победы','побед')}</strong></div>${teamLogoHtml(b)}</div></div><div class="mc-h2h-list">${rows}</div>`;
+    }catch{const target=overlay.querySelector('#mcH2H');if(target&&Number(target.dataset.matchId)===Number(m.id))target.innerHTML='<div class="mc-empty">Не удалось загрузить историю очных встреч.</div>'}
+  }
+
   function openMatch(id,pushUrl=true){
     if(typeof D==='undefined'||!D?.matches)return;
     const m=D.matches.find(x=>Number(x.id)===Number(id));if(!m)return;
@@ -118,8 +163,10 @@
       </div>
       <div class="mc-meta">${meta.map(x=>`<span class="mc-chip">${escHtml(x)}</span>`).join('')}</div>
       <section class="mc-section"><h3>Счёт по периодам</h3>${periodTable}</section>
+      <section class="mc-section"><h3>Очные встречи</h3><div id="mcH2H" class="mc-h2h" data-match-id="${m.id}"><div class="mc-empty">Загружаем историю очных встреч…</div></div></section>
       <section class="mc-section"><h3>Протокол матча</h3><div class="mc-protocol">${renderProtocol(m)}</div></section>`;
     overlay.classList.add('open');document.body.style.overflow='hidden';
+    renderHeadToHead(m);
     if(pushUrl){const u=new URL(location.href);u.searchParams.set('match',String(m.id));history.pushState({matchCenter:true},'',u)}
   }
   function closeMatch(fromPop=false){
