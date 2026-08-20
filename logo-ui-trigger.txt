@@ -1,0 +1,1 @@
+Apply logo UI patch on 2026-08-20.
