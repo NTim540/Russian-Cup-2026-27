@@ -1,0 +1,40 @@
+name: Link FHR organizer
+
+on:
+  push:
+    paths:
+      - '.github/workflows/link-fhr.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add FHR link
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old='<article class="card organizer"><div class="organizer-mark">ФХР</div><div class="organizer-copy"><small>Организатор соревнования</small><strong>Федерация хоккея России</strong></div></article>'
+          new='<a class="card organizer fhr-organizer-link" href="https://junior.fhr.ru" target="_blank" rel="noopener noreferrer" aria-label="Перейти на сайт Федерации хоккея России"><div class="organizer-mark">ФХР</div><div class="organizer-copy"><small>Организатор соревнования</small><strong>Федерация хоккея России</strong></div><span class="organizer-arrow" aria-hidden="true">↗</span></a>'
+          if old not in s:
+              raise SystemExit('Organizer block not found')
+          s=s.replace(old,new,1)
+          css='.fhr-organizer-link{cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease}.fhr-organizer-link:hover{transform:translateY(-2px);border-color:rgba(127,198,255,.28);background:linear-gradient(180deg,rgba(21,43,70,.94),rgba(11,25,43,.96))}.fhr-organizer-link:focus-visible{outline:2px solid var(--ice);outline-offset:3px}.organizer-arrow{font-size:24px;color:#9fcfff;font-weight:800;flex:0 0 auto}'
+          marker='.organizer-copy strong{font-size:20px}'
+          if css not in s:
+              s=s.replace(marker,marker+css,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Clean workflow and commit
+        run: |
+          rm .github/workflows/link-fhr.yml
+          git config user.name "ChatGPT"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html .github/workflows/link-fhr.yml
+          git commit -m "Link FHR organizer to junior site"
+          git push
