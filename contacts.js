@@ -28,11 +28,18 @@
       #tournament-countdown .countdown-unit{padding:18px 12px;border:1px solid rgba(127,198,255,.12);border-radius:18px;background:rgba(255,255,255,.035);text-align:center}
       #tournament-countdown .countdown-value{display:block;font-size:clamp(34px,5vw,62px);line-height:.95;font-weight:950;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
       #tournament-countdown .countdown-label{display:block;margin-top:8px;color:#8193a8;font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
-      #tournament-countdown .first-match{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.09)}
-      #tournament-countdown .first-match-label{color:#e85a65;font-size:9px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}
-      #tournament-countdown .first-match-teams{margin-top:5px;font-size:clamp(18px,2.4vw,28px);font-weight:950;letter-spacing:-.025em}
-      #tournament-countdown .first-match-meta{margin-top:7px;color:#8fa0b5;font-size:11px;line-height:1.5}
-      #tournament-countdown .first-match-date{padding:10px 13px;border-radius:12px;border:1px solid rgba(226,58,71,.30);background:rgba(226,58,71,.08);color:#ffd7da;font-size:11px;font-weight:900;text-align:right;white-space:nowrap}
+      #tournament-countdown .first-match{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;margin-top:22px;padding-top:22px;border-top:1px solid rgba(255,255,255,.09)}
+      #tournament-countdown .first-match-label{color:#e85a65;font-size:9px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+      #tournament-countdown .first-match-teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px}
+      #tournament-countdown .first-team{display:flex;align-items:center;gap:12px;min-width:0;font-size:clamp(18px,2.2vw,28px);font-weight:950;letter-spacing:-.025em}
+      #tournament-countdown .first-team.away{justify-content:flex-end;text-align:right}
+      #tournament-countdown .first-team-logo{width:58px;height:58px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
+      #tournament-countdown .first-team-name{min-width:0}
+      #tournament-countdown .first-match-vs{color:#6f8197;font-size:11px;font-weight:950;letter-spacing:.12em}
+      #tournament-countdown .first-match-meta{margin-top:12px;color:#8fa0b5;font-size:11px;line-height:1.5}
+      #tournament-countdown .first-match-date{min-width:190px;padding:16px 18px;border-radius:16px;border:1px solid rgba(226,58,71,.30);background:rgba(226,58,71,.08);color:#ffd7da;text-align:center;white-space:nowrap}
+      #tournament-countdown .first-match-date strong{display:block;font-size:clamp(22px,2.6vw,34px);line-height:1;font-weight:950;letter-spacing:-.035em;text-transform:uppercase}
+      #tournament-countdown .first-match-date span{display:block;margin-top:8px;font-size:clamp(24px,3.2vw,40px);line-height:1;font-weight:950;font-variant-numeric:tabular-nums}
       #tournament-countdown.started .countdown-title{color:#8ae1b6}
 
       html[data-theme='light'] #contacts .contact-card{background:linear-gradient(180deg,#fff,#f7fafc);border-color:rgba(28,62,98,.12);box-shadow:0 16px 40px rgba(32,60,90,.08)}
@@ -50,7 +57,7 @@
 
       @media(max-width:700px){
         #contacts .contacts-grid{grid-template-columns:1fr}#contacts .contact-card{padding:19px 18px;min-height:104px}#contacts .contact-value{font-size:20px}#contacts .project-note{grid-template-columns:36px minmax(0,1fr);gap:12px;padding:16px 15px}#contacts .project-note-icon{width:34px;height:34px;border-radius:10px;font-size:16px}#contacts .project-note p{font-size:12px;line-height:1.58}
-        #tournament-countdown{padding-top:8px;padding-bottom:26px}#tournament-countdown .countdown-card{padding:20px 15px;border-radius:22px}#tournament-countdown .countdown-grid{gap:6px}#tournament-countdown .countdown-unit{padding:14px 5px;border-radius:14px}#tournament-countdown .countdown-value{font-size:32px}#tournament-countdown .countdown-label{font-size:7px;letter-spacing:.08em}#tournament-countdown .first-match{grid-template-columns:1fr;gap:10px}#tournament-countdown .first-match-date{text-align:left;width:max-content;max-width:100%}
+        #tournament-countdown{padding-top:8px;padding-bottom:26px}#tournament-countdown .countdown-card{padding:20px 15px;border-radius:22px}#tournament-countdown .countdown-grid{gap:6px}#tournament-countdown .countdown-unit{padding:14px 5px;border-radius:14px}#tournament-countdown .countdown-value{font-size:32px}#tournament-countdown .countdown-label{font-size:7px;letter-spacing:.08em}#tournament-countdown .first-match{grid-template-columns:1fr;gap:14px}#tournament-countdown .first-match-teams{gap:8px}#tournament-countdown .first-team{display:grid;justify-items:center;text-align:center;gap:7px;font-size:13px}#tournament-countdown .first-team.away{justify-content:stretch;text-align:center}#tournament-countdown .first-team-logo{width:48px;height:48px}#tournament-countdown .first-match-date{width:100%;min-width:0}#tournament-countdown .first-match-date strong{font-size:20px}#tournament-countdown .first-match-date span{font-size:30px}
       }
     `;
     document.head.appendChild(style);
@@ -104,6 +111,32 @@
     footerNav.insertBefore(a,admin||null);
   }
 
+  const COUNTDOWN_TEAM_LOGOS={
+    'Динамо Москва':'https://drive.google.com/thumbnail?id=1I3KuJZEajmksDKtoBsdj4h_75fU0e_KY&sz=w512',
+    'МАХ':'https://drive.google.com/thumbnail?id=1Veii4NYgKc06nRtxKmCRQv1YCE164YZP&sz=w512',
+    'Торпедо':'https://drive.google.com/thumbnail?id=17NYLCFaSrX6q4g0T7jhBnmidrI1JzKl9&sz=w512',
+    'Локомотив':'https://drive.google.com/thumbnail?id=1D6wJnaawN4kMt-1ZWTSvf-trYkslzyKi&sz=w512',
+    'Авангард':'https://drive.google.com/thumbnail?id=1y6CZfZSXYDVqCAjOvv6xB_7Fwu1AQwvn&sz=w512',
+    'Локомотив 2004':'https://drive.google.com/thumbnail?id=1sq7UHtBq_xiexekxmzWawF3yVTaEl-J-&sz=w512',
+    'Крылья Советов':'https://drive.google.com/thumbnail?id=1n6ViHZhkRvq_R_Ul1PEHnFnX7HVNk6-p&sz=w512',
+    'Сибирь':'https://drive.google.com/thumbnail?id=1Xul8VXC7juk2NHQfb28Cl9Jt_Kj0Obw-&sz=w512',
+    'Лада':'https://drive.google.com/thumbnail?id=15mcwMoXT7OaH46jj8w90PCeTtJY54UAF&sz=w512',
+    'Трактор':'https://drive.google.com/thumbnail?id=1qWTRWy-p36RDSMlAy4AqA60PrrUTaczd&sz=w512',
+    'Ак Барс':'https://drive.google.com/thumbnail?id=1I09r6XwD-9L4r5ojPGKCHsJ5WGUyOFy1&sz=w512',
+    'Спартак':'https://drive.google.com/thumbnail?id=19kJ3uz-yyb1Z2y8qvRbFwuw_2kjUUD2f&sz=w512',
+    'Динамо СПБ':'https://drive.google.com/thumbnail?id=1x4KaAFMJ_qfmi26oVjnsc-huKpWtqBbh&sz=w512',
+    'СКА-Стрельна':'https://drive.google.com/thumbnail?id=1DH_sKpyVZsh6vnt8Q1_ovBpDuVkPHrNh&sz=w512',
+    'АКМ':'https://drive.google.com/thumbnail?id=1NmPj1OwI3C1yuNmgt2XX57HbEiiDauB7&sz=w512',
+    'ЦСКА':'https://drive.google.com/thumbnail?id=1bT6o4afTqonyA05keLbe_nfQ78sAmNda&sz=w512',
+    'Армия СКА':'https://drive.google.com/thumbnail?id=14XZX2FRyR5x_aVkU2SMLhW-Emk0RUkTo&sz=w512',
+    'Нефтехимик':'https://drive.google.com/thumbnail?id=1csEdtjesEvgAFSsfnfhmWUnUE23Tnqeg&sz=w512',
+    'Северсталь':'https://drive.google.com/thumbnail?id=10xBTOFy_ps1G3LNaHV3WpbQkuZ74pjRn&sz=w512',
+    'Красная Машина Юниор':'https://drive.google.com/thumbnail?id=1qATM0WxWDCgYfemDQvhdy30Ub0sWSWWV&sz=w512'
+  };
+
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const logoHtml=name=>COUNTDOWN_TEAM_LOGOS[name]?`<img class="first-team-logo" src="${COUNTDOWN_TEAM_LOGOS[name]}" alt="Логотип ${esc(name)}">`:'';
+
   function addCountdown(){
     if(document.getElementById('tournament-countdown')) return true;
     if(typeof D==='undefined'||!D?.matches?.length||!D?.teams?.length) return false;
@@ -121,7 +154,7 @@
     const section=document.createElement('section');
     section.id='tournament-countdown';
     section.className='wrap reveal';
-    section.innerHTML=`<div class="countdown-card"><div class="countdown-kicker">Кубок России U16 · 2026/27</div><div class="countdown-title">До старта турнира осталось:</div><div class="countdown-grid"><div class="countdown-unit"><span class="countdown-value" data-cd="days">00</span><span class="countdown-label">Дней</span></div><div class="countdown-unit"><span class="countdown-value" data-cd="hours">00</span><span class="countdown-label">Часов</span></div><div class="countdown-unit"><span class="countdown-value" data-cd="minutes">00</span><span class="countdown-label">Минут</span></div><div class="countdown-unit"><span class="countdown-value" data-cd="seconds">00</span><span class="countdown-label">Секунд</span></div></div><div class="first-match"><div><div class="first-match-label">Первый матч турнира · матч №${first.game_no??'—'}</div><div class="first-match-teams">${home} — ${away}</div><div class="first-match-meta">${prettyDate} · ${hhmm}${venue?' · '+venue:''}</div></div><div class="first-match-date">${prettyDate.toUpperCase()} · ${hhmm}</div></div></div>`;
+    section.innerHTML=`<div class="countdown-card"><div class="countdown-kicker">Кубок России U16 · 2026/27</div><div class="countdown-title">До старта турнира осталось:</div><div class="countdown-grid"><div class="countdown-unit"><span class="countdown-value" data-cd="days">00</span><span class="countdown-label">Дней</span></div><div class="countdown-unit"><span class="countdown-value" data-cd="hours">00</span><span class="countdown-label">Часов</span></div><div class="countdown-unit"><span class="countdown-value" data-cd="minutes">00</span><span class="countdown-label">Минут</span></div><div class="countdown-unit"><span class="countdown-value" data-cd="seconds">00</span><span class="countdown-label">Секунд</span></div></div><div class="first-match"><div><div class="first-match-label">Первый матч турнира · матч №${first.game_no??'—'}</div><div class="first-match-teams"><div class="first-team">${logoHtml(home)}<span class="first-team-name">${esc(home)}</span></div><div class="first-match-vs">VS</div><div class="first-team away"><span class="first-team-name">${esc(away)}</span>${logoHtml(away)}</div></div><div class="first-match-meta">${venue||'Место проведения уточняется'}</div></div><div class="first-match-date"><strong>${prettyDate}</strong><span>${hhmm}</span></div></div></div>`;
     const hero=document.querySelector('.hero');
     if(hero) hero.insertAdjacentElement('afterend',section);
     else document.querySelector('main')?.prepend(section);
