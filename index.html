@@ -70,7 +70,7 @@
 
     .info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.info-card{padding:20px}.info-card .num{font-size:11px;color:var(--ice);font-weight:900;letter-spacing:.14em}.info-card h3{font-size:20px;margin:10px 0 8px}.info-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
     .history-card{display:grid;grid-template-columns:180px 1fr auto;align-items:center;gap:18px;padding:22px}.history-year{font-size:42px;font-weight:950;letter-spacing:-.05em;color:#dff1ff}.history-copy strong{display:block;font-size:18px}.history-copy span{color:var(--muted);font-size:13px}.history-arrow{font-size:22px;color:#9fcfff}
-    .organizer{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:24px}.organizer-mark{width:74px;height:74px;border-radius:18px;display:grid;place-items:center;border:1px solid rgba(226,58,71,.22);background:rgba(226,58,71,.07);font-weight:950;font-size:22px}.organizer-copy{flex:1}.organizer-copy small{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:.11em;font-size:10px;margin-bottom:5px}.organizer-copy strong{font-size:20px}
+    .organizer{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:24px}.organizer-mark{width:74px;height:74px;border-radius:18px;display:grid;place-items:center;border:1px solid rgba(226,58,71,.22);background:rgba(226,58,71,.07);font-weight:950;font-size:22px}.organizer-copy{flex:1}.organizer-copy small{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:.11em;font-size:10px;margin-bottom:5px}.organizer-copy strong{font-size:20px}.fhr-organizer-link{cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease}.fhr-organizer-link:hover{transform:translateY(-2px);border-color:rgba(127,198,255,.28);background:linear-gradient(180deg,rgba(21,43,70,.94),rgba(11,25,43,.96))}.fhr-organizer-link:focus-visible{outline:2px solid var(--ice);outline-offset:3px}.organizer-arrow{font-size:24px;color:#9fcfff;font-weight:800;flex:0 0 auto}
 
     footer{margin-top:44px;border-top:1px solid var(--line);background:rgba(4,12,22,.72)}.footer-main{padding:34px 0 22px;display:grid;grid-template-columns:1.2fr 1fr;gap:28px}.footer-brand strong{display:block;font-size:18px}.footer-brand p{color:var(--muted);font-size:12px;line-height:1.6;max-width:600px;margin:10px 0 0}.footer-nav{display:flex;justify-content:flex-end;align-items:flex-start;gap:8px;flex-wrap:wrap}.footer-nav a{font-size:12px;color:#a4b1c2;padding:7px 9px;border-radius:9px}.footer-nav a:hover{background:rgba(255,255,255,.05);color:#fff}.disclaimer{border-top:1px solid rgba(255,255,255,.06);padding:18px 0 26px;color:#68778c;font-size:11px;line-height:1.6}.admin-link{opacity:.65}
 
@@ -151,7 +151,7 @@
   </section>
 
   <section class="section compact wrap reveal">
-    <article class="card organizer"><div class="organizer-mark">ФХР</div><div class="organizer-copy"><small>Организатор соревнования</small><strong>Федерация хоккея России</strong></div></article>
+    <a class="card organizer fhr-organizer-link" href="https://junior.fhr.ru" target="_blank" rel="noopener noreferrer" aria-label="Перейти на сайт Федерации хоккея России"><div class="organizer-mark">ФХР</div><div class="organizer-copy"><small>Организатор соревнования</small><strong>Федерация хоккея России</strong></div><span class="organizer-arrow" aria-hidden="true">↗</span></a>
   </section>
 </main>
 
