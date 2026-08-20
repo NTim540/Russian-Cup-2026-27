@@ -1,0 +1,1 @@
+Trigger Vercel deployment after connecting Git repository on 2026-08-20.
