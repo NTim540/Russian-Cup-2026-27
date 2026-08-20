@@ -1,0 +1,71 @@
+name: Apply logo UI patch
+
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch site
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          css='''
+    /* Logo system */
+    .brand-mark{overflow:hidden}
+    .brand-mark img{width:30px;height:30px;object-fit:contain;display:block}
+    .team-cell,.upcoming-team-main,.match-team-inner{display:flex;align-items:center;gap:10px;min-width:0}
+    .team-logo{width:28px;height:28px;object-fit:contain;flex:0 0 auto;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.22))}
+    .upcoming-team-main .team-logo,.match-team-inner .team-logo{width:34px;height:34px}
+    .match-team.away .match-team-inner{justify-content:flex-end}
+    .organizer-mark{overflow:hidden}.organizer-mark img{width:56px;height:56px;object-fit:contain;display:block}
+    .winner-logo{width:84px;height:84px;object-fit:contain;display:block}
+    @media(max-width:760px){.team-logo{width:24px;height:24px}.upcoming-team-main .team-logo,.match-team-inner .team-logo{width:28px;height:28px}.team-cell,.upcoming-team-main,.match-team-inner{gap:7px}.brand-mark img{width:26px;height:26px}}
+'''
+          if '/* Logo system */' not in s:s=s.replace('  </style>',css+'  </style>',1)
+
+          cup='https://drive.google.com/thumbnail?id=1hwFp1ukBAQ_Qd-nI5okdiejSRlUrfLeB&sz=w512'
+          fhr='https://drive.google.com/thumbnail?id=1nFMK_7IvAoiHPbC7z9k_eLlwsrw3Bcmx&sz=w512'
+          s=s.replace('<span class="brand-mark">U16</span>',f'<span class="brand-mark"><img src="{cup}" alt="Кубок России U16"></span>',1)
+          s=s.replace('<article class="card organizer"><div class="organizer-mark">ФХР</div><div class="organizer-copy">',f'<article class="card organizer"><div class="organizer-mark"><img src="{fhr}" alt="Федерация хоккея России"></div><div class="organizer-copy">',1)
+
+          helper='''const TEAM_LOGOS={1:'https://drive.google.com/thumbnail?id=1I3KuJZEajmksDKtoBsdj4h_75fU0e_KY&sz=w512',2:'https://drive.google.com/thumbnail?id=1Veii4NYgKc06nRtxKmCRQv1YCE164YZP&sz=w512',3:'https://drive.google.com/thumbnail?id=17NYLCFaSrX6q4g0T7jhBnmidrI1JzKl9&sz=w512',4:'https://drive.google.com/thumbnail?id=1D6wJnaawN4kMt-1ZWTSvf-trYkslzyKi&sz=w512',5:'https://drive.google.com/thumbnail?id=1y6CZfZSXYDVqCAjOvv6xB_7Fwu1AQwvn&sz=w512',6:'https://drive.google.com/thumbnail?id=1sq7UHtBq_xiexekxmzWawF3yVTaEl-J-&sz=w512',7:'https://drive.google.com/thumbnail?id=1n6ViHZhkRvq_R_Ul1PEHnFnX7HVNk6-p&sz=w512',8:'https://drive.google.com/thumbnail?id=1Xul8VXC7juk2NHQfb28Cl9Jt_Kj0Obw-&sz=w512',9:'https://drive.google.com/thumbnail?id=15mcwMoXT7OaH46jj8w90PCeTtJY54UAF&sz=w512',10:'https://drive.google.com/thumbnail?id=1qWTRWy-p36RDSMlAy4AqA60PrrUTaczd&sz=w512',11:'https://drive.google.com/thumbnail?id=1I09r6XwD-9L4r5ojPGKCHsJ5WGUyOFy1&sz=w512',12:'https://drive.google.com/thumbnail?id=19kJ3uz-yyb1Z2y8qvRbFwuw_2kjUUD2f&sz=w512',13:'https://drive.google.com/thumbnail?id=1x4KaAFMJ_qfmi26oVjnsc-huKpWtqBbh&sz=w512',14:'https://drive.google.com/thumbnail?id=1DH_sKpyVZsh6vnt8Q1_ovBpDuVkPHrNh&sz=w512',15:'https://drive.google.com/thumbnail?id=1NmPj1OwI3C1yuNmgt2XX57HbEiiDauB7&sz=w512',16:'https://drive.google.com/thumbnail?id=1bT6o4afTqonyA05keLbe_nfQ78sAmNda&sz=w512',17:'https://drive.google.com/thumbnail?id=14XZX2FRyR5x_aVkU2SMLhW-Emk0RUkTo&sz=w512',18:'https://drive.google.com/thumbnail?id=1csEdtjesEvgAFSsfnfhmWUnUE23Tnqeg&sz=w512',19:'https://drive.google.com/thumbnail?id=10xBTOFy_ps1G3LNaHV3WpbQkuZ74pjRn&sz=w512',20:'https://drive.google.com/thumbnail?id=1qATM0WxWDCgYfemDQvhdy30Ub0sWSWWV&sz=w512'};
+function logoPath(teamId){return TEAM_LOGOS[Number(teamId)]||''}
+function logoImg(teamId,name,cls='team-logo'){const src=logoPath(teamId);return src?'<img class="'+cls+'" src="'+src+'" alt="Логотип '+esc(name)+'" loading="lazy" decoding="async">':''}
+function teamVisual(teamId,name,cls='team-cell',away=false){const img=logoImg(teamId,name),text=esc(name);return'<span class="'+cls+'">'+(away?text+img:img+text)+'</span>'}
+'''
+          if 'const TEAM_LOGOS=' not in s:s=s.replace('function table(rows,compact=false){',helper+'function table(rows,compact=false){',1)
+
+          pairs=[
+          ("<td class=\"team\">'+esc(r.team)+'</td>","<td class=\"team\">'+teamVisual(r.team_id,r.team,'team-cell')+'</td>"),
+          ("<div class=\"upcoming-team\"><span>'+esc(teamName(m.home_team_id))+'</span><span>ХОЗ</span></div>","<div class=\"upcoming-team\">'+teamVisual(m.home_team_id,teamName(m.home_team_id),'upcoming-team-main')+'<span>ХОЗ</span></div>"),
+          ("<div class=\"upcoming-team\"><span>'+esc(teamName(m.away_team_id))+'</span><span>ГОСТ</span></div>","<div class=\"upcoming-team\">'+teamVisual(m.away_team_id,teamName(m.away_team_id),'upcoming-team-main')+'<span>ГОСТ</span></div>"),
+          ("<div class=\"match-team\">'+esc(teamName(m.home_team_id))+'</div>","<div class=\"match-team\">'+teamVisual(m.home_team_id,teamName(m.home_team_id),'match-team-inner')+'</div>"),
+          ("<div class=\"match-team away\">'+esc(teamName(m.away_team_id))+'</div>","<div class=\"match-team away\">'+teamVisual(m.away_team_id,teamName(m.away_team_id),'match-team-inner',true)+'</div>")]
+          for a,b in pairs:
+              if a in s:s=s.replace(a,b,1)
+              elif b not in s:raise SystemExit('missing target '+a[:50])
+
+          a="const w=rows[0];card.classList.add('show');"
+          b="const w=rows[0];const mark=card.querySelector('.winner-mark');if(mark)mark.innerHTML=logoImg(w.team_id,w.team,'winner-logo')||'U16';card.classList.add('show');"
+          if a in s:s=s.replace(a,b,1)
+          elif b not in s:raise SystemExit('missing winner target')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Clean workflows and commit
+        run: |
+          rm -f .github/workflows/patch-logo-ui.yml .github/workflows/patch-logo-ui-v2.yml
+          git config user.name "ChatGPT"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html .github/workflows
+          git commit -m "Add logos across tournament site"
+          git push
