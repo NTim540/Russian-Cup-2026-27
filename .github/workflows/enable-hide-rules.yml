@@ -1,0 +1,31 @@
+name: Enable hidden rules section
+on:
+  push:
+    paths:
+      - '.github/workflows/enable-hide-rules.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          tag='<script src="/hide-rules.js?v=20260820-1"></script>'
+          if tag not in s:
+              s=s.replace('</body>',tag+'\n</body>')
+              p.write_text(s)
+          PY
+          rm .github/workflows/enable-hide-rules.yml
+      - name: Commit
+        run: |
+          git config user.name "ChatGPT"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Hide tournament rules section" || exit 0
+          git push
