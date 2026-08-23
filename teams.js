@@ -32,7 +32,7 @@
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   async function get(path){const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
   function initials(name){return name.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()}
-  function card(team){const logo=TEAM_LOGOS[team.name],city=TEAM_CITIES[team.name]||'Город уточняется';return `
+  function card(team){const logo=team.logo_url||TEAM_LOGOS[team.name],city=team.city||TEAM_CITIES[team.name]||'Город уточняется';return `
     <a class="team-card" data-team-id="${team.id}" href="/team.html?team=${team.id}" aria-label="Открыть страницу команды ${esc(team.name)}">
       <div class="team-logo-wrap">
         ${logo?`<img class="team-logo" src="${logo}" alt="Логотип ${esc(team.name)}" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">`:''}

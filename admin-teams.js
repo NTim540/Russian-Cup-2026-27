@@ -42,7 +42,7 @@
   function wireArenaRemove(){form.querySelectorAll('.arena-remove').forEach(b=>b.onclick=()=>{b.closest('.arena-row')?.remove()})}
   function addArena(){const list=form.querySelector('#arenaList');if(!list)return;const row=document.createElement('div');row.className='arena-row';row.innerHTML=`<div class="field"><label>Название арены</label><input class="input arena-name" placeholder="Например, G-Drive Арена"></div><div class="field"><label>Адрес</label><input class="input arena-address" placeholder="Город, улица, дом"></div><button type="button" class="btn danger small arena-remove" title="Удалить арену">×</button>`;list.appendChild(row);wireArenaRemove()}
   function renderForm(){const t=team();if(!t){form.innerHTML='<div class="empty">Команды не загружены.</div>';preview.innerHTML='<span>Нет данных</span>';return}selectedId=t.id;sel.value=String(t.id);renderPreview(t);form.innerHTML=`
-      <div class="panel-title"><div><h3 style="margin:0">${esc(t.name)}</h3><div class="muted">Данные карточки команды</div></div><a class="btn sec small" target="_blank" href="/team.html?id=${t.id}">Открыть страницу ↗</a></div>
+      <div class="panel-title"><div><h3 style="margin:0">${esc(t.name)}</h3><div class="muted">Данные карточки команды</div></div><a class="btn sec small" target="_blank" href="/team.html?team=${t.id}">Открыть страницу ↗</a></div>
       <div class="team-admin-grid">
         <div class="field"><label>Город</label><input id="teamCity" class="input" value="${esc(t.city||'')}" placeholder="Например, Омск"></div>
         <div class="field"><label>Логотип · URL</label><input id="teamLogoUrl" class="input" value="${esc(t.logo_url||'')}" placeholder="https://..."></div>
