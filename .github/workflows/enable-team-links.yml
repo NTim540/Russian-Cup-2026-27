@@ -1,0 +1,31 @@
+name: Enable team links
+on:
+  push:
+    paths:
+      - '.github/workflows/enable-team-links.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable team profile links
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          tag='<script src="/team-links.js?v=20260823-1"></script>'
+          if tag not in s:
+              anchor='<script src="/vote.js?v=20260822-1"></script>'
+              if anchor not in s: raise SystemExit('vote script anchor not found')
+              s=s.replace(anchor,anchor+'\n'+tag,1)
+              p.write_text(s)
+          PY
+          rm .github/workflows/enable-team-links.yml
+          git config user.name 'ChatGPT/actions'
+          git config user.email 'actions@users.noreply.github.com'
+          git add index.html .github/workflows/enable-team-links.yml
+          git commit -m 'Enable team profile links across site'
+          git push
