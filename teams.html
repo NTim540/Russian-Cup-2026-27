@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>Команды · Кубок России U16</title>
+  <style>
+    :root{--bg:#07111f;--panel:#0d1b2d;--panel2:#12243b;--line:rgba(255,255,255,.10);--text:#f7f9fc;--muted:#91a0b4;--blue:#2387d9;--ice:#7fc6ff;--red:#e31f2b;--shadow:0 24px 70px rgba(0,0,0,.30)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-3;background:radial-gradient(circle at 12% -5%,rgba(47,111,237,.24),transparent 32%),radial-gradient(circle at 88% 3%,rgba(226,58,71,.10),transparent 28%),linear-gradient(180deg,#07111f 0%,#081526 52%,#06101d 100%)}body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-2;opacity:.30;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(to bottom,black 0%,transparent 78%)}a{color:inherit;text-decoration:none}.wrap{width:min(1240px,calc(100% - 32px));margin:auto}
+    .site-header{position:sticky;top:0;z-index:80;border-bottom:1px solid var(--line);background:rgba(7,17,31,.82);backdrop-filter:blur(20px)}.header-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.brand-mark{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(127,198,255,.20),rgba(47,111,237,.16));border:1px solid rgba(127,198,255,.24);overflow:hidden}.brand-mark img{width:32px;height:32px;object-fit:contain}.brand-copy{min-width:0}.brand-copy small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.16em;font-weight:750;margin-bottom:2px}.brand-copy strong{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nav{display:flex;align-items:center;gap:4px;color:#9eacc0;font-size:13px}.nav a{position:relative;padding:10px 11px;border-radius:11px;transition:.18s ease}.nav a:hover{color:#fff;background:rgba(255,255,255,.055)}.nav a.active{color:#fff}.nav a.active:after{content:"";position:absolute;left:12px;right:12px;bottom:4px;height:2px;background:var(--red);border-radius:999px}
+    .page-head{padding:68px 0 26px}.page-kicker{color:var(--ice);font-size:10px;text-transform:uppercase;letter-spacing:.18em;font-weight:900;margin-bottom:10px}.page-title{margin:0;font-size:clamp(52px,8vw,92px);line-height:.88;letter-spacing:-.06em;text-transform:uppercase}.page-sub{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:17px;color:var(--muted);font-size:14px}.page-sub strong{color:#dce7f2}.page-dot{width:4px;height:4px;border-radius:50%;background:var(--red)}
+    .teams-section{padding:24px 0 72px}.teams-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.team-card{position:relative;min-height:300px;padding:28px 22px 24px;border:1px solid var(--line);border-radius:7px;background:linear-gradient(180deg,rgba(18,36,59,.90),rgba(8,22,37,.96));box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}.team-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 18%,rgba(35,135,217,.11),transparent 42%);pointer-events:none}.team-card:after{content:"";position:absolute;left:0;top:0;width:42%;height:2px;background:linear-gradient(90deg,var(--red),var(--blue));opacity:.9}.team-card:hover{transform:translateY(-4px);border-color:rgba(127,198,255,.25);box-shadow:0 30px 78px rgba(0,0,0,.38)}.team-logo-wrap{position:relative;z-index:1;height:150px;width:100%;display:grid;place-items:center;margin-bottom:16px}.team-logo{max-width:142px;max-height:142px;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 13px 22px rgba(0,0,0,.34))}.team-logo-fallback{display:none;width:104px;height:104px;border-radius:28px;border:1px solid rgba(127,198,255,.20);background:rgba(35,135,217,.08);place-items:center;font-size:28px;font-weight:950;color:#dcecff}.team-name{position:relative;z-index:1;margin:0;max-width:100%;font-size:18px;line-height:1.12;font-weight:950;letter-spacing:-.025em}.team-city{position:relative;z-index:1;margin-top:8px;color:var(--muted);font-size:13px;line-height:1.3;font-weight:500}.loading,.error{grid-column:1/-1;padding:48px 20px;border:1px dashed var(--line);border-radius:7px;text-align:center;color:var(--muted);font-size:13px}
+    footer{position:relative;margin-top:26px;background:linear-gradient(180deg,#050e18,#030a11);border-top:1px solid rgba(126,190,255,.11)}footer:before{content:"";position:absolute;left:0;right:0;top:-1px;height:2px;background:linear-gradient(90deg,var(--red) 0 18%,var(--blue) 18% 56%,transparent 56%)}.footer-main{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;padding:34px 0}.footer-brand strong{font-size:18px;text-transform:uppercase}.footer-brand strong:before{content:"// ";color:var(--red)}.footer-brand p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.55}.footer-nav{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.footer-nav a{padding:8px 10px;border-radius:3px;color:#8fa0b5;font-size:9px;text-transform:uppercase;letter-spacing:.06em;font-weight:850}.footer-nav a:hover{color:#fff;background:rgba(35,135,217,.07)}.disclaimer{padding:16px 0 24px;border-top:1px solid rgba(255,255,255,.06);color:#6f8197;font-size:9px;line-height:1.55}
+    html[data-theme='light'] .team-card{background:linear-gradient(180deg,#fff,#f6f9fd);border-color:rgba(20,45,80,.10);box-shadow:0 18px 55px rgba(27,53,87,.09)}html[data-theme='light'] .team-card:before{background:radial-gradient(circle at 50% 18%,rgba(35,135,217,.08),transparent 44%)}html[data-theme='light'] .team-card:hover{border-color:rgba(47,111,237,.20);box-shadow:0 24px 64px rgba(27,53,87,.14)}html[data-theme='light'] .team-name{color:#102139}html[data-theme='light'] footer{background:linear-gradient(180deg,#edf3f8,#e7eef5)}html[data-theme='light'] .disclaimer{border-top-color:rgba(20,45,80,.07)}
+    @media(max-width:1000px){.teams-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:760px){.wrap{width:min(100% - 20px,1240px)}.header-inner{min-height:64px}.brand-mark{width:36px;height:36px}.brand-mark img{width:28px;height:28px}.brand-copy small{display:none}.nav{max-width:53vw;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav a{white-space:nowrap;padding:8px 9px}.page-head{padding:46px 0 20px}.page-title{font-size:54px}.teams-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.team-card{min-height:250px;padding:20px 12px 18px}.team-logo-wrap{height:120px;margin-bottom:12px}.team-logo{max-width:112px;max-height:112px}.team-name{font-size:15px}.team-city{font-size:12px}.footer-main{grid-template-columns:1fr}.footer-nav{justify-content:flex-start}}
+    @media(max-width:390px){.page-title{font-size:48px}.team-card{min-height:230px}.team-logo-wrap{height:104px}.team-logo{max-width:98px;max-height:98px}.team-name{font-size:14px}}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark"><img src="https://drive.google.com/thumbnail?id=1hwFp1ukBAQ_Qd-nI5okdiejSRlUrfLeB&sz=w512" alt="Кубок России U16"></span>
+      <span class="brand-copy"><small id="season">2026/27</small><strong>КУБОК РОССИИ U16</strong></span>
+    </a>
+    <nav class="nav" aria-label="Основная навигация">
+      <a href="/#upcoming">Матчи</a><a href="/#overall">Таблица</a><a href="/#groups">Группы</a><a class="active" href="/teams.html">Команды</a><a href="/#history">История</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="page-head wrap">
+    <div class="page-kicker">Кубок России U16 · 2026/27</div>
+    <h1 class="page-title">Команды</h1>
+    <div class="page-sub"><strong id="teamCount">— участников</strong><span class="page-dot"></span><span>Состав команд турнира</span></div>
+  </section>
+  <section class="teams-section wrap">
+    <div id="teamsGrid" class="teams-grid"><div class="loading">Загружаем команды…</div></div>
+  </section>
+</main>
+<footer>
+  <div class="wrap footer-main"><div class="footer-brand"><strong>КУБОК РОССИИ U16</strong><p>Расписание, результаты, таблицы, матч-центр и история турнира.</p></div><div class="footer-nav"><a href="/#upcoming">Матчи</a><a href="/#overall">Таблицы</a><a href="/teams.html">Команды</a><a href="/#history">История</a></div></div>
+  <div class="wrap disclaimer">Независимый информационный проект о Кубке России U16. Проект не является официальным ресурсом, организатором соревнования или представителем Федерации хоккея России. Все товарные знаки, наименования и эмблемы принадлежат их правообладателям.</div>
+</footer>
+<script src="/theme.js?v=20260820-1"></script>
+<script src="/teams.js?v=20260823-1"></script>
+</body>
+</html>
