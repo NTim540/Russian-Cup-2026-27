@@ -28,19 +28,26 @@
     'Ак Барс':'Казань','Спартак':'Москва','Динамо СПБ':'Санкт-Петербург','СКА-Стрельна':'Санкт-Петербург','АКМ':'Новомосковск',
     'ЦСКА':'Москва','Армия СКА':'Санкт-Петербург','Нефтехимик':'Нижнекамск','Северсталь':'Череповец','Красная Машина Юниор':'Красногорск'
   };
+  const UNKNOWN='Участник не определен';
   const $=s=>document.querySelector(s);
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   async function get(path){const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
   function initials(name){return name.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()}
-  function card(team){const logo=team.logo_url||TEAM_LOGOS[team.name],city=team.city||TEAM_CITIES[team.name]||'Город уточняется';return `
-    <a class="team-card" data-team-id="${team.id}" href="/team.html?team=${team.id}" aria-label="Открыть страницу команды ${esc(team.name)}">
+  function card(team){
+    const unknown=team.name===UNKNOWN;
+    const logo=unknown?null:(team.logo_url||TEAM_LOGOS[team.name]);
+    const city=unknown?'':(team.city||TEAM_CITIES[team.name]||'Город уточняется');
+    const inner=`
       <div class="team-logo-wrap">
         ${logo?`<img class="team-logo" src="${logo}" alt="Логотип ${esc(team.name)}" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">`:''}
-        <div class="team-logo-fallback" style="${logo?'':'display:grid'}">${esc(initials(team.name))}</div>
+        <div class="team-logo-fallback" style="display:grid">${unknown?'?':esc(initials(team.name))}</div>
       </div>
       <h2 class="team-name">${esc(team.name)}</h2>
-      <div class="team-city">${esc(city)}</div>
-    </a>`}
+      ${city?`<div class="team-city">${esc(city)}</div>`:''}`;
+    return unknown
+      ? `<article class="team-card unknown-team-card" data-team-id="${team.id}" aria-label="${UNKNOWN}">${inner}</article>`
+      : `<a class="team-card" data-team-id="${team.id}" href="/team.html?team=${team.id}" aria-label="Открыть страницу команды ${esc(team.name)}">${inner}</a>`;
+  }
   async function init(){
     try{
       const catalog=await get('/api/catalog');
