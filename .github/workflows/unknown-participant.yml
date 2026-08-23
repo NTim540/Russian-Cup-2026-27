@@ -1,0 +1,66 @@
+name: Unknown participant placeholder
+on:
+  push:
+    paths:
+      - '.github/workflows/unknown-participant.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch participant placeholder
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # teams.js: show a question mark card and no city/link for unknown participant
+          p=Path('teams.js')
+          s=p.read_text()
+          old="""  function card(team){const logo=team.logo_url||TEAM_LOGOS[team.name],city=team.city||TEAM_CITIES[team.name]||'Город уточняется';return `
+    <a class=\"team-card\" data-team-id=\"${team.id}\" href=\"/team.html?team=${team.id}\" aria-label=\"Открыть страницу команды ${esc(team.name)}\">
+      <div class=\"team-logo-wrap\">
+        ${logo?`<img class=\"team-logo\" src=\"${logo}\" alt=\"Логотип ${esc(team.name)}\" loading=\"lazy\" decoding=\"async\" onerror=\"this.style.display='none';this.nextElementSibling.style.display='grid'\">`:''}
+        <div class=\"team-logo-fallback\" style=\"${logo?'':'display:grid'}\">${esc(initials(team.name))}</div>
+      </div>
+      <h2 class=\"team-name\">${esc(team.name)}</h2>
+      <div class=\"team-city\">${esc(city)}</div>
+    </a>`}"""
+          new="""  function card(team){const unknown=team.name==='Участник не определен',logo=unknown?null:(team.logo_url||TEAM_LOGOS[team.name]),city=unknown?'':(team.city||TEAM_CITIES[team.name]||'Город уточняется'),open=unknown?`<article class=\"team-card unknown-team-card\" data-team-id=\"${team.id}\" aria-label=\"Участник не определен\">`:`<a class=\"team-card\" data-team-id=\"${team.id}\" href=\"/team.html?team=${team.id}\" aria-label=\"Открыть страницу команды ${esc(team.name)}\">`,close=unknown?'</article>':'</a>';return `
+    ${open}
+      <div class=\"team-logo-wrap\">
+        ${logo?`<img class=\"team-logo\" src=\"${logo}\" alt=\"Логотип ${esc(team.name)}\" loading=\"lazy\" decoding=\"async\" onerror=\"this.style.display='none';this.nextElementSibling.style.display='grid'\">`:''}
+        <div class=\"team-logo-fallback\" style=\"display:grid\">${unknown?'?':esc(initials(team.name))}</div>
+      </div>
+      <h2 class=\"team-name\">${esc(team.name)}</h2>
+      ${city?`<div class=\"team-city\">${esc(city)}</div>`:''}
+    ${close}`}"""
+          if old not in s: raise SystemExit('teams.js target not found')
+          p.write_text(s.replace(old,new,1))
+
+          # logos.js: use a neutral question-mark emblem everywhere this participant appears
+          p=Path('logos.js')
+          s=p.read_text()
+          needle="    'СКА-Стрельна':'https://drive.google.com/thumbnail?id=1DH_sKpyVZsh6vnt8Q1_ovBpDuVkPHrNh&sz=w512',\n"
+          repl=needle+"    'Участник не определен':'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2244%22 fill=%22none%22 stroke=%22%237fc6ff%22 stroke-width=%225%22 opacity=%22.65%22/%3E%3Ctext x=%2250%22 y=%2269%22 text-anchor=%22middle%22 font-size=%2258%22 font-family=%22Arial%22 font-weight=%22700%22 fill=%22%237fc6ff%22%3E?%3C/text%3E%3C/svg%3E',\n"
+          if needle not in s: raise SystemExit('logos.js target not found')
+          p.write_text(s.replace(needle,repl,1))
+
+          # team-links.js: placeholder is not a real team profile, so do not make it clickable
+          p=Path('team-links.js')
+          s=p.read_text()
+          needle="  const href=id=>`/team.html?team=${encodeURIComponent(id)}`;\n"
+          repl=needle+"  const isUnknown=team=>String(team?.name||'')==='Участник не определен';\n"
+          if needle not in s: raise SystemExit('team-links helper target not found')
+          s=s.replace(needle,repl,1)
+          s=s.replace("    if(!el||!team||el.querySelector(':scope > .team-profile-link'))return;", "    if(!el||!team||isUnknown(team)||el.querySelector(':scope > .team-profile-link'))return;",1)
+          s=s.replace("    if(!el||!team||el.closest('a')||el.querySelector(':scope > .team-profile-link'))return;", "    if(!el||!team||isUnknown(team)||el.closest('a')||el.querySelector(':scope > .team-profile-link'))return;",1)
+          p.write_text(s)
+          PY
+          rm .github/workflows/unknown-participant.yml
+          git config user.name 'ChatGPT/actions'
+          git config user.email 'actions@users.noreply.github.com'
+          git add teams.js logos.js team-links.js .github/workflows/unknown-participant.yml
+          git commit -m 'Show unknown participant placeholder'
+          git push
