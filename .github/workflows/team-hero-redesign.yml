@@ -1,0 +1,82 @@
+name: Team profile hero redesign
+on:
+  push:
+    paths:
+      - '.github/workflows/team-hero-redesign.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch team profile hero and admin field
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # --- team.html ---
+          p=Path('team.html')
+          s=p.read_text()
+          old='.team-hero-card{position:relative;min-height:390px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);align-items:center;gap:36px;padding:44px 48px;border:1px solid rgba(126,190,255,.12);border-radius:8px;background:linear-gradient(120deg,rgba(8,25,42,.96),rgba(9,29,48,.90) 58%,rgba(227,31,43,.055));box-shadow:0 30px 90px rgba(0,0,0,.34);overflow:hidden}'
+          new=old+'.team-hero-bg{position:absolute;inset:0;z-index:0;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:0;transform:scale(1.025);transition:opacity .28s ease}.team-hero-bg.has-image{opacity:1}.team-hero-bg:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,16,28,.97) 0%,rgba(5,16,28,.91) 38%,rgba(5,16,28,.72) 66%,rgba(5,16,28,.80) 100%),linear-gradient(180deg,rgba(7,18,31,.16),rgba(7,18,31,.62))}.team-hero-card>.team-copy,.team-hero-card>.team-logo-side{position:relative;z-index:2}'
+          if old not in s: raise SystemExit('team hero card target not found')
+          s=s.replace(old,new,1)
+          old='.team-logo-side:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;border:1px solid rgba(126,190,255,.08);box-shadow:0 0 0 52px rgba(126,190,255,.018),0 0 0 104px rgba(126,190,255,.012)}'
+          new='.team-logo-side:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;border:1px solid rgba(126,190,255,.19);background:radial-gradient(circle at 50% 42%,rgba(126,190,255,.095),rgba(5,17,29,.34) 68%,rgba(5,17,29,.10));box-shadow:inset 0 0 42px rgba(126,190,255,.045),0 0 0 52px rgba(126,190,255,.018),0 0 0 104px rgba(126,190,255,.012)}'
+          if old not in s: raise SystemExit('team logo circle target not found')
+          s=s.replace(old,new,1)
+          s=s.replace('max-width:280px;max-height:280px','max-width:190px;max-height:190px',1)
+          s=s.replace('.team-logo-large{max-width:170px;max-height:170px}', '.team-logo-large{max-width:112px;max-height:112px}',1)
+          s=s.replace('.team-logo-large{max-width:145px;max-height:145px}', '.team-logo-large{max-width:96px;max-height:96px}',1)
+          old='<article class="team-hero-card">\n      <div class="team-copy">'
+          new='<article class="team-hero-card">\n      <div class="team-hero-bg" id="teamHeroBg" aria-hidden="true"></div>\n      <div class="team-copy">'
+          if old not in s: raise SystemExit('team hero markup target not found')
+          s=s.replace(old,new,1)
+          s=s.replace('/team-detail.js?v=20260823-2','/team-detail.js?v=20260823-3',1)
+          p.write_text(s)
+
+          # --- team-detail.js ---
+          p=Path('team-detail.js')
+          s=p.read_text()
+          old="meta={city:team.city||fallback.city||'',arena:arenaText,socials:{"
+          new="meta={city:team.city||fallback.city||'',arena:arenaText,hero:team.hero_image_url||'',socials:{"
+          if old not in s: raise SystemExit('team-detail meta target not found')
+          s=s.replace(old,new,1)
+          old="    const ms=data.matches.filter(m=>[m.home_team_id,m.away_team_id].includes(team.id));\n    document.title=team.name+' · Кубок России U16';"
+          new="    const ms=data.matches.filter(m=>[m.home_team_id,m.away_team_id].includes(team.id));\n    const tourLabel=String(data.stage?.name||'1 тур').replace(/^1-й тур$/i,'1 тур'),groupLabel=group?.code||group?.name||'—';\n    document.title=team.name+' · Кубок России U16';"
+          if old not in s: raise SystemExit('team-detail stage insertion target not found')
+          s=s.replace(old,new,1)
+          old="$('#teamKicker').textContent=(meta.city?meta.city+' · ':'')+(group?.name||group?.code||'Команда турнира');$('#teamName').textContent=team.name;$('#teamArena').textContent=meta.arena||((meta.city?meta.city+' · ':'')+'адрес арены будет добавлен');"
+          new="$('#teamKicker').textContent=tourLabel+' • группа '+groupLabel;$('#teamName').textContent=team.name;$('#teamArena').textContent=meta.arena||((meta.city?meta.city+' · ':'')+'адрес арены будет добавлен');const hero=$('#teamHeroBg');if(hero){hero.style.backgroundImage=meta.hero?`url(\"${meta.hero.replace(/\"/g,'%22')}\")`:'';hero.classList.toggle('has-image',Boolean(meta.hero))}"
+          if old not in s: raise SystemExit('team-detail kicker target not found')
+          s=s.replace(old,new,1)
+          s=s.replace("function initials(name){return name.split(/\\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()}","function initials(name){return name==='Участник не определен'?'?':name.split(/\\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()}",1)
+          p.write_text(s)
+
+          # --- admin-teams.js ---
+          p=Path('admin-teams.js')
+          s=p.read_text()
+          s=s.replace('Логотип, город, арены, соцсети и официальный сайт.','Логотип, фон города/арены, город, арены, соцсети и официальный сайт.',1)
+          old='        <div class="field"><label>Логотип · URL</label><input id="teamLogoUrl" class="input" value="${esc(t.logo_url||\'\')}" placeholder="https://..."></div>\n        <div class="field"><label>ВКонтакте</label>'
+          new='        <div class="field"><label>Логотип · URL</label><input id="teamLogoUrl" class="input" value="${esc(t.logo_url||\'\')}" placeholder="https://..."></div>\n        <div class="field wide"><label>Фото города / арены · URL</label><input id="teamHeroImageUrl" class="input" value="${esc(t.hero_image_url||\'\')}" placeholder="https://..."><div class="muted" style="margin-top:5px">Используется как затемнённый фон верхнего блока на странице команды.</div></div>\n        <div class="field"><label>ВКонтакте</label>'
+          if old not in s: raise SystemExit('admin team hero field target not found')
+          s=s.replace(old,new,1)
+          old="const body={action:'update_team_profile',id:t.id,city:form.querySelector('#teamCity').value.trim(),logo_url:form.querySelector('#teamLogoUrl').value.trim(),vk_url:"
+          new="const body={action:'update_team_profile',id:t.id,city:form.querySelector('#teamCity').value.trim(),logo_url:form.querySelector('#teamLogoUrl').value.trim(),hero_image_url:form.querySelector('#teamHeroImageUrl').value.trim(),vk_url:"
+          if old not in s: raise SystemExit('admin save payload target not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+
+          # --- admin.html cache bust ---
+          p=Path('admin.html')
+          s=p.read_text()
+          if '/admin-teams.js?v=20260823-1' not in s: raise SystemExit('admin cache target not found')
+          p.write_text(s.replace('/admin-teams.js?v=20260823-1','/admin-teams.js?v=20260823-2',1))
+          PY
+          rm .github/workflows/team-hero-redesign.yml
+          git config user.name 'ChatGPT/actions'
+          git config user.email 'actions@users.noreply.github.com'
+          git add team.html team-detail.js admin-teams.js admin.html .github/workflows/team-hero-redesign.yml
+          git commit -m 'Redesign team profile hero'
+          git push
