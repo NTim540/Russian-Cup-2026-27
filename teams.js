@@ -37,10 +37,11 @@
     const unknown=team.name===UNKNOWN;
     const logo=unknown?null:(team.logo_url||TEAM_LOGOS[team.name]);
     const city=unknown?'':(team.city||TEAM_CITIES[team.name]||'Город уточняется');
+    const fallbackText=unknown?'?':esc(initials(team.name));
     const inner=`
       <div class="team-logo-wrap">
         ${logo?`<img class="team-logo" src="${logo}" alt="Логотип ${esc(team.name)}" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">`:''}
-        <div class="team-logo-fallback" style="display:grid">${unknown?'?':esc(initials(team.name))}</div>
+        <div class="team-logo-fallback" style="${logo?'display:none':'display:grid'}">${fallbackText}</div>
       </div>
       <h2 class="team-name">${esc(team.name)}</h2>
       ${city?`<div class="team-city">${esc(city)}</div>`:''}`;
