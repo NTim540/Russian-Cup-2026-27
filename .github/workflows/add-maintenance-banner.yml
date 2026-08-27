@@ -1,0 +1,36 @@
+name: Add maintenance banner
+on:
+  push:
+    paths:
+      - '.github/workflows/add-maintenance-banner.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add maintenance banner loader
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          files=['index.html','teams.html','team.html','history-2025-26.html']
+          tag='<script src="/maintenance.js?v=20260827-1"></script>'
+
+          for name in files:
+              p=Path(name)
+              s=p.read_text()
+              if name=='index.html':
+                  import re
+                  s=re.sub(r'<script src="/maintenance\.js\?v=[^"]+"></script>',tag,s)
+              elif tag not in s:
+                  s=s.replace('</body>',tag+'\n</body>',1)
+              p.write_text(s)
+          PY
+          rm .github/workflows/add-maintenance-banner.yml
+          git config user.name 'ChatGPT/actions'
+          git config user.email 'actions@users.noreply.github.com'
+          git add index.html teams.html team.html history-2025-26.html .github/workflows/add-maintenance-banner.yml
+          git commit -m 'Show maintenance notice across public pages'
+          git push
