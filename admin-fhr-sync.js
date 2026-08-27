@@ -50,7 +50,10 @@
     if(!box){box=document.createElement('div');box.className='fhr-sync-box';card.appendChild(box)}
     if(box.dataset.busy==='1')return;
     const active=document.activeElement&&box.contains(document.activeElement);
-    if(!active)box.innerHTML=panelHtml(m);
+    if(!active){
+      box.innerHTML=panelHtml(m);
+      box.dataset.wired='0';
+    }
     wire(card,box,id);
   }
 
