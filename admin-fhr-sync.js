@@ -71,7 +71,7 @@
     });
     box.querySelector('.fhr-check')?.addEventListener('click',async()=>{
       setBusy(box,true);setStatus(box,'Загружаю и распознаю страницу ФХР…');setPreview(box,null);
-      try{await ensureConfigured(box,id);const b=await call({action:'preview_parse',match_id:id});mergeMatch(id,b.match);setPreview(box,b.parsed);const s=b.parsed?.headline_score?b.parsed.headline_score.join(':'):'счёт не найден',g=b.parsed?.goals?.length||0;setStatus(box,`Распознано: ${s} · голов: ${g}. Данные пока не записаны в матч.`,'ok');setBusy(box,false)}catch(e){const m=getMatch(id);if(m)m.fhr_sync_status='ERROR';setStatus(box,e.message||String(e),'bad');setBusy(box,false)}
+      try{await ensureConfigured(box,id);const b=await call({action:'preview_parse',match_id:id});mergeMatch(id,b.match);setPreview(box,b.parsed);const s=b.parsed?.headline_score?b.parsed.headline_score.join(':'):'счёт не найден',g=b.parsed?.goals?.length||0;setStatus(box,`Распознано: ${s} · голов: ${g}. Это предпросмотр — данные в матч ещё не записаны.`,'ok');setBusy(box,false)}catch(e){const m=getMatch(id);if(m)m.fhr_sync_status='ERROR';setStatus(box,e.message||String(e),'bad');setBusy(box,false)}
     });
     box.querySelector('.fhr-sync-now')?.addEventListener('click',async()=>{
       setBusy(box,true);setStatus(box,'Синхронизирую счёт, периоды и события…');setPreview(box,null);
@@ -81,8 +81,7 @@
 
   function renderAll(){document.querySelectorAll('#matches .match-card[data-id]').forEach(updatePanel)}
   let queued=false;const queue=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;renderAll()})};
-  const matches=document.querySelector('#matches');if(matches)new MutationObserver(queue).observe(matches,{childList:true,subtree:true});
+  const matches=document.querySelector('#matches');if(matches)new MutationObserver(queue).observe(matches,{childList:true});
   document.addEventListener('click',e=>{if(e.target.closest?.('[data-tab="matches"],.match-filter-btn,.save,.del'))setTimeout(renderAll,60)},true);
-  setInterval(renderAll,2500);
   renderAll();
 })();
