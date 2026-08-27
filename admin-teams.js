@@ -8,6 +8,6 @@
   });
   load('/admin-teams-core.js?v=20260823-2')
     .then(()=>load('/admin-team-preview.js?v=20260823-2'))
-    .then(()=>load('/admin-fhr-sync.js?v=20260827-1'))
+    .then(()=>load('/admin-fhr-sync.js?v=20260827-2'))
     .catch(e=>console.error(e));
 })();
