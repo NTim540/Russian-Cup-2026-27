@@ -32,7 +32,36 @@
   `;
   document.head.appendChild(style);
 
+  const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toUpperCase();
+
+  function reorderStandingsTable(table){
+    const head=table.querySelector('thead tr');
+    if(!head)return;
+    const cells=[...head.children];
+    const labels=cells.map(c=>norm(c.textContent));
+    const iLoss=labels.findIndex(x=>x==='П');
+    const iOtWin=labels.findIndex(x=>x==='ВО/Б'||x==='В ОТ/Б');
+    const iOtLoss=labels.findIndex(x=>x==='ПО/Б'||x==='П ОТ/Б');
+
+    if(iOtWin>=0){
+      cells[iOtWin].textContent='В ОТ/Б';
+      cells[iOtWin].title='Победы в овертайме или по буллитам';
+    }
+    if(iOtLoss>=0){
+      cells[iOtLoss].textContent='П ОТ/Б';
+      cells[iOtLoss].title='Поражения в овертайме или по буллитам';
+    }
+
+    if(iLoss<0||iOtWin<0||iOtWin<iLoss)return;
+    head.insertBefore(cells[iOtWin],cells[iLoss]);
+    table.querySelectorAll('tbody tr').forEach(tr=>{
+      const row=[...tr.children];
+      if(row[iOtWin]&&row[iLoss])tr.insertBefore(row[iOtWin],row[iLoss]);
+    });
+  }
+
   function fix(){
+    document.querySelectorAll('#overallTable, #groupTables table').forEach(reorderStandingsTable);
     document.querySelectorAll('#overallTable tbody tr:nth-child(-n+3) td.place').forEach(td=>{
       if(td.querySelector('.place-medal'))return;
       const value=(td.textContent||'').trim();
