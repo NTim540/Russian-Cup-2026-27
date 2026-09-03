@@ -2,6 +2,7 @@
   const STYLE_ID='rosters-fhr-view-style';
   const PLACEHOLDER=`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="10" fill="#10243a"/><circle cx="40" cy="29" r="14" fill="#5f7891"/><path d="M15 72c2-17 12-26 25-26s23 9 25 26" fill="#5f7891"/></svg>`)}`;
   const labels={g:'Вратари',d:'Защитники',f:'Нападающие',u:'Игроки'};
+  const order=['g','d','f','u'];
 
   function addStyles(){
     if(document.getElementById(STYLE_ID))return;
@@ -37,6 +38,8 @@
     document.head.appendChild(s);
   }
 
+  function codeFor(card){return order.find(x=>card.classList.contains(x))||'u'}
+
   function apply(){
     const sec=document.getElementById('rosterSection');
     if(!sec)return false;
@@ -44,38 +47,44 @@
     const grid=sec.querySelector('.roster-grid');
     if(!grid)return true;
 
-    const cards=[...grid.querySelectorAll(':scope > .roster-card')];
-    const order=['g','d','f','u'];
-    cards.sort((a,b)=>order.findIndex(x=>a.classList.contains(x))-order.findIndex(x=>b.classList.contains(x))).forEach(card=>grid.appendChild(card));
+    const current=[...grid.querySelectorAll(':scope > .roster-card')];
+    const sorted=[...current].sort((a,b)=>order.indexOf(codeFor(a))-order.indexOf(codeFor(b)));
+    const needsReorder=current.some((card,i)=>card!==sorted[i]);
+    if(needsReorder)sorted.forEach(card=>grid.appendChild(card));
 
-    cards.forEach(card=>{
-      const code=order.find(x=>card.classList.contains(x))||'u';
+    sorted.forEach(card=>{
+      const code=codeFor(card);
       const title=card.querySelector('.roster-card-head strong');
-      if(title)title.textContent=labels[code];
+      if(title&&title.textContent!==labels[code])title.textContent=labels[code];
       card.querySelectorAll('.roster-player').forEach(row=>{
-        if(!row.querySelector('.roster-avatar')){
-          const avatar=document.createElement('span');
-          avatar.className='roster-avatar';
-          const img=document.createElement('img');
-          img.alt='Фото игрока';
-          img.loading='lazy';
-          img.decoding='async';
-          img.src=row.dataset.photo||PLACEHOLDER;
-          img.onerror=()=>{if(img.src!==PLACEHOLDER)img.src=PLACEHOLDER};
-          avatar.appendChild(img);
-          const num=row.querySelector('.roster-num');
-          num?.insertAdjacentElement('afterend',avatar);
-        }
+        if(row.querySelector('.roster-avatar'))return;
+        const avatar=document.createElement('span');
+        avatar.className='roster-avatar';
+        const img=document.createElement('img');
+        img.alt='Фото игрока';
+        img.loading='lazy';
+        img.decoding='async';
+        img.src=row.dataset.photo||PLACEHOLDER;
+        img.onerror=()=>{if(img.src!==PLACEHOLDER)img.src=PLACEHOLDER};
+        avatar.appendChild(img);
+        row.querySelector('.roster-num')?.insertAdjacentElement('afterend',avatar);
       });
     });
     sec.dataset.fhrView='1';
     return true;
   }
 
+  let queued=false;
+  const queue=()=>{
+    if(queued)return;
+    queued=true;
+    requestAnimationFrame(()=>{queued=false;apply()});
+  };
+
   let tries=0;
-  const timer=setInterval(()=>{tries++;if(apply()||tries>50)clearInterval(timer)},180);
-  const obs=new MutationObserver(()=>apply());
-  obs.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(()=>obs.disconnect(),15000);
+  const timer=setInterval(()=>{tries++;if(apply()||tries>40)clearInterval(timer)},200);
+  const obs=new MutationObserver(queue);
+  obs.observe(document.body,{childList:true,subtree:true});
+  setTimeout(()=>obs.disconnect(),12000);
   apply();
 })();
