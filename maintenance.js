@@ -68,6 +68,9 @@
     document.head.appendChild(s);
   }
   if((path==='/team.html'||path==='/team')&&!document.querySelector('script[data-team-rosters]')){
+    const rosterLabels=document.createElement('style');
+    rosterLabels.textContent='.roster-card.g .roster-card-head strong,.roster-card.d .roster-card-head strong,.roster-card.f .roster-card-head strong{font-size:0}.roster-card.g .roster-card-head strong:after{content:"Вратари";font-size:11px}.roster-card.d .roster-card-head strong:after{content:"Защитники";font-size:11px}.roster-card.f .roster-card-head strong:after{content:"Нападающие";font-size:11px}';
+    document.head.appendChild(rosterLabels);
     const s=document.createElement('script');
     s.src='/rosters.js?v=20260903-1';
     s.dataset.teamRosters='1';
