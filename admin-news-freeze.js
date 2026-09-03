@@ -2,10 +2,11 @@
   const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-news';
   const RENDERER='/news-widgets.js?v=20260903-1';
   const STYLE_ID='admin-news-freeze-style';
-  let mode='frozen',currentId=null,snapshotAt=null,rendererPromise=null;
+  let mode='frozen',currentId=null,currentRecord=null,snapshotAt=null,rendererPromise=null,forceRefresh=false;
   const q=s=>document.querySelector(s);
   const getPw=()=>{try{if(typeof PW!=='undefined'&&PW)return PW}catch{}return sessionStorage.getItem('rcAdminPw')||''};
   const tournamentId=()=>{try{return Number(D?.tournament?.id)||0}catch{return 0}};
+  const sameWidgets=(a,b)=>{try{return JSON.stringify(a||[])===JSON.stringify(b||[])}catch{return false}};
 
   function ensureRenderer(){
     if(window.renderNewsWidgets)return Promise.resolve();
@@ -32,21 +33,24 @@
     const sel=q('#newsWidgetMode'),badge=q('#newsWidgetModeBadge'),help=q('#newsWidgetModeHelp'),refresh=q('#newsWidgetRefresh'),stamp=q('#newsWidgetSnapshotAt');
     if(sel)sel.value=mode;
     if(badge){badge.textContent=mode==='live'?'LIVE':'ЗАФИКСИРОВАНО';badge.classList.toggle('live',mode==='live')}
-    if(help)help.textContent=mode==='live'?'Виджеты автоматически показывают текущие данные турнира. Таблица и результаты будут меняться после обновления базы.':'Виджеты фиксируются в момент сохранения новости и больше сами не меняются. Чтобы обновить их позже, нажмите «Обновить виджеты сейчас».';
+    if(help)help.textContent=mode==='live'
+      ?'Виджеты автоматически показывают текущие данные турнира и меняются вместе с базой.'
+      :'Виджеты хранят сохранённый снимок. Обычное редактирование текста новости его не меняет. Для обновления данных нажмите «Обновить виджеты сейчас».';
     if(refresh)refresh.classList.toggle('hidden',mode==='live');
     if(stamp)stamp.textContent=mode==='live'?'Автообновление включено':fmtSnapshot();
   }
 
   async function loadModeFor(id){
-    currentId=id||null;
-    if(!currentId){mode='frozen';snapshotAt=null;updateModeUi();return}
+    currentId=id||null;currentRecord=null;
+    if(!currentId){mode='frozen';snapshotAt=null;forceRefresh=false;updateModeUi();return}
     const tid=tournamentId();if(!tid)return;
     try{
       const r=await fetch(API+'?admin=1&tournament_id='+tid,{headers:{'x-admin-password':getPw()},cache:'no-store'}),b=await r.json();
       if(!r.ok)return;
       const n=(b.items||[]).find(x=>Number(x.id)===Number(currentId));
       if(!n)return;
-      mode=n.widgets_auto_update===true?'live':'frozen';snapshotAt=n.widgets_snapshot_at||null;updateModeUi();
+      currentRecord=n;
+      mode=n.widgets_auto_update===true?'live':'frozen';snapshotAt=n.widgets_snapshot_at||null;forceRefresh=false;updateModeUi();
     }catch(e){console.error('News widget mode:',e)}
   }
 
@@ -62,8 +66,8 @@
     `;document.head.appendChild(s)}
     const box=document.createElement('div');box.className='widget-mode-box';box.innerHTML=`<div class="widget-mode-row"><div class="field"><label>Обновление данных виджетов</label><select id="newsWidgetMode" class="select"><option value="frozen">Только вручную — зафиксировать данные</option><option value="live">Автоматически — всегда актуальные данные</option></select></div><button id="newsWidgetRefresh" class="btn sec small" type="button">Обновить виджеты сейчас</button></div><div id="newsWidgetModeHelp" class="widget-mode-copy"></div><div class="widget-mode-status"><span id="newsWidgetModeBadge" class="news-badge"></span><span id="newsWidgetSnapshotAt"></span></div>`;
     builder.appendChild(box);
-    q('#newsWidgetMode').onchange=e=>{mode=e.target.value==='live'?'live':'frozen';updateModeUi()};
-    q('#newsWidgetRefresh').onclick=()=>{mode='frozen';updateModeUi();q('#newsSave')?.click()};
+    q('#newsWidgetMode').onchange=e=>{mode=e.target.value==='live'?'live':'frozen';forceRefresh=false;updateModeUi()};
+    q('#newsWidgetRefresh').onclick=()=>{mode='frozen';forceRefresh=true;updateModeUi();q('#newsSave')?.click()};
     const syncFromMsg=()=>{const t=msg.textContent||'';const m=t.match(/Редактирование публикации №(\d+)/);if(m)loadModeFor(Number(m[1]));else if(t.includes('Новая публикация'))loadModeFor(null)};
     new MutationObserver(syncFromMsg).observe(msg,{childList:true,subtree:true,characterData:true});syncFromMsg();updateModeUi();
     return true;
@@ -73,24 +77,43 @@
   window.fetch=async function(input,init={}){
     const url=typeof input==='string'?input:input?.url||'';
     const method=String(init?.method||'GET').toUpperCase();
+    let intercepted=false;
     if(url.startsWith(API)&&method==='POST'&&init?.body){
       try{
         const body=JSON.parse(init.body);
         if(body&&['create','update'].includes(String(body.action||''))){
+          intercepted=true;
           const live=mode==='live';body.widgets_auto_update=live;
-          if(live||!Array.isArray(body.widgets)||!body.widgets.length){body.widgets_snapshot_html=null;body.widgets_snapshot_at=null}
-          else{
-            const msg=q('#newsMsg');if(msg)msg.textContent='Фиксирую данные виджетов…';
-            body.widgets_snapshot_html=await makeSnapshot(body);body.widgets_snapshot_at=new Date().toISOString();snapshotAt=body.widgets_snapshot_at;
+          if(live||!Array.isArray(body.widgets)||!body.widgets.length){
+            body.widgets_snapshot_html=null;body.widgets_snapshot_at=null;
+          }else{
+            const widgetsChanged=!sameWidgets(body.widgets,currentRecord?.widgets);
+            const needsSnapshot=forceRefresh||!currentRecord?.widgets_snapshot_html||widgetsChanged;
+            if(needsSnapshot){
+              const msg=q('#newsMsg');if(msg)msg.textContent=forceRefresh?'Обновляю данные виджетов…':'Фиксирую данные виджетов…';
+              body.widgets_snapshot_html=await makeSnapshot(body);body.widgets_snapshot_at=new Date().toISOString();
+            }else{
+              body.widgets_snapshot_html=currentRecord.widgets_snapshot_html;
+              body.widgets_snapshot_at=currentRecord.widgets_snapshot_at;
+            }
           }
           init={...init,body:JSON.stringify(body)};
         }
       }catch(e){
+        forceRefresh=false;
         console.error('News snapshot:',e);
         return new Response(JSON.stringify({error:'Не удалось зафиксировать виджеты: '+(e?.message||e)}),{status:400,headers:{'Content-Type':'application/json'}})
       }
     }
-    return nativeFetch(input,init)
+    const r=await nativeFetch(input,init);
+    if(intercepted){
+      try{
+        const b=await r.clone().json();
+        if(r.ok&&b?.item){currentRecord=b.item;currentId=Number(b.item.id);snapshotAt=b.item.widgets_snapshot_at||null;mode=b.item.widgets_auto_update?'live':'frozen'}
+      }catch{}
+      forceRefresh=false;updateModeUi();
+    }
+    return r
   };
 
   let tries=0;const timer=setInterval(()=>{tries++;if(init()||tries>60)clearInterval(timer)},100);
