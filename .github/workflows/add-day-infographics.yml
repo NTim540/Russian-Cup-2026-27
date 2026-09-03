@@ -1,0 +1,89 @@
+name: Add day infographics
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch admin infographics
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('admin-infographics.html')
+          s=p.read_text(encoding='utf-8')
+
+          old='''<div class="notice">Первая версия рассчитана на четыре шаблона: анонс матча, результат, игровой день и новость. Данные команд и матчей подставляются автоматически.</div>'''
+          new='''<div class="notice">Генератор поддерживает анонс и результат отдельного матча, анонс всех игр дня, результаты всего дня и новостную карточку. Данные команд и матчей подставляются автоматически.</div>'''
+          assert old in s, 'notice block not found'
+          s=s.replace(old,new,1)
+
+          old='''<div class="field"><label>Шаблон</label><select id="type" class="select"><option value="announcement">Анонс матча</option><option value="result">Результат матча</option><option value="gamesday">Игровой день</option><option value="news">Новость</option></select></div>'''
+          new='''<div class="field"><label>Шаблон</label><select id="type" class="select"><option value="announcement">Анонс матча</option><option value="result">Результат матча</option><option value="gamesday">Анонс игр дня</option><option value="resultsday">Результаты всего дня</option><option value="news">Новость</option></select></div>'''
+          assert old in s, 'type select not found'
+          s=s.replace(old,new,1)
+
+          start=s.index('async function drawGamesDay(){')
+          end=s.index('async function drawNews(){', start)
+          new_func=r'''async function drawGamesDay(kind='announcement'){
+  const date=$('#gameDate').value;
+  const ms=(D.matches||[]).filter(m=>m.game_date===date).sort((a,b)=>(a.start_time||'').localeCompare(b.start_time||'')||(a.game_no||0)-(b.game_no||0));
+  const isResults=kind==='results';
+  await header(isResults?'РЕЗУЛЬТАТЫ ДНЯ':'ИГРЫ ДНЯ');
+  text(fmtDate(date),70,235,44,'950','left','#fff');
+  text(`${ms.length} ${ms.length===1?'МАТЧ':([2,3,4].includes(ms.length)?'МАТЧА':'МАТЧЕЙ')}`,1010,235,18,'900','right','#7fc6ff');
+  if(!ms.length){text('МАТЧЕЙ НА ЭТУ ДАТУ НЕТ',540,650,34,'900','center','#91a0b4');footer();return}
+  const top=300,bottom=1185,gap=12;
+  const rowH=Math.min(185,Math.floor((bottom-top-gap*(ms.length-1))/ms.length));
+  const logoSize=Math.max(58,Math.min(106,rowH-58));
+  const nameSize=Math.max(18,Math.min(25,Math.floor(rowH*.16)));
+  const mainSize=Math.max(28,Math.min(40,Math.floor(rowH*.25)));
+  let y=top;
+  for(const m of ms){
+    const h=team(m.home_team_id),a=team(m.away_team_id),g=group(m.group_id);
+    fillRounded(70,y,940,rowH,22,'rgba(255,255,255,.035)','rgba(255,255,255,.09)');
+    const ly=y+(rowH-logoSize)/2;
+    await logoOrInitial(h,92,ly,logoSize);
+    await logoOrInitial(a,988-logoSize,ly,logoSize);
+    const nameY=y+Math.max(52,rowH*.43);
+    wrap(h.name,220,nameY,260,Math.max(26,nameSize+7),2,nameSize,'900','left','#fff');
+    wrap(a.name,860,nameY,260,Math.max(26,nameSize+7),2,nameSize,'900','right','#fff');
+    if(isResults){
+      const played=Number.isInteger(m.home_score)&&Number.isInteger(m.away_score);
+      text(played?`${m.home_score}:${m.away_score}`:'—',540,y+rowH*.48,mainSize+8,'950','center','#fff');
+      const finish=m.finish_type==='OT'?'ОТ':m.finish_type==='SO'?'Б':' ';
+      if(played&&finish.trim())text(finish,540,y+rowH*.70,14,'950','center','#7fc6ff');
+    }else{
+      text(m.start_time||'—',540,y+rowH*.48,mainSize,'950','center','#fff');
+    }
+    text(`${g?.code||''} • МАТЧ №${m.game_no||'—'}`,540,y+rowH-24,13,'850','center','#91a0b4');
+    y+=rowH+gap;
+  }
+  footer();
+}
+'''
+          s=s[:start]+new_func+s[end:]
+
+          old="""async function render(){if(!D)return;$('#status').textContent='Обновляю…';bg();const type=$('#type').value;try{if(type==='announcement'||type==='result')await drawMatch(type);else if(type==='gamesday')await drawGamesDay();else await drawNews();$('#status').textContent='Готово · 1080×1350'}catch(e){console.error(e);$('#status').textContent='Ошибка превью: '+e.message}}"""
+          new="""async function render(){if(!D)return;$('#status').textContent='Обновляю…';bg();const type=$('#type').value;try{if(type==='announcement'||type==='result')await drawMatch(type);else if(type==='gamesday')await drawGamesDay('announcement');else if(type==='resultsday')await drawGamesDay('results');else await drawNews();$('#status').textContent='Готово · 1080×1350'}catch(e){console.error(e);$('#status').textContent='Ошибка превью: '+e.message}}"""
+          assert old in s, 'render function not found'
+          s=s.replace(old,new,1)
+
+          old="""function switchType(){const t=$('#type').value;$('#matchControls').classList.toggle('hidden',!['announcement','result'].includes(t));$('#gamesdayControls').classList.toggle('hidden',t!=='gamesday');$('#newsControls').classList.toggle('hidden',t!=='news');render()}"""
+          new="""function switchType(){const t=$('#type').value;$('#matchControls').classList.toggle('hidden',!['announcement','result'].includes(t));$('#gamesdayControls').classList.toggle('hidden',!['gamesday','resultsday'].includes(t));$('#newsControls').classList.toggle('hidden',t!=='news');render()}"""
+          assert old in s, 'switchType function not found'
+          s=s.replace(old,new,1)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin-infographics.html
+          git commit -m "Add full-day game and result infographics"
+          git push
