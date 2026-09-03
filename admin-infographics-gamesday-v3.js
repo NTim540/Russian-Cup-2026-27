@@ -23,16 +23,16 @@
     registerHit({id:key,type:'image',editable:false,x:xx,y:yy,w:sz,h:sz});
   }
 
-  function sideBlockV3(id,name,city,x,centerY,maxWidth,rowH,align){
-    const base=rowH>=320?34:rowH>=235?29:rowH>=180?25:21;
-    const min=rowH>=235?20:16;
+  function sideBlockV3(id,name,city,x,centerY,maxWidth,rowH,align,compact=false){
+    const base=compact?30:rowH>=320?34:rowH>=235?29:rowH>=180?25:21;
+    const min=compact?17:rowH>=235?20:16;
     const f=fitLines(name,maxWidth,2,base,min,'900');
-    const lineH=Math.max(f.size*1.12,22);
+    const lineH=Math.max(f.size*(compact?1.06:1.12),22);
     const blockH=(f.lines.length-1)*lineH;
     const startY=centerY-blockH/2;
     sceneWrap(id+':name',name,x,startY,maxWidth,lineH,2,f.size,'900',align,'#f7fbff',true,true);
-    const citySize=Math.max(12,Math.min(16,f.size*.57));
-    sceneText(id+':city',city||'',x,startY+blockH+lineH+8,citySize,'700',align,'#8fa6bd');
+    const citySize=Math.max(12,Math.min(compact?15:16,f.size*.55));
+    sceneText(id+':city',city||'',x,startY+blockH+lineH+(compact?12:8),citySize,'700',align,'#8fa6bd');
   }
 
   function vkMarkV3(id,cx,cy,scale=1){
@@ -47,12 +47,13 @@
     registerHit({id:key,type:'image',editable:false,x,y,w:total,h:icon});
   }
 
-  function centerGuideV3(y,rowH){
+  function centerGuideV3(y,rowH,twoMatches=false){
+    const left=twoMatches?448:438,right=twoMatches?632:642;
     ctx.save();
     ctx.strokeStyle='rgba(127,198,255,.075)';
     ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(438,y+28);ctx.lineTo(438,y+rowH-28);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(642,y+28);ctx.lineTo(642,y+rowH-28);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(left,y+28);ctx.lineTo(left,y+rowH-28);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(right,y+28);ctx.lineTo(right,y+rowH-28);ctx.stroke();
     ctx.restore();
   }
 
@@ -64,13 +65,14 @@
     if(!ms.length){sceneText('day3:empty','МАТЧЕЙ НА ЭТУ ДАТУ НЕТ',540,650,34,'900','center','#91a0b4');footer();return}
 
     const {top,rowH,gap}=metricsV3(ms.length);
+    const twoMatches=ms.length===2;
     let y=top;
     for(const m of ms){
       const h=team(m.home_team_id),a=team(m.away_team_id),g=group(m.group_id);
       const large=ms.length<=2;
 
       fillRounded(70,y,940,rowH,26,'rgba(7,21,37,.46)','rgba(127,198,255,.13)');
-      centerGuideV3(y,rowH);
+      centerGuideV3(y,rowH,twoMatches);
 
       const logoSize=rowH>=320?118:rowH>=235?98:rowH>=180?78:Math.max(52,rowH*.42);
       const ly=y+(rowH-logoSize)/2;
@@ -78,11 +80,17 @@
       await dayLogoV3(`day3:${m.id}:awayLogo`,a,984-logoSize,ly,logoSize);
 
       const textY=y+rowH*.40;
-      const textWidth=large?270:250;
-      sideBlockV3(`day3:${m.id}:home`,h.name,teamCity(h),218,textY,textWidth,rowH,'left');
-      sideBlockV3(`day3:${m.id}:away`,a.name,teamCity(a),862,textY,textWidth,rowH,'right');
+      if(twoMatches){
+        /* Keep both team blocks completely outside the central time column. */
+        sideBlockV3(`day3:${m.id}:home`,h.name,teamCity(h),410,textY,190,rowH,'right',true);
+        sideBlockV3(`day3:${m.id}:away`,a.name,teamCity(a),670,textY,190,rowH,'left',true);
+      }else{
+        const textWidth=large?270:250;
+        sideBlockV3(`day3:${m.id}:home`,h.name,teamCity(h),218,textY,textWidth,rowH,'left');
+        sideBlockV3(`day3:${m.id}:away`,a.name,teamCity(a),862,textY,textWidth,rowH,'right');
+      }
 
-      const mainSize=rowH>=320?56:rowH>=235?48:rowH>=180?40:Math.max(27,rowH*.22);
+      const mainSize=twoMatches?54:rowH>=320?56:rowH>=235?48:rowH>=180?40:Math.max(27,rowH*.22);
       if(isResults){
         const played=Number.isInteger(m.home_score)&&Number.isInteger(m.away_score);
         sceneText(`day3:${m.id}:score`,played?`${m.home_score}:${m.away_score}`:'—',540,y+rowH*.43,mainSize+6,'950','center','#fff');
@@ -90,7 +98,7 @@
         if(played&&m.finish_type==='SO')sceneText(`day3:${m.id}:finish`,'Б',540,y+rowH*.62,12,'950','center','#78c7ff');
       }else{
         sceneText(`day3:${m.id}:time`,m.start_time||'—',540,y+rowH*.42,mainSize,'950','center','#fff');
-        vkMarkV3(`day3:${m.id}:vk`,540,y+rowH*.61,large?1.08:.92);
+        vkMarkV3(`day3:${m.id}:vk`,540,y+rowH*.61,twoMatches?1:.92);
       }
 
       sceneText(`day3:${m.id}:meta`,`${g?.code||''} · №${m.game_no||'—'}`,540,y+rowH-18,11.5,'800','center','#738ba3');
