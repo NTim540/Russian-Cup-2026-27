@@ -74,6 +74,13 @@
     const s=document.createElement('script');
     s.src='/rosters.js?v=20260903-1';
     s.dataset.teamRosters='1';
+    s.onload=()=>{
+      if(document.querySelector('script[data-akm-roster]'))return;
+      const a=document.createElement('script');
+      a.src='/rosters-akm.js?v=20260903-1';
+      a.dataset.akmRoster='1';
+      document.head.appendChild(a);
+    };
     document.head.appendChild(s);
   }
 })();
