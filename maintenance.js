@@ -84,7 +84,7 @@
     document.head.appendChild(s);
 
     const v=document.createElement('script');
-    v.src='/rosters-fhr-view.js?v=20260903-1';
+    v.src='/rosters-fhr-view.js?v=20260903-2';
     v.dataset.rosterFhrView='1';
     document.head.appendChild(v);
   }
