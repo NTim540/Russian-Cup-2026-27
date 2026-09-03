@@ -59,4 +59,12 @@
   new MutationObserver(djQueue).observe(document.body,{childList:true,subtree:true});
   setInterval(addDynamoJuniorsLogos,1200);
   addDynamoJuniorsLogos();
+
+  const path=location.pathname.replace(/\/+$/,'')||'/';
+  if(path==='/'&&!document.querySelector('script[data-home-news]')){
+    const s=document.createElement('script');
+    s.src='/news.js?v=20260903-1';
+    s.dataset.homeNews='1';
+    document.head.appendChild(s);
+  }
 })();
