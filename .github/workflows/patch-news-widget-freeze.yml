@@ -1,0 +1,40 @@
+name: Patch news widget freeze loaders
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch loaders
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('admin.html')
+          s=p.read_text(encoding='utf-8')
+          s,n=re.subn(r'/admin-teams\.js\?v=[^"\']+', '/admin-teams.js?v=20260903-5', s, count=1)
+          assert n==1, 'admin loader not found'
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('news.html')
+          s=p.read_text(encoding='utf-8')
+          if 'news-widgets-freeze.js' not in s:
+              marker='<script src="/news-widgets.js?v=20260903-1"></script>'
+              assert marker in s, 'news widgets marker not found'
+              s=s.replace(marker, marker+'\n<script src="/news-widgets-freeze.js?v=20260903-1"></script>', 1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/patch-news-widget-freeze.yml
+          git add admin.html news.html
+          git commit -m "Enable manual news widget snapshots"
+          git push
