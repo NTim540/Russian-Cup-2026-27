@@ -12,4 +12,7 @@
     }
     return original(news,container)
   };
+  if(!document.querySelector('script[data-news-match-widgets]')){
+    const s=document.createElement('script');s.src='/news-match-widgets.js?v=20260904-1';s.dataset.newsMatchWidgets='1';document.head.appendChild(s);
+  }
 })();
