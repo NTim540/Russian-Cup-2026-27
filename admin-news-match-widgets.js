@@ -12,9 +12,12 @@
   function matchLabel(m){const d=m?.game_date?new Date(m.game_date+'T12:00:00').toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'}):'';return`${d} · №${m?.game_no??'—'} · ${teamName(m.home_team_id)} — ${teamName(m.away_team_id)}`}
   function defaultTitle(type,m){return type===RESULT?`${teamName(m.home_team_id)} — ${teamName(m.away_team_id)}`:`${teamName(m.home_team_id)} — ${teamName(m.away_team_id)} · трансляция`}
 
-  function ensurePublicRenderer(){
-    if(document.querySelector('script[data-news-match-widgets]'))return;
-    const s=document.createElement('script');s.src='/news-match-widgets.js?v=20260904-1';s.dataset.newsMatchWidgets='1';document.head.appendChild(s);
+  function loadScript(src,mark){return new Promise((resolve,reject)=>{if(mark&&document.querySelector(`script[${mark}]`)){resolve();return}const s=document.createElement('script');s.src=src;if(mark)s.setAttribute(mark,'1');s.onload=resolve;s.onerror=()=>reject(new Error('Не удалось загрузить '+src));document.head.appendChild(s)})}
+  async function ensurePublicRenderer(){
+    try{
+      if(typeof window.renderNewsWidgets!=='function')await loadScript('/news-widgets.js?v=20260903-1','data-news-base-renderer');
+      if(!document.querySelector('script[data-news-match-widgets]'))await loadScript('/news-match-widgets.js?v=20260904-1','data-news-match-widgets');
+    }catch(e){console.error('News match renderer:',e)}
   }
 
   function ensureUi(){
@@ -25,8 +28,8 @@
       const box=document.createElement('div');box.className='field hidden';box.id='widgetMatchField';box.innerHTML='<label>Матч</label><select id="widgetMatch" class="select"></select>';
       fields.appendChild(box);
     }
-    type.addEventListener('change',syncUi);
-    q('#widgetAdd')?.addEventListener('click',captureAdd,true);
+    if(type.dataset.matchWidgetInit!=='1'){type.dataset.matchWidgetInit='1';type.addEventListener('change',syncUi)}
+    const add=q('#widgetAdd');if(add&&add.dataset.matchWidgetInit!=='1'){add.dataset.matchWidgetInit='1';add.addEventListener('click',captureAdd,true)}
     syncUi();populateMatches();return true;
   }
 
