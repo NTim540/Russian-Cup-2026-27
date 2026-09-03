@@ -28,4 +28,35 @@
 
   const header=document.querySelector('.site-header,.header');
   if(header)header.insertAdjacentElement('afterend',notice);else document.body.prepend(notice);
+
+  const DJ_NAME='Динамо-Джуниверс';
+  const DJ_LOGO='https://drive.google.com/thumbnail?id=1HTqvh6fg5ZzOLFwOtY62zucjnRZyOXmu&sz=w512';
+  function addDynamoJuniorsLogos(){
+    const selectors='td.team,#upcomingGrid .upcoming-team>span:first-child,#matchList .match-team,#matchCenterOverlay .mc-team,#matchCenterOverlay .mc-period-team,#matchCenterOverlay .mc-h2h-side';
+    document.querySelectorAll(selectors).forEach(el=>{
+      const text=(el.dataset.teamName||el.textContent||'').replace(/\s+/g,' ').trim();
+      if(!text.includes(DJ_NAME))return;
+      const target=el.querySelector(':scope > .team-profile-link')||el;
+      if(target.querySelector('img[data-dj-logo="1"]')||target.querySelector(`img[src*="1HTqvh6fg5ZzOLFwOtY62zucjnRZyOXmu"]`))return;
+      if(target.querySelector('img'))return;
+      const img=document.createElement('img');
+      img.src=DJ_LOGO;
+      img.alt='Логотип '+DJ_NAME;
+      img.loading='lazy';
+      img.decoding='async';
+      img.dataset.djLogo='1';
+      if(el.classList.contains('mc-team')){
+        target.insertBefore(img,target.firstChild);
+      }else{
+        img.className=el.classList.contains('mc-event')?'mc-event-logo':'team-logo-img';
+        if(el.classList.contains('away')||el.classList.contains('mc-h2h-side')&&el.classList.contains('away'))target.appendChild(img);else target.insertBefore(img,target.firstChild);
+        el.classList.add('logo-ready');
+      }
+    });
+  }
+  let djQueued=false;
+  const djQueue=()=>{if(djQueued)return;djQueued=true;requestAnimationFrame(()=>{djQueued=false;addDynamoJuniorsLogos()})};
+  new MutationObserver(djQueue).observe(document.body,{childList:true,subtree:true});
+  setInterval(addDynamoJuniorsLogos,1200);
+  addDynamoJuniorsLogos();
 })();
