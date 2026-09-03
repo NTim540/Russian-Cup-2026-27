@@ -67,4 +67,10 @@
     s.dataset.homeNews='1';
     document.head.appendChild(s);
   }
+  if((path==='/team.html'||path==='/team')&&!document.querySelector('script[data-team-rosters]')){
+    const s=document.createElement('script');
+    s.src='/rosters.js?v=20260903-1';
+    s.dataset.teamRosters='1';
+    document.head.appendChild(s);
+  }
 })();
