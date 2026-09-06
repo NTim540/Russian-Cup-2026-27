@@ -61,6 +61,12 @@
   addDynamoJuniorsLogos();
 
   const path=location.pathname.replace(/\/+$/,'')||'/';
+  if(path==='/'&&!document.querySelector('script[data-mobile-layout-fix]')){
+    const m=document.createElement('script');
+    m.src='/mobile-layout-fix.js?v=20260906-1';
+    m.dataset.mobileLayoutFix='1';
+    document.head.appendChild(m);
+  }
   if(path==='/'&&!document.querySelector('script[data-home-news]')){
     const s=document.createElement('script');
     s.src='/news.js?v=20260903-1';
