@@ -4,7 +4,7 @@
 
   const EDGE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-fhr-roster';
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const safePhoto=url=>{try{const u=new URL(url);return u.protocol==='https:'&&u.hostname==='img.fhr.ru'&&u.pathname.startsWith('/players/')?u.toString():''}catch{return''}};
+  const safePhoto=url=>{try{const u=new URL(url);const h=u.hostname.toLowerCase();return u.protocol==='https:'&&(h==='img.fhr.ru'||h==='junior.fhr.ru'||h==='fhr.ru'||h.endsWith('.fhr.ru'))?u.toString():''}catch{return''}};
   const proxyPhoto=url=>url?`${EDGE}?photo=${encodeURIComponent(url)}`:'';
   const labels={G:'Вратари',D:'Защитники',F:'Нападающие',U:'Игроки'};
   const classes={G:'g',D:'d',F:'f',U:'u'};
@@ -24,7 +24,7 @@
 
   function row(p){
     const photo=safePhoto(p.photo),proxy=proxyPhoto(photo);
-    return `<div class="roster-player" data-photo="${esc(photo)}"><span class="roster-num">${esc(p.number)}</span><span class="roster-avatar">${photo?`<img src="${esc(proxy)}" data-direct-photo="${esc(photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`:''}</span><span class="roster-name">${esc(p.name)}</span></div>`;
+    return `<div class="roster-player" data-photo="${esc(photo)}"><span class="roster-num">${esc(p.number)}</span><span class="roster-avatar">${photo?`<img src="${esc(proxy)}" data-direct-photo="${esc(photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`:''}</span><span class="roster-name">${esc(p.name)}</span></div>`;
   }
 
   function render(players){
@@ -40,14 +40,17 @@
 
   async function load(){
     try{
-      const r=await fetch(`${EDGE}?team=${team}`,{mode:'cors',cache:'no-store'});
-      if(!r.ok)throw Error(`Roster ${r.status}`);
+      const r=await fetch(`${EDGE}?team=${team}&v=2`,{mode:'cors',cache:'no-store'});
+      if(!r.ok){let detail='';try{detail=await r.text()}catch{};throw Error(`Roster ${r.status} ${detail}`)}
       const b=await r.json();
       if(!Array.isArray(b.players)||!b.players.length)throw Error('Empty roster');
       render(b.players);
     }catch(e){
       console.warn('FHR roster Edge unavailable, keeping local roster',e);
-      document.getElementById('rosterSection')?.setAttribute('data-source','local-fallback');
+      const sec=document.getElementById('rosterSection');
+      sec?.setAttribute('data-source','local-fallback');
+      const sub=sec?.querySelector('.section-sub');
+      if(sub)sub.textContent='Резервный состав · источник ФХР временно недоступен';
     }
   }
 
