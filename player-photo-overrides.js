@@ -1,12 +1,13 @@
 (()=>{
   const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup';
   const EDGE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-fhr-roster';
-  const PREFIX='__PP_';
+  const PHOTO_PREFIX='__PP_';
   const teamId=Number(new URL(location.href).searchParams.get('team'));
   if(!Number.isInteger(teamId)||teamId<1)return;
 
   const clean=x=>String(x||'').replace(/\s+/g,' ').trim();
-  const isStorage=x=>String(x?.name||'').startsWith(PREFIX);
+  const isPhotoStorage=x=>String(x?.name||'').startsWith(PHOTO_PREFIX);
+  const isHiddenStorage=x=>{const n=String(x?.name||'');return n.startsWith('__PP_')||n.startsWith('__LU_')};
   let PHOTO_MAP={};
   let queued=false;
 
@@ -18,7 +19,7 @@
   }
   function validUrl(raw){try{const u=new URL(String(raw||''));return u.protocol==='https:'?u.toString():''}catch{return''}}
   function decodeMap(arenas){
-    const parts=(Array.isArray(arenas)?arenas:[]).filter(isStorage).sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(x=>String(x.address||'')).join('');
+    const parts=(Array.isArray(arenas)?arenas:[]).filter(isPhotoStorage).sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(x=>String(x.address||'')).join('');
     if(!parts)return{};
     try{const raw=JSON.parse(parts),out={};for(const [name,url] of Object.entries(raw||{})){const u=validUrl(unpackUrl(url));if(clean(name)&&u)out[clean(name)]=u}return out}catch{return{}}
   }
@@ -68,7 +69,7 @@
       const cat=await fetch(API+'/api/catalog',{cache:'no-store'}).then(r=>r.json()),t=cat.tournaments?.[0];if(!t)return;
       const stages=(cat.stages||[]).filter(s=>Number(s.tournament_id)===Number(t.id)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)),stage=stages[0];if(!stage)return;
       const data=await fetch(API+'/api/data?tournament_slug='+encodeURIComponent(t.slug)+'&stage_id='+stage.id,{cache:'no-store'}).then(r=>r.json()),team=data.teams?.find(x=>Number(x.id)===teamId);if(!team)return;
-      const arenas=Array.isArray(team.arenas)?team.arenas:[],real=arenas.filter(a=>!isStorage(a));
+      const arenas=Array.isArray(team.arenas)?team.arenas:[],real=arenas.filter(a=>!isHiddenStorage(a));
       PHOTO_MAP=decodeMap(arenas);
       const arenaEl=document.querySelector('#teamArena');if(arenaEl){const text=real.map(a=>[a.name,a.address].filter(Boolean).join(' — ')).filter(Boolean).join(' · ');if(text)arenaEl.textContent=text;else if(team.city)arenaEl.textContent=team.city+' · адрес арены будет добавлен'}
       apply();
