@@ -100,12 +100,12 @@
     document.head.appendChild(live);
 
     const manual=document.createElement('script');
-    manual.src='/player-photo-overrides.js?v=20260907-2';
+    manual.src='/player-photo-overrides.js?v=20260907-3';
     manual.dataset.playerPhotoOverrides='1';
     document.head.appendChild(manual);
 
     const profiles=document.createElement('script');
-    profiles.src='/player-profile-links.js?v=20260907-1';
+    profiles.src='/player-profile-links.js?v=20260907-2';
     profiles.dataset.playerProfileLinks='1';
     document.head.appendChild(profiles);
   }
