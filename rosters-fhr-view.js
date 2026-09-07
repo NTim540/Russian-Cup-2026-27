@@ -7,12 +7,10 @@
     const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
     return parts.slice(0,2).map(x=>Array.from(x)[0]?.toLocaleUpperCase('ru-RU')||'').join('');
   }
-
   function teamLogo(){
     const img=document.querySelector('.team-logo-large,.team-logo-side img');
     return img?.currentSrc||img?.src||'';
   }
-
   function renderFallback(avatar,name){
     avatar.className='roster-avatar roster-avatar-fallback';
     avatar.replaceChildren();
@@ -80,19 +78,29 @@
   }
 
   function codeFor(card){return order.find(x=>card.classList.contains(x))||'u'}
+  function proxyUrl(photo){return photo?`/api/fhr-photo?src=${encodeURIComponent(photo)}`:''}
 
-  function wireImage(img,avatar,name){
-    if(img.dataset.fallbackWired==='1')return;
-    img.dataset.fallbackWired='1';
-    img.addEventListener('error',()=>{
-      const direct=String(img.dataset.directPhoto||'').trim();
-      if(direct&&img.dataset.directRetried!=='1'){
-        img.dataset.directRetried='1';
-        img.src=direct;
+  function wireImage(img,avatar,name,row){
+    if(img.dataset.photoGuard==='1')return;
+    img.dataset.photoGuard='1';
+    const direct=String(row.dataset.photo||img.dataset.directPhoto||'').trim();
+    const proxy=String(img.dataset.proxyPhoto||proxyUrl(direct)).trim();
+    let stage=img.src===direct?'direct':'proxy';
+
+    const fail=()=>{
+      if(stage==='direct'&&proxy){
+        stage='proxy';
+        img.src=proxy;
         return;
       }
       renderFallback(avatar,name);
-    });
+    };
+
+    img.addEventListener('error',fail);
+    img.addEventListener('load',()=>avatar.classList.remove('roster-avatar-fallback'));
+
+    // Если ошибка случилась до того, как этот обработчик успел подключиться.
+    if(img.complete&&img.naturalWidth===0)queueMicrotask(fail);
   }
 
   function ensureAvatar(row){
@@ -104,24 +112,29 @@
       row.querySelector('.roster-num')?.insertAdjacentElement('afterend',avatar);
     }
 
-    const img=avatar.querySelector('img:not(.roster-avatar-logo)');
+    let img=avatar.querySelector('img:not(.roster-avatar-logo)');
+    const photo=String(row.dataset.photo||'').trim();
+
     if(img){
       avatar.classList.remove('roster-avatar-fallback');
-      wireImage(img,avatar,name);
+      if(photo&&!img.dataset.directPhoto)img.dataset.directPhoto=photo;
+      wireImage(img,avatar,name,row);
       return;
     }
 
-    const photo=String(row.dataset.photo||'').trim();
     if(photo){
       avatar.className='roster-avatar';
       avatar.replaceChildren();
-      const photoImg=document.createElement('img');
-      photoImg.alt=name?`Фото игрока ${name}`:'Фото игрока';
-      photoImg.loading='lazy';
-      photoImg.decoding='async';
-      photoImg.src=photo;
-      avatar.appendChild(photoImg);
-      wireImage(photoImg,avatar,name);
+      img=document.createElement('img');
+      img.alt=name?`Фото игрока ${name}`:'Фото игрока';
+      img.loading='lazy';
+      img.decoding='async';
+      img.referrerPolicy='no-referrer';
+      img.dataset.directPhoto=photo;
+      img.dataset.proxyPhoto=proxyUrl(photo);
+      img.src=photo;
+      avatar.appendChild(img);
+      wireImage(img,avatar,name,row);
       return;
     }
 
@@ -151,16 +164,11 @@
   }
 
   let queued=false;
-  const queue=()=>{
-    if(queued)return;
-    queued=true;
-    requestAnimationFrame(()=>{queued=false;apply()});
-  };
-
+  const queue=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;apply()})};
   let tries=0;
-  const timer=setInterval(()=>{tries++;if(apply()||tries>40)clearInterval(timer)},200);
+  const timer=setInterval(()=>{tries++;if(apply()||tries>60)clearInterval(timer)},200);
   const obs=new MutationObserver(queue);
   obs.observe(document.body,{childList:true,subtree:true});
-  setTimeout(()=>obs.disconnect(),12000);
+  setTimeout(()=>obs.disconnect(),18000);
   apply();
 })();
