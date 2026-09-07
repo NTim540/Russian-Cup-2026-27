@@ -95,7 +95,7 @@
     document.head.appendChild(v);
 
     const live=document.createElement('script');
-    live.src='/rosters-live.js?v=20260907-2';
+    live.src='/rosters-live.js?v=20260907-3';
     live.dataset.rostersLive='1';
     document.head.appendChild(live);
   }
