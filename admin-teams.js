@@ -10,6 +10,7 @@
   // FHR sync is intentionally independent from the team-admin chain.
   // Even if a team preview helper fails, match synchronization must remain available.
   load('/admin-fhr-sync.js?v=20260827-5').catch(e=>console.error('FHR sync:',e));
+  load('/admin-player-lineups.js?v=20260907-1').catch(e=>console.error('Player lineups:',e));
   load('/admin-news.js?v=20260903-4')
     .then(()=>load('/admin-news-freeze.js?v=20260903-2'))
     .then(()=>load('/admin-news-match-widgets.js?v=20260904-1'))
