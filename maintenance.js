@@ -93,5 +93,10 @@
     v.src='/rosters-fhr-view.js?v=20260903-2';
     v.dataset.rosterFhrView='1';
     document.head.appendChild(v);
+
+    const live=document.createElement('script');
+    live.src='/rosters-live.js?v=20260907-1';
+    live.dataset.rostersLive='1';
+    document.head.appendChild(live);
   }
 })();
