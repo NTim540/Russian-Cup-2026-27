@@ -2,9 +2,8 @@
   const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-analytics';
   const section=document.querySelector('#tab-news');
   if(!section||document.querySelector('#newsArticleAnalytics'))return;
-  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const nf=n=>Number(n||0).toLocaleString('ru-RU');
-  let map=new Map(),busy=false,lastLoaded=0;
+  let map=new Map(),busy=false,lastLoaded=0,decorateTimer=null;
 
   const style=document.createElement('style');
   style.textContent=`
@@ -17,9 +16,10 @@
   document.head.appendChild(style);
 
   const editor=section.querySelector('.news-admin-grid > .card.panel');
+  if(!editor)return;
   const panel=document.createElement('div');panel.id='newsArticleAnalytics';panel.className='news-analytics-panel';
-  panel.innerHTML=`<div class="news-analytics-head"><div><h3>Статистика новости</h3><div class="muted">Анонимные просмотры и уникальные читатели.</div></div><button type="button" class="news-analytics-refresh">Обновить</button></div><div class="news-analytics-grid"><div class="news-analytics-stat"><strong data-na="views">—</strong><span>Просмотры · 30 дней</span></div><div class="news-analytics-stat"><strong data-na="visitors">—</strong><span>Уникальные · 30 дней</span></div><div class="news-analytics-stat"><strong data-na="depth">—</strong><span>Просмотров / читателя</span></div></div><div class="news-analytics-foot">Статистика по отдельным статьям собирается с момента подключения этого счётчика. Клики внутри новости уже записываются отдельными событиями для расширенной аналитики.</div>`;
-  const msg=editor?.querySelector('#newsMsg');if(msg)msg.insertAdjacentElement('beforebegin',panel);else editor?.appendChild(panel);
+  panel.innerHTML=`<div class="news-analytics-head"><div><h3>Статистика новости</h3><div class="muted">Анонимные просмотры и уникальные читатели.</div></div><button type="button" class="news-analytics-refresh">Обновить</button></div><div class="news-analytics-grid"><div class="news-analytics-stat"><strong data-na="views">—</strong><span>Просмотры · 30 дней</span></div><div class="news-analytics-stat"><strong data-na="visitors">—</strong><span>Уникальные · 30 дней</span></div><div class="news-analytics-stat"><strong data-na="depth">—</strong><span>Просмотров / читателя</span></div></div><div class="news-analytics-foot">Статистика по отдельным статьям собирается с момента подключения счётчика.</div>`;
+  const msg=editor.querySelector('#newsMsg');if(msg)msg.insertAdjacentElement('beforebegin',panel);else editor.appendChild(panel);
   const refreshBtn=panel.querySelector('.news-analytics-refresh');
 
   function pw(){try{if(typeof PW!=='undefined'&&PW)return PW}catch{}return sessionStorage.getItem('rcAdminPw')||''}
@@ -29,17 +29,19 @@
     const id=selectedId(),s=stat(id),v=Number(s.pageviews||0),u=Number(s.visitors||0);
     panel.querySelector('[data-na="views"]').textContent=id?(s.known?nf(v):'0'):'—';
     panel.querySelector('[data-na="visitors"]').textContent=id?(s.known?nf(u):'0'):'—';
-    panel.querySelector('[data-na="depth"]').textContent=id&&s.known&&u?(v/u).toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1}):id?'—':'—';
+    panel.querySelector('[data-na="depth"]').textContent=id&&s.known&&u?(v/u).toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1}):'—';
     panel.style.opacity=id?'1':'.6';
   }
   function decorate(){
     section.querySelectorAll('.news-item[data-id]').forEach(el=>{
       const id=Number(el.dataset.id),s=stat(id),meta=el.querySelector('.news-item-meta');if(!meta)return;
       let badge=meta.querySelector('.news-analytics-mini');if(!badge){badge=document.createElement('span');badge.className='news-analytics-mini';meta.appendChild(badge)}
-      badge.textContent=s.known?`Просм. ${nf(s.pageviews)} · уник. ${nf(s.visitors)}`:'Просм. 0 · уник. 0';
+      const text=s.known?`Просм. ${nf(s.pageviews)} · уник. ${nf(s.visitors)}`:'Просм. 0 · уник. 0';
+      if(badge.textContent!==text)badge.textContent=text;
     });
     renderPanel();
   }
+  function scheduleDecorate(){clearTimeout(decorateTimer);decorateTimer=setTimeout(decorate,80)}
   function parse(d){
     const next=new Map();
     for(const r of d.top_pages||[]){const m=String(r.path||'').match(/^\/news(?:\.html)?\?id=(\d+)/);if(!m)continue;next.set(Number(m[1]),{pageviews:Number(r.pageviews)||0,visitors:Number(r.visitors)||0,known:true})}
@@ -52,8 +54,8 @@
   }
 
   refreshBtn.addEventListener('click',()=>load(true));
-  const newsBtn=document.querySelector('.tab[data-tab="news"]');newsBtn?.addEventListener('click',()=>setTimeout(()=>load(true),80));
-  new MutationObserver(()=>decorate()).observe(section,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-  setInterval(()=>{if(!section.classList.contains('hidden'))load()},15000);
+  const newsBtn=document.querySelector('.tab[data-tab="news"]');newsBtn?.addEventListener('click',()=>setTimeout(()=>{scheduleDecorate();load(true)},100));
+  section.addEventListener('click',e=>{if(e.target.closest?.('.news-item'))setTimeout(renderPanel,60)},true);
+  setInterval(()=>{if(!section.classList.contains('hidden')){scheduleDecorate();load()}},15000);
   decorate();
 })();
