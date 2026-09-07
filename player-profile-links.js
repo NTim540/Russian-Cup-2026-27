@@ -7,8 +7,6 @@
     #rosterSection .roster-player[data-player-profile-link="1"]{cursor:pointer;position:relative;transition:background .16s ease,border-color .16s ease,transform .16s ease}
     #rosterSection .roster-player[data-player-profile-link="1"]:hover{background:rgba(127,198,255,.055)!important}
     #rosterSection .roster-player[data-player-profile-link="1"]:focus-visible{outline:2px solid rgba(127,198,255,.65);outline-offset:2px;border-radius:7px}
-    #rosterSection .roster-player[data-player-profile-link="1"] .roster-name:after{content:"↗";display:inline-block;margin-left:7px;color:#56748e;font-size:10px;opacity:.65;transition:.16s ease}
-    #rosterSection .roster-player[data-player-profile-link="1"]:hover .roster-name:after{color:#8ed1ff;opacity:1;transform:translateX(2px)}
   `;
   document.head.appendChild(style);
 
