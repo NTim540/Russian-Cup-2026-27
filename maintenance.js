@@ -108,5 +108,10 @@
     profiles.src='/player-profile-links.js?v=20260907-2';
     profiles.dataset.playerProfileLinks='1';
     document.head.appendChild(profiles);
+
+    const standings=document.createElement('script');
+    standings.src='/team-standings-sync.js?v=20260907-1';
+    standings.dataset.teamStandingsSync='1';
+    document.head.appendChild(standings);
   }
 })();
