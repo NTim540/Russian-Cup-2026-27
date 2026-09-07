@@ -90,12 +90,12 @@
     document.head.appendChild(s);
 
     const v=document.createElement('script');
-    v.src='/rosters-fhr-view.js?v=20260907-3';
+    v.src='/rosters-fhr-view.js?v=20260907-4';
     v.dataset.rosterFhrView='1';
     document.head.appendChild(v);
 
     const live=document.createElement('script');
-    live.src='/rosters-live.js?v=20260907-1';
+    live.src='/rosters-live.js?v=20260907-2';
     live.dataset.rostersLive='1';
     document.head.appendChild(live);
   }
