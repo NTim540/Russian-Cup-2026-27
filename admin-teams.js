@@ -17,6 +17,6 @@
 
   load('/admin-teams-core.js?v=20260823-2')
     .then(()=>load('/admin-team-preview.js?v=20260823-2'))
-    .then(()=>load('/admin-player-photos.js?v=20260907-1'))
+    .then(()=>load('/admin-player-photos.js?v=20260907-2'))
     .catch(e=>console.error('Team admin:',e));
 })();
