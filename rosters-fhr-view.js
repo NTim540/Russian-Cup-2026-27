@@ -1,8 +1,44 @@
 (()=>{
   const STYLE_ID='rosters-fhr-view-style';
-  const PLACEHOLDER=`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="10" fill="#10243a"/><circle cx="40" cy="29" r="14" fill="#5f7891"/><path d="M15 72c2-17 12-26 25-26s23 9 25 26" fill="#5f7891"/></svg>`)}`;
   const labels={g:'Вратари',d:'Защитники',f:'Нападающие',u:'Игроки'};
   const order=['g','d','f','u'];
+
+  function initials(name){
+    const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
+    return parts.slice(0,2).map(x=>Array.from(x)[0]?.toLocaleUpperCase('ru-RU')||'').join('');
+  }
+
+  function teamLogo(){
+    const img=document.querySelector('.team-logo-large,.team-logo-side img');
+    return img?.currentSrc||img?.src||'';
+  }
+
+  function renderFallback(avatar,name){
+    avatar.className='roster-avatar roster-avatar-fallback';
+    avatar.replaceChildren();
+    const ini=initials(name);
+    if(ini){
+      const span=document.createElement('span');
+      span.className='roster-avatar-initials';
+      span.textContent=ini;
+      span.setAttribute('aria-label',`Фото ${name} отсутствует`);
+      avatar.appendChild(span);
+      return;
+    }
+    const logo=teamLogo();
+    if(logo){
+      const img=document.createElement('img');
+      img.className='roster-avatar-logo';
+      img.src=logo;
+      img.alt='Логотип команды';
+      avatar.appendChild(img);
+      return;
+    }
+    const mark=document.createElement('span');
+    mark.className='roster-avatar-initials';
+    mark.textContent='—';
+    avatar.appendChild(mark);
+  }
 
   function addStyles(){
     if(document.getElementById(STYLE_ID))return;
@@ -21,14 +57,19 @@
       #rosterSection .roster-num{width:auto!important;height:auto!important;display:block!important;background:transparent!important;border-radius:0!important;color:var(--text,#fff)!important;font-size:18px!important;line-height:1!important;font-weight:950!important;text-align:center!important}
       #rosterSection .roster-avatar{width:52px;height:52px;border-radius:7px;overflow:hidden;border:1px solid rgba(127,198,255,.14);background:rgba(127,198,255,.05);display:block}
       #rosterSection .roster-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
+      #rosterSection .roster-avatar-fallback{display:grid!important;place-items:center;background:linear-gradient(145deg,rgba(35,135,217,.19),rgba(127,198,255,.07))!important;border-color:rgba(127,198,255,.18)!important;color:#dff3ff}
+      #rosterSection .roster-avatar-initials{display:grid;place-items:center;width:100%;height:100%;font-size:15px;line-height:1;font-weight:950;letter-spacing:.035em;text-transform:uppercase}
+      #rosterSection .roster-avatar-logo{width:74%!important;height:74%!important;object-fit:contain!important;object-position:center!important;opacity:.9}
       #rosterSection .roster-name{font-size:14px!important;line-height:1.25!important;font-weight:800!important;white-space:normal!important}
       #rosterSection .roster-player:hover{background:rgba(127,198,255,.035)!important}
       html[data-theme='light'] #rosterSection .roster-player{border-bottom-color:rgba(20,45,80,.08)!important}
       html[data-theme='light'] #rosterSection .roster-num{color:#102139!important}
       html[data-theme='light'] #rosterSection .roster-avatar{border-color:rgba(20,45,80,.10);background:#eef4f9}
+      html[data-theme='light'] #rosterSection .roster-avatar-fallback{background:linear-gradient(145deg,#edf4fb,#dfeaf6)!important;border-color:rgba(20,45,80,.10)!important;color:#16314f}
       @media(max-width:620px){
         #rosterSection .roster-player{grid-template-columns:38px 48px minmax(0,1fr)!important;gap:10px!important;min-height:62px!important;padding:7px 4px!important}
         #rosterSection .roster-avatar{width:46px;height:46px;border-radius:6px}
+        #rosterSection .roster-avatar-initials{font-size:13px}
         #rosterSection .roster-num{font-size:16px!important}
         #rosterSection .roster-name{font-size:12px!important}
         #rosterSection .roster-card{margin-bottom:20px!important}
@@ -39,6 +80,43 @@
   }
 
   function codeFor(card){return order.find(x=>card.classList.contains(x))||'u'}
+
+  function ensureAvatar(row){
+    const name=row.querySelector('.roster-name')?.textContent?.replace(/\s+/g,' ').trim()||'';
+    let avatar=row.querySelector('.roster-avatar');
+    if(!avatar){
+      avatar=document.createElement('span');
+      avatar.className='roster-avatar';
+      row.querySelector('.roster-num')?.insertAdjacentElement('afterend',avatar);
+    }
+
+    const img=avatar.querySelector('img:not(.roster-avatar-logo)');
+    if(img){
+      avatar.classList.remove('roster-avatar-fallback');
+      if(img.dataset.fallbackWired!=='1'){
+        img.dataset.fallbackWired='1';
+        img.addEventListener('error',()=>renderFallback(avatar,name),{once:true});
+      }
+      return;
+    }
+
+    const photo=String(row.dataset.photo||'').trim();
+    if(photo){
+      avatar.className='roster-avatar';
+      avatar.replaceChildren();
+      const photoImg=document.createElement('img');
+      photoImg.alt=name?`Фото игрока ${name}`:'Фото игрока';
+      photoImg.loading='lazy';
+      photoImg.decoding='async';
+      photoImg.dataset.fallbackWired='1';
+      photoImg.addEventListener('error',()=>renderFallback(avatar,name),{once:true});
+      photoImg.src=photo;
+      avatar.appendChild(photoImg);
+      return;
+    }
+
+    if(!avatar.classList.contains('roster-avatar-fallback'))renderFallback(avatar,name);
+  }
 
   function apply(){
     const sec=document.getElementById('rosterSection');
@@ -56,19 +134,7 @@
       const code=codeFor(card);
       const title=card.querySelector('.roster-card-head strong');
       if(title&&title.textContent!==labels[code])title.textContent=labels[code];
-      card.querySelectorAll('.roster-player').forEach(row=>{
-        if(row.querySelector('.roster-avatar'))return;
-        const avatar=document.createElement('span');
-        avatar.className='roster-avatar';
-        const img=document.createElement('img');
-        img.alt='Фото игрока';
-        img.loading='lazy';
-        img.decoding='async';
-        img.src=row.dataset.photo||PLACEHOLDER;
-        img.onerror=()=>{if(img.src!==PLACEHOLDER)img.src=PLACEHOLDER};
-        avatar.appendChild(img);
-        row.querySelector('.roster-num')?.insertAdjacentElement('afterend',avatar);
-      });
+      card.querySelectorAll('.roster-player').forEach(ensureAvatar);
     });
     sec.dataset.fhrView='1';
     return true;
