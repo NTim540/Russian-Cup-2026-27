@@ -81,6 +81,20 @@
 
   function codeFor(card){return order.find(x=>card.classList.contains(x))||'u'}
 
+  function wireImage(img,avatar,name){
+    if(img.dataset.fallbackWired==='1')return;
+    img.dataset.fallbackWired='1';
+    img.addEventListener('error',()=>{
+      const direct=String(img.dataset.directPhoto||'').trim();
+      if(direct&&img.dataset.directRetried!=='1'){
+        img.dataset.directRetried='1';
+        img.src=direct;
+        return;
+      }
+      renderFallback(avatar,name);
+    });
+  }
+
   function ensureAvatar(row){
     const name=row.querySelector('.roster-name')?.textContent?.replace(/\s+/g,' ').trim()||'';
     let avatar=row.querySelector('.roster-avatar');
@@ -93,10 +107,7 @@
     const img=avatar.querySelector('img:not(.roster-avatar-logo)');
     if(img){
       avatar.classList.remove('roster-avatar-fallback');
-      if(img.dataset.fallbackWired!=='1'){
-        img.dataset.fallbackWired='1';
-        img.addEventListener('error',()=>renderFallback(avatar,name),{once:true});
-      }
+      wireImage(img,avatar,name);
       return;
     }
 
@@ -108,10 +119,9 @@
       photoImg.alt=name?`Фото игрока ${name}`:'Фото игрока';
       photoImg.loading='lazy';
       photoImg.decoding='async';
-      photoImg.dataset.fallbackWired='1';
-      photoImg.addEventListener('error',()=>renderFallback(avatar,name),{once:true});
       photoImg.src=photo;
       avatar.appendChild(photoImg);
+      wireImage(photoImg,avatar,name);
       return;
     }
 
