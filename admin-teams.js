@@ -15,7 +15,6 @@
   load('/admin-news.js?v=20260903-4')
     .then(()=>load('/admin-news-freeze.js?v=20260903-2'))
     .then(()=>load('/admin-news-match-widgets.js?v=20260904-1'))
-    .then(()=>load('/admin-news-analytics.js?v=20260908-1'))
     .catch(e=>console.error('News admin:',e));
 
   load('/admin-teams-core.js?v=20260823-2')
