@@ -3,6 +3,7 @@
   if(!Number.isInteger(team)||team<1)return;
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safePhoto=url=>{try{const u=new URL(url);return u.protocol==='https:'&&u.hostname==='img.fhr.ru'?u.toString():''}catch{return''}};
+  const proxyPhoto=url=>url?`/api/fhr-photo?src=${encodeURIComponent(url)}`:'';
   const labels={G:'Вратари',D:'Защитники',F:'Нападающие',U:'Игроки'};
   const classes={G:'g',D:'d',F:'f',U:'u'};
 
@@ -20,8 +21,8 @@
   }
 
   function row(p){
-    const photo=safePhoto(p.photo);
-    return `<div class="roster-player" data-photo="${esc(photo)}"><span class="roster-num">${esc(p.number)}</span><span class="roster-avatar">${photo?`<img src="${esc(photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`:''}</span><span class="roster-name">${esc(p.name)}</span></div>`;
+    const photo=safePhoto(p.photo),src=proxyPhoto(photo);
+    return `<div class="roster-player" data-photo="${esc(photo)}"><span class="roster-num">${esc(p.number)}</span><span class="roster-avatar">${photo?`<img src="${esc(src)}" data-direct-photo="${esc(photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`:''}</span><span class="roster-name">${esc(p.name)}</span></div>`;
   }
   function render(players){
     const sec=makeSection();
