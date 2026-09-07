@@ -98,5 +98,10 @@
     live.src='/rosters-live.js?v=20260907-4';
     live.dataset.rostersLive='1';
     document.head.appendChild(live);
+
+    const manual=document.createElement('script');
+    manual.src='/player-photo-overrides.js?v=20260907-1';
+    manual.dataset.playerPhotoOverrides='1';
+    document.head.appendChild(manual);
   }
 })();
