@@ -113,5 +113,10 @@
     standings.src='/team-standings-sync.js?v=20260907-1';
     standings.dataset.teamStandingsSync='1';
     document.head.appendChild(standings);
+
+    const calendar=document.createElement('script');
+    calendar.src='/team-calendar-export.js?v=20260908-1';
+    calendar.dataset.teamCalendarExport='1';
+    document.head.appendChild(calendar);
   }
 })();
