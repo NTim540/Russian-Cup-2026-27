@@ -21,8 +21,8 @@
   }
 
   function row(p){
-    const photo=safePhoto(p.photo),src=proxyPhoto(photo);
-    return `<div class="roster-player" data-photo="${esc(photo)}"><span class="roster-num">${esc(p.number)}</span><span class="roster-avatar">${photo?`<img src="${esc(src)}" data-direct-photo="${esc(photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`:''}</span><span class="roster-name">${esc(p.name)}</span></div>`;
+    const photo=safePhoto(p.photo),proxy=proxyPhoto(photo);
+    return `<div class="roster-player" data-photo="${esc(photo)}"><span class="roster-num">${esc(p.number)}</span><span class="roster-avatar">${photo?`<img src="${esc(photo)}" data-proxy-photo="${esc(proxy)}" alt="${esc(p.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`:''}</span><span class="roster-name">${esc(p.name)}</span></div>`;
   }
   function render(players){
     const sec=makeSection();
@@ -36,7 +36,7 @@
 
   async function load(){
     try{
-      const r=await fetch(`/api/fhr-roster?team=${team}`,{cache:'default'});
+      const r=await fetch(`/api/fhr-roster?team=${team}&v=20260907-2`,{cache:'no-store'});
       if(!r.ok)throw Error(`Roster ${r.status}`);
       const b=await r.json();
       if(Array.isArray(b.players)&&b.players.length)render(b.players);
