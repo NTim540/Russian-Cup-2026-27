@@ -80,3 +80,8 @@ test('Article 18 uses all-match GD before all wins and foreign relegation only a
   assert.deepEqual(ids(R.competition(data,{final:true,isForeign:t=>t.id===1})),[2,1]);
   assert.throws(()=>R.competition(data,{final:true}),/nationality/);
 });
+
+test('completed Tour 5 switches overall table to Article 18 final classification',()=>{
+  const data={settings:s,stage:{id:5,sort_order:5},stages:[{id:1,sort_order:1},{id:5,sort_order:5}],teams:[{id:1,name:'Foreign',country_code:'BY'},{id:2,name:'Russian',country_code:'RU'}],groups:[],memberships:[],matches:[match(1,2,3,0,{stage_id:5})],all_matches:[match(1,2,3,0,{stage_id:5})]};
+  assert.deepEqual(ids(R.overall(data)),[2,1]);
+});
