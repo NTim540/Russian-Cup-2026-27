@@ -86,30 +86,30 @@ test('completed Tour 5 switches overall table to Article 18 final classification
   assert.deepEqual(ids(R.overall(data)),[2,1]);
 });
 
-test('technical result is a completed regulation win and loss',()=>{
+test('technical result is completed and awards technical W/L without inventing regulation-time W/L',()=>{
   const m=match(1,2,null,null,{technical_result_type:'NO_SHOW',technical_winner_team_id:1,technical_goals_count:false});
   assert.equal(R.done(m),true);
   assert.equal(R.matchScore(m),'+:–');
   assert.equal(R.points(m,1,s),2);
   assert.equal(R.points(m,2,s),0);
   const a=R.stats({id:1,name:'A'},null,[m],s),b=R.stats({id:2,name:'B'},null,[m],s);
-  assert.deepEqual([a.gp,a.w,a.rw,a.gf,a.ga,a.pts],[1,1,1,0,0,2]);
-  assert.deepEqual([b.gp,b.l,b.rl,b.gf,b.ga,b.pts],[1,1,1,0,0,0]);
+  assert.deepEqual([a.gp,a.w,a.tw,a.rw,a.ow,a.gf,a.ga,a.pts],[1,1,1,0,0,0,0,2]);
+  assert.deepEqual([b.gp,b.l,b.tl,b.rl,b.ol,b.gf,b.ga,b.pts],[1,1,1,0,0,0,0,0]);
 });
 
 test('Article 34 technical result can preserve original score but excludes it from goal difference',()=>{
   const m=match(1,2,7,1,{technical_result_type:'INELIGIBLE_PLAYER',technical_winner_team_id:2,technical_goals_count:false});
   const a=R.stats({id:1,name:'A'},null,[m],s),b=R.stats({id:2,name:'B'},null,[m],s);
-  assert.deepEqual([a.pts,a.gf,a.ga,a.gd,a.l],[0,0,0,0,1]);
-  assert.deepEqual([b.pts,b.gf,b.ga,b.gd,b.w],[2,0,0,0,1]);
+  assert.deepEqual([a.pts,a.gf,a.ga,a.gd,a.l,a.tl,a.rl],[0,0,0,0,1,1,0]);
+  assert.deepEqual([b.pts,b.gf,b.ga,b.gd,b.w,b.tw,b.rw],[2,0,0,0,1,1,0]);
   assert.equal(R.matchScore(m),'–:+');
 });
 
 test('technical played score counts only when explicitly enabled',()=>{
   const m=match(1,2,2,4,{technical_result_type:'OTHER',technical_winner_team_id:1,technical_goals_count:true});
   const a=R.stats({id:1,name:'A'},null,[m],s),b=R.stats({id:2,name:'B'},null,[m],s);
-  assert.deepEqual([a.pts,a.gf,a.ga,a.gd],[2,2,4,-2]);
-  assert.deepEqual([b.pts,b.gf,b.ga,b.gd],[0,4,2,2]);
+  assert.deepEqual([a.pts,a.gf,a.ga,a.gd,a.tw,a.rw],[2,2,4,-2,1,0]);
+  assert.deepEqual([b.pts,b.gf,b.ga,b.gd,b.tl,b.rl],[0,4,2,2,1,0]);
 });
 
 test('Article 38 keeps disqualified team points but removes it from numbered final places',()=>{
