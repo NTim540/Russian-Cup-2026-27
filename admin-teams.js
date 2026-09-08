@@ -7,6 +7,7 @@
     document.head.appendChild(s);
   });
 
+  load('/admin-sidebar.js?v=20260908-1').catch(e=>console.error('Admin sidebar:',e));
   load('/admin-access-ui.js?v=20260908-1').catch(e=>console.error('Admin access:',e));
 
   // Independent admin helpers: one failed module should not block the others.
