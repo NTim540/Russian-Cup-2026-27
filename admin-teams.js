@@ -7,9 +7,10 @@
     document.head.appendChild(s);
   });
 
+  load('/admin-access-ui.js?v=20260908-1').catch(e=>console.error('Admin access:',e));
+
   // Independent admin helpers: one failed module should not block the others.
   load('/admin-regulation-results.js?v=20260908-1').catch(e=>console.error('Regulation results:',e));
-  load('/admin-fhr-sync.js?v=20260827-5').catch(e=>console.error('FHR sync:',e));
   load('/admin-player-lineups-v2.js?v=20260908-1').catch(e=>console.error('Player lineups:',e));
   load('/admin-lineup-storage-hide.js?v=20260907-1').catch(e=>console.error('Lineup storage:',e));
   load('/admin-data-quality.js?v=20260908-1').catch(e=>console.error('Data quality:',e));
@@ -23,4 +24,9 @@
     .then(()=>load('/admin-team-preview.js?v=20260823-2'))
     .then(()=>load('/admin-player-photos.js?v=20260907-2'))
     .catch(e=>console.error('Team admin:',e));
+
+  // FHR synchronization remains an owner-only maintenance tool for now.
+  document.addEventListener('admin-auth-ready',e=>{
+    if(e.detail?.profile?.legacy_owner)load('/admin-fhr-sync.js?v=20260827-5').catch(err=>console.error('FHR sync:',err));
+  },{once:true});
 })();
