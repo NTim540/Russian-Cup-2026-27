@@ -73,6 +73,12 @@
     place.dataset.overallEqualPlace='1';
     document.head.appendChild(place);
   }
+  if(path==='/'&&!document.querySelector('script[data-overall-final-zones]')){
+    const zones=document.createElement('script');
+    zones.src='/overall-final-zones.js?v=20260908-1';
+    zones.dataset.overallFinalZones='1';
+    document.head.appendChild(zones);
+  }
   if((path==='/'||path==='/team.html'||path==='/team')&&!document.querySelector('script[data-technical-results-ui]')){
     const reg=document.createElement('script');
     reg.src='/technical-results-ui.js?v=20260908-1';
