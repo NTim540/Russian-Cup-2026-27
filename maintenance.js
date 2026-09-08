@@ -61,6 +61,12 @@
   addDynamoJuniorsLogos();
 
   const path=location.pathname.replace(/\/+$/,'')||'/';
+  if((path==='/'||path==='/team.html'||path==='/team')&&!document.querySelector('script[data-technical-results-ui]')){
+    const reg=document.createElement('script');
+    reg.src='/technical-results-ui.js?v=20260908-1';
+    reg.dataset.technicalResultsUi='1';
+    document.head.appendChild(reg);
+  }
   if(path==='/'&&!document.querySelector('script[data-mobile-layout-fix]')){
     const m=document.createElement('script');
     m.src='/mobile-layout-fix.js?v=20260906-1';
