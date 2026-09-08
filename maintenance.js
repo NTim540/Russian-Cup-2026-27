@@ -67,6 +67,12 @@
     help.dataset.standingsHelpCleanup='1';
     document.head.appendChild(help);
   }
+  if(path==='/'&&!document.querySelector('script[data-overall-equal-place]')){
+    const place=document.createElement('script');
+    place.src='/overall-equal-place.js?v=20260908-1';
+    place.dataset.overallEqualPlace='1';
+    document.head.appendChild(place);
+  }
   if((path==='/'||path==='/team.html'||path==='/team')&&!document.querySelector('script[data-technical-results-ui]')){
     const reg=document.createElement('script');
     reg.src='/technical-results-ui.js?v=20260908-1';
