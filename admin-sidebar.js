@@ -3,10 +3,12 @@
   const tabs=app?.querySelector('.tabs');
   if(!app||!tabs||app.dataset.sidebarReady==='1')return;
   app.dataset.sidebarReady='1';
+  app.closest('main.wrap')?.classList.add('admin-page-wrap');
 
   const style=document.createElement('style');
   style.textContent=`
-    #app{width:min(1500px,calc(100vw - 28px));margin:0 auto}
+    .admin-page-wrap{width:min(1560px,calc(100% - 28px))}
+    #app{width:100%;margin:0 auto}
     .admin-shell{display:grid;grid-template-columns:246px minmax(0,1fr);gap:28px;align-items:start}
     .admin-sidebar{position:sticky;top:86px;height:calc(100vh - 104px);display:flex;flex-direction:column;padding:13px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(14,29,48,.97),rgba(8,20,35,.97));box-shadow:0 22px 65px rgba(0,0,0,.24);overflow:hidden}
     .admin-sidebar-head{padding:7px 8px 13px;border-bottom:1px solid var(--line);margin-bottom:10px}
@@ -36,11 +38,11 @@
     .admin-sidebar-toggle{position:relative}.admin-sidebar-toggle::before{transform:translateY(-5px)}.admin-sidebar-toggle::after{transform:translateY(5px)}
     .admin-sidebar-backdrop{display:none}
     @media(max-width:1050px){
-      #app{width:min(100% - 24px,1240px)}
+      .admin-page-wrap{width:min(100% - 24px,1240px)}
       .admin-shell{grid-template-columns:218px minmax(0,1fr);gap:18px}
     }
     @media(max-width:820px){
-      #app{width:min(100% - 16px,1240px)}
+      .admin-page-wrap{width:min(100% - 16px,1240px)}
       .admin-shell{display:block}
       .admin-sidebar{position:fixed;z-index:80;top:0;left:0;width:min(310px,86vw);height:100dvh;border-radius:0 18px 18px 0;padding:18px 13px;transform:translateX(-104%);transition:transform .2s ease;box-shadow:30px 0 70px rgba(0,0,0,.42)}
       body.admin-sidebar-open{overflow:hidden}
