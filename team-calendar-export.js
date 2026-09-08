@@ -35,8 +35,10 @@
   `;
   document.head.appendChild(style);
 
+  const mounted=()=>Boolean(document.querySelector('.team-calendar-wrap[data-team-calendar-export]'));
+
   function mount(){
-    if(document.querySelector('[data-team-calendar-export]'))return;
+    if(mounted())return;
     const socials=document.querySelector('#socials,.socials');
     const copy=document.querySelector('.team-copy');
     if(!copy)return;
@@ -106,5 +108,5 @@
     finally{btn.disabled=false}
   }
 
-  let tries=0;const timer=setInterval(()=>{tries++;mount();if(document.querySelector('[data-team-calendar-export]')||tries>80)clearInterval(timer)},150);mount();
+  let tries=0;const timer=setInterval(()=>{tries++;mount();if(mounted()||tries>80)clearInterval(timer)},150);mount();
 })();
