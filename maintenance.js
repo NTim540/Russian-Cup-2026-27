@@ -110,7 +110,7 @@
     document.head.appendChild(profiles);
 
     const standings=document.createElement('script');
-    standings.src='/team-standings-sync.js?v=20260907-1';
+    standings.src='/team-standings-sync.js?v=20260908-2';
     standings.dataset.teamStandingsSync='1';
     document.head.appendChild(standings);
 

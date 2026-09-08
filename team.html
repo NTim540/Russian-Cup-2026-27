@@ -18,6 +18,22 @@
     @media(max-width:1000px){.team-hero-card{grid-template-columns:1fr 280px;padding:34px}.stats-grid{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:760px){.wrap{width:min(100% - 20px,1240px)}.header-inner{min-height:64px}.brand-mark{width:36px;height:36px}.brand-copy small{display:none}.nav{max-width:53vw;overflow-x:auto;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav a{white-space:nowrap;padding:8px 9px}.team-hero{padding-top:24px}.team-hero-card{grid-template-columns:1fr;padding:24px 18px;gap:12px}.team-copy{order:2}.team-logo-side{order:1;min-height:175px}.team-logo-side:before{width:160px;height:160px;box-shadow:0 0 0 32px rgba(126,190,255,.015)}.team-logo-large{max-width:112px;max-height:112px}.team-title{text-align:center;font-size:48px;margin-top:8px}.team-kicker{justify-content:center}.team-location{text-align:center}.socials{justify-content:center}.stats-grid{grid-template-columns:repeat(3,1fr)}.stat-card{padding:14px 10px}.stat-card strong{font-size:22px}.next-match{grid-template-columns:1fr 38px 1fr;gap:7px;padding:16px 10px}.next-team{display:grid;justify-items:center;text-align:center;gap:7px;font-size:11px}.next-team.away{justify-content:stretch;text-align:center}.next-team img{width:38px;height:38px}.next-meta{grid-column:1/-1;min-width:0;padding:12px 0 0;border-left:0;border-top:1px solid var(--line);text-align:center}.match-row{grid-template-columns:62px 1fr 62px 1fr;padding:11px 9px;gap:7px}.match-place{display:none}.match-team{font-size:10px}.footer-main{grid-template-columns:1fr}.footer-nav{justify-content:flex-start}}
     @media(max-width:430px){.team-title{font-size:42px}.stats-grid{grid-template-columns:repeat(2,1fr)}.team-logo-large{max-width:96px;max-height:96px}.team-logo-side{min-height:150px}}
+    .team-status-layout.has-neighbours{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+    .team-neighbours{min-width:0;padding:14px 18px;border:1px solid var(--line);border-radius:8px;background:rgba(127,198,255,.025)}
+    .neighbours-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;font-weight:750;margin-bottom:8px}
+    .neighbours-heading a{font-size:11px;font-weight:500;color:var(--muted)}
+    .team-neighbours table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+    .team-neighbours th{font-weight:500;font-size:10px;color:var(--muted);text-align:left;padding:3px 8px 5px}
+    .team-neighbours th:first-child{width:48px}.team-neighbours th:last-child{width:48px}
+    .team-neighbours td{padding:7px 8px;border:0;line-height:1.35}
+    .team-neighbours td:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
+    .team-neighbours td:last-child,.team-neighbours th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+    .team-neighbours td a{display:block;overflow-wrap:anywhere}
+    .team-neighbours .is-current{background:rgba(35,135,217,.13);font-weight:800}
+    .team-neighbours .is-current td:first-child{color:inherit;border-left:2px solid #2387d9}
+    .team-neighbours a:hover{text-decoration:underline}.team-neighbours a:focus-visible{outline:2px solid #2387d9;outline-offset:3px}
+    html[data-theme='light'] .team-neighbours{background:#fff;border-color:rgba(20,45,80,.10);color:#102139}
+    @media(max-width:760px){.team-status-layout.has-neighbours{grid-template-columns:1fr;gap:12px}.team-neighbours{padding:12px 14px}}
   </style>
 </head>
 <body>
@@ -48,7 +64,7 @@
 
   <section class="section wrap">
     <div class="section-head"><div><div class="section-kicker">Положение</div><h2 class="section-title">Турнирный статус</h2></div><div class="form" id="form"></div></div>
-    <div class="group-card"><div class="group-main"><small>Группа</small><strong id="groupName">—</strong></div><div class="group-position"><strong id="groupPlace">—</strong><span>место в группе</span></div></div>
+    <div class="team-status-layout"><div class="group-card"><div class="group-main"><small>Группа</small><strong id="groupName">—</strong></div><div class="group-position"><strong id="groupPlace">—</strong><span>место в группе</span></div></div><aside id="teamNeighbours" class="team-neighbours" hidden></aside></div>
   </section>
 
   <section class="section wrap">
@@ -72,7 +88,7 @@
 <script src="/theme.js?v=20260820-1"></script>
 <script src="/team-detail.js?v=20260823-3"></script>
 <script src="/my-team.js?v=20260823-1"></script>
-<script src="/maintenance.js?v=20260908-2"></script>
+<script src="/maintenance.js?v=20260908-3"></script>
 <script src="/team-calendar-export.js?v=20260908-2"></script>
 </body>
 </html>
