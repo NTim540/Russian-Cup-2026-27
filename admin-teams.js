@@ -9,6 +9,7 @@
 
   load('/admin-sidebar.js?v=20260908-1').catch(e=>console.error('Admin sidebar:',e));
   load('/admin-access-ui.js?v=20260908-1').catch(e=>console.error('Admin access:',e));
+  load('/admin-match-cards-v2.js?v=20260908-1').catch(e=>console.error('Match cards:',e));
 
   // Independent admin helpers: one failed module should not block the others.
   load('/admin-regulation-results.js?v=20260908-1').catch(e=>console.error('Regulation results:',e));
