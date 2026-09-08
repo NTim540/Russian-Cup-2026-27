@@ -1,6 +1,6 @@
 (()=>{
   const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-news';
-  const RENDERER='/news-widgets.js?v=20260903-1';
+  const RENDERER='/news-widgets.js?v=20260908-4';
   const STYLE_ID='admin-news-freeze-style';
   let mode='frozen',currentId=null,currentRecord=null,snapshotAt=null,rendererPromise=null,forceRefresh=false;
   const q=s=>document.querySelector(s);

@@ -15,7 +15,7 @@
   function loadScript(src,mark){return new Promise((resolve,reject)=>{if(mark&&document.querySelector(`script[${mark}]`)){resolve();return}const s=document.createElement('script');s.src=src;if(mark)s.setAttribute(mark,'1');s.onload=resolve;s.onerror=()=>reject(new Error('Не удалось загрузить '+src));document.head.appendChild(s)})}
   async function ensurePublicRenderer(){
     try{
-      if(typeof window.renderNewsWidgets!=='function')await loadScript('/news-widgets.js?v=20260903-1','data-news-base-renderer');
+      if(typeof window.renderNewsWidgets!=='function')await loadScript('/news-widgets.js?v=20260908-4','data-news-base-renderer');
       if(!document.querySelector('script[data-news-match-widgets]'))await loadScript('/news-match-widgets.js?v=20260904-1','data-news-match-widgets');
     }catch(e){console.error('News match renderer:',e)}
   }

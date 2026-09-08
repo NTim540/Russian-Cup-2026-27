@@ -57,14 +57,14 @@
   }
 
   async function j(url){const r=await fetch(url,{cache:'no-store'}),b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка загрузки');return b}
-  function pts(m,id,s){if(!done(m))return 0;const winner=(m.home_score>m.away_score?m.home_team_id:m.away_team_id);return winner===id?s.win_points:(m.finish_type==='REG'?s.regulation_loss_points:s.ot_loss_points)}
-  function raw(t,g,ms,s){let o={team_id:t.id,team:t.name,group_id:g.id,group_code:g.code,gp:0,w:0,rw:0,ow:0,l:0,rl:0,ol:0,gf:0,ga:0,gd:0,pts:0,unresolved:false};for(const m of ms){if(!done(m)||![m.home_team_id,m.away_team_id].includes(t.id))continue;o.gp++;const h=m.home_team_id===t.id,f=h?m.home_score:m.away_score,a=h?m.away_score:m.home_score;o.gf+=f;o.ga+=a;o.pts+=pts(m,t.id,s);if(f>a){o.w++;if(m.finish_type==='REG')o.rw++;else o.ow++}else{o.l++;if(m.finish_type==='REG')o.rl++;else o.ol++}}o.gd=o.gf-o.ga;return o}
-  function split(a,get){const m=new Map;for(const x of a){const k=get(x);if(!m.has(k))m.set(k,[]);m.get(k).push(x)}return[...m.entries()].sort((a,b)=>Number(b[0])-Number(a[0])).map(x=>x[1])}
-  function head(rows,ms,s){const ids=new Set(rows.map(x=>x.team_id)),o=new Map(rows.map(x=>[x.team_id,{p:0,d:0}]));for(const m of ms){if(!done(m)||!ids.has(m.home_team_id)||!ids.has(m.away_team_id))continue;for(const id of [m.home_team_id,m.away_team_id]){const h=m.home_team_id===id,f=h?m.home_score:m.away_score,a=h?m.away_score:m.home_score,x=o.get(id);x.p+=pts(m,id,s);x.d+=f-a}}return o}
-  function inside(rows,ms,s){if(rows.length<2)return rows;const h=head(rows,ms,s),gets=[r=>h.get(r.team_id).p,r=>h.get(r.team_id).d,r=>r.gd,r=>r.w,r=>r.rw,r=>r.gf];let groups=[rows];for(const get of gets){const next=[];for(const g of groups){if(g.length<2){next.push(g);continue}const p=split(g,get);if(p.length>1)for(const q of p)next.push(q.length>1?inside(q,ms,s):q);else next.push(g)}groups=next;if(groups.every(g=>g.length===1))break}return groups.flat()}
-  function groupRows(D,g,s){const ms=D.matches.filter(m=>Number(m.group_id)===Number(g.id)),mem=D.memberships.filter(x=>Number(x.group_id)===Number(g.id)).sort((a,b)=>(a.seed||999)-(b.seed||999)),rows=mem.map(x=>raw(D.teams.find(t=>Number(t.id)===Number(x.team_id)),g,ms,s)),by=new Map;for(const r of rows){if(!by.has(r.pts))by.set(r.pts,[]);by.get(r.pts).push(r)}let out=[];for(const p of [...by.keys()].sort((a,b)=>b-a)){const g2=by.get(p);out.push(...(g2.length>1?inside(g2,ms,s):g2))}out.forEach((r,i)=>r.place=i+1);return out}
-  function cross(D,rows,s){if(rows.length<2)return rows;if(rows.every(r=>r.group_id===rows[0].group_id))return inside(rows,D.matches.filter(m=>m.group_id===rows[0].group_id),s);let groups=[rows];const gets=[r=>r.rw,r=>r.gd,r=>r.gf];for(const get of gets){const next=[];for(const g of groups){if(g.length<2){next.push(g);continue}const p=split(g,get);if(p.length>1)for(const q of p)next.push(q.length>1?cross(D,q,s):q);else next.push(g)}groups=next;if(groups.every(g=>g.length===1))break}return groups.flat()}
-  function overall(D,s){const rows=D.groups.flatMap(g=>groupRows(D,g,s)),by=new Map;for(const r of rows){if(!by.has(r.pts))by.set(r.pts,[]);by.get(r.pts).push(r)}let out=[];for(const p of [...by.keys()].sort((a,b)=>b-a)){const q=by.get(p);out.push(...(q.length>1?cross(D,q,s):q))}out.forEach((r,i)=>r.place=i+1);return out}
+
+
+
+
+
+function groupRows(D,g,s){return CupStandings.groupRows(D,g,s)}
+
+function overall(D,s){return CupStandings.overall(D,s)}
   function table(rows){return`<div class="nw-table-wrap"><table><thead><tr><th>№</th><th class="team">Команда</th><th>И</th><th>В</th><th>В ОТ/Б</th><th>П</th><th>П ОТ/Б</th><th>Шайбы</th><th>+/-</th><th>О</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="pos">${r.place}</td><td class="team">${esc(r.team)}</td><td>${r.gp}</td><td>${r.rw}</td><td>${r.ow}</td><td>${r.rl}</td><td>${r.ol}</td><td>${r.gf}:${r.ga}</td><td class="${r.gd>0?'gdplus':r.gd<0?'gdminus':''}">${r.gd>0?'+':''}${r.gd}</td><td class="pts">${r.pts}</td></tr>`).join('')}</tbody></table></div>`}
   function teamObj(D,id){return D.teams.find(t=>Number(t.id)===Number(id))||null}
   function teamName(D,id){return teamObj(D,id)?.name||'—'}
@@ -99,6 +99,7 @@
     if(!widgets.length){container.innerHTML='';return}
     container.innerHTML='<div class="nw-empty">Загружаем данные турнира…</div>';
     try{
+      if(!window.CupStandings)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='/standings-rules.js?v=20260908-1';script.onload=resolve;script.onerror=()=>reject(Error('Не удалось загрузить правила таблиц'));document.head.appendChild(script)});
       const cat=await j(CORE+'/api/catalog'),t=cat.tournaments.find(x=>Number(x.id)===Number(news.tournament_id));if(!t)throw Error('Турнир для виджетов не найден');
       const cache=new Map();
       async function data(stageId){const sid=Number(stageId)||cat.stages.find(s=>Number(s.tournament_id)===Number(t.id))?.id;if(!sid)throw Error('Этап не найден');if(!cache.has(sid))cache.set(sid,j(CORE+'/api/data?tournament_slug='+encodeURIComponent(t.slug)+'&stage_id='+sid));return cache.get(sid)}
