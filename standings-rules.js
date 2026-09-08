@@ -88,10 +88,25 @@
     return mem?(data.groups||[]).find(g=>same(g.id,mem.group_id))||null:null;
   }
 
+  function finalStageComplete(data){
+    const stages=(data.stages||[]).map(x=>Number(x.sort_order)).filter(Number.isFinite);
+    const maxStage=stages.length?Math.max(...stages):0;
+    const current=Number(data.stage?.sort_order);
+    return current>=5&&current===maxStage&&(data.matches||[]).length>0&&(data.matches||[]).every(done);
+  }
+
+  function hasVerifiedCountries(data){
+    return (data.teams||[]).length>0&&(data.teams||[]).every(t=>/^[A-Z]{2}$/.test(String(t.country_code||'').toUpperCase()));
+  }
+
   // Article 17 general tournament table: accumulated points from all Tours up
-  // to the selected Tour. Crossover matches count here.
+  // to the selected Tour. Crossover matches count here. Once Tour 5 is fully
+  // complete, the same table becomes the Article 18 final classification.
   function overall(data,s=data.settings){
     const matches=matchesThroughSelectedTour(data);
+    if(finalStageComplete(data)&&hasVerifiedCountries(data)){
+      return competition({...data,all_matches:matches},{final:true,isForeign:t=>String(t.country_code).toUpperCase()!=='RU'});
+    }
     const rows=(data.teams||[]).map(t=>stats(t,currentGroup(data,t.id),matches,s));
     return rank(rows,matches,s,'overall');
   }
@@ -111,7 +126,7 @@
     return rows.map((r,i)=>({...r,place:i+1}));
   }
 
-  const api={done,points,stats,resolve,rank,isCrossover,groupRows,matchesThroughSelectedTour,overall,competition};
+  const api={done,points,stats,resolve,rank,isCrossover,groupRows,matchesThroughSelectedTour,finalStageComplete,hasVerifiedCountries,overall,competition};
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.CupStandings=api;
 
