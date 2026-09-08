@@ -118,5 +118,10 @@
     calendar.src='/team-calendar-export.js?v=20260908-1';
     calendar.dataset.teamCalendarExport='1';
     document.head.appendChild(calendar);
+
+    const cityHero=document.createElement('script');
+    cityHero.src='/team-city-hero-fallback.js?v=20260908-1';
+    cityHero.dataset.teamCityHeroFallback='1';
+    document.head.appendChild(cityHero);
   }
 })();
