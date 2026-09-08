@@ -8,6 +8,7 @@
   });
 
   // Independent admin helpers: one failed module should not block the others.
+  load('/admin-regulation-results.js?v=20260908-1').catch(e=>console.error('Regulation results:',e));
   load('/admin-fhr-sync.js?v=20260827-5').catch(e=>console.error('FHR sync:',e));
   load('/admin-player-lineups-v2.js?v=20260908-1').catch(e=>console.error('Player lineups:',e));
   load('/admin-lineup-storage-hide.js?v=20260907-1').catch(e=>console.error('Lineup storage:',e));
