@@ -18,6 +18,7 @@
     .catch(e=>console.error('News admin:',e));
 
   load('/admin-teams-core.js?v=20260823-2')
+    .then(()=>load('/admin-team-hero-upload.js?v=20260908-1'))
     .then(()=>load('/admin-team-preview.js?v=20260823-2'))
     .then(()=>load('/admin-player-photos.js?v=20260907-2'))
     .catch(e=>console.error('Team admin:',e));
