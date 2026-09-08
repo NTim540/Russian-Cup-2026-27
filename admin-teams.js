@@ -28,6 +28,10 @@
 
   // FHR synchronization remains an owner-only maintenance tool for now.
   document.addEventListener('admin-auth-ready',e=>{
-    if(e.detail?.profile?.legacy_owner)load('/admin-fhr-sync.js?v=20260827-5').catch(err=>console.error('FHR sync:',err));
+    if(e.detail?.profile?.legacy_owner){
+      load('/admin-fhr-sync.js?v=20260827-5')
+        .then(()=>load('/admin-fhr-live-status.js?v=20260908-1'))
+        .catch(err=>console.error('FHR sync:',err));
+    }
   },{once:true});
 })();
