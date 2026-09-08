@@ -10,16 +10,13 @@
   load('/admin-sidebar.js?v=20260908-1').catch(e=>console.error('Admin sidebar:',e));
   load('/admin-access-ui.js?v=20260908-1').catch(e=>console.error('Admin access:',e));
   load('/admin-match-cards-v2.js?v=20260908-1').catch(e=>console.error('Match cards:',e));
+  load('/admin-news-link.js?v=20260908-1').catch(e=>console.error('News link:',e));
 
   // Independent admin helpers: one failed module should not block the others.
   load('/admin-regulation-results.js?v=20260908-1').catch(e=>console.error('Regulation results:',e));
   load('/admin-player-lineups-v2.js?v=20260908-1').catch(e=>console.error('Player lineups:',e));
   load('/admin-lineup-storage-hide.js?v=20260907-1').catch(e=>console.error('Lineup storage:',e));
   load('/admin-data-quality.js?v=20260908-1').catch(e=>console.error('Data quality:',e));
-  load('/admin-news.js?v=20260903-4')
-    .then(()=>load('/admin-news-freeze.js?v=20260903-2'))
-    .then(()=>load('/admin-news-match-widgets.js?v=20260904-1'))
-    .catch(e=>console.error('News admin:',e));
 
   load('/admin-teams-core.js?v=20260823-2')
     .then(()=>load('/admin-team-hero-upload.js?v=20260908-1'))
