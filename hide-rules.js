@@ -15,10 +15,17 @@
   cleanupLaunchUi();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanupLaunchUi,{once:true});
 
-  if((location.pathname==='/'||location.pathname.endsWith('/index.html'))&&!document.querySelector('script[data-home-ice-motion]')){
+  const homepage=location.pathname==='/'||location.pathname.endsWith('/index.html');
+  if(homepage&&!document.querySelector('script[data-home-ice-motion]')){
     const s=document.createElement('script');
     s.src='/home-ice-motion.js?v=20260909-3';
     s.dataset.homeIceMotion='1';
     document.head.appendChild(s);
+  }
+  if(homepage&&!document.querySelector('script[data-hero-faceoff]')){
+    const f=document.createElement('script');
+    f.src='/hero-faceoff.js?v=20260910-1';
+    f.dataset.heroFaceoff='1';
+    document.head.appendChild(f);
   }
 })();
