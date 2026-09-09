@@ -22,10 +22,10 @@
     s.dataset.homeIceMotion='1';
     document.head.appendChild(s);
   }
-  if(homepage&&!document.querySelector('script[data-hero-faceoff]')){
+  if(homepage&&!document.querySelector('script[data-homepage-hero-config]')){
     const f=document.createElement('script');
-    f.src='/hero-faceoff.js?v=20260910-1';
-    f.dataset.heroFaceoff='1';
+    f.src='/homepage-hero-config.js?v=20260910-1';
+    f.dataset.homepageHeroConfig='1';
     document.head.appendChild(f);
   }
 })();
