@@ -4,14 +4,38 @@
   const RESULT='match_result';
   const ANNOUNCE='match_announce';
   const TYPES=new Set([RESULT,ANNOUNCE]);
+  const TEAM_LOGOS={
+    'ДИНАМО МОСКВА':'https://drive.google.com/thumbnail?id=1I3KuJZEajmksDKtoBsdj4h_75fU0e_KY&sz=w512',
+    'МАХ':'https://drive.google.com/thumbnail?id=1Veii4NYgKc06nRtxKmCRQv1YCE164YZP&sz=w512',
+    'ТОРПЕДО':'https://drive.google.com/thumbnail?id=17NYLCFaSrX6q4g0T7jhBnmidrI1JzKl9&sz=w512',
+    'ЛОКОМОТИВ':'https://drive.google.com/thumbnail?id=1D6wJnaawN4kMt-1ZWTSvf-trYkslzyKi&sz=w512',
+    'АВАНГАРД':'https://drive.google.com/thumbnail?id=1y6CZfZSXYDVqCAjOvv6xB_7Fwu1AQwvn&sz=w512',
+    'ЛОКОМОТИВ 2004':'https://drive.google.com/thumbnail?id=1sq7UHtBq_xiexekxmzWawF3yVTaEl-J-&sz=w512',
+    'КРЫЛЬЯ СОВЕТОВ':'https://drive.google.com/thumbnail?id=1n6ViHZhkRvq_R_Ul1PEHnFnX7HVNk6-p&sz=w512',
+    'СИБИРЬ':'https://drive.google.com/thumbnail?id=1Xul8VXC7juk2NHQfb28Cl9Jt_Kj0Obw-&sz=w512',
+    'ЛАДА':'https://drive.google.com/thumbnail?id=15mcwMoXT7OaH46jj8w90PCeTtJY54UAF&sz=w512',
+    'ТРАКТОР':'https://drive.google.com/thumbnail?id=1qWTRWy-p36RDSMlAy4AqA60PrrUTaczd&sz=w512',
+    'АК БАРС':'https://drive.google.com/thumbnail?id=1I09r6XwD-9L4r5ojPGKCHsJ5WGUyOFy1&sz=w512',
+    'СПАРТАК':'https://drive.google.com/thumbnail?id=19kJ3uz-yyb1Z2y8qvRbFwuw_2kjUUD2f&sz=w512',
+    'ДИНАМО СПБ':'https://drive.google.com/thumbnail?id=1x4KaAFMJ_qfmi26oVjnsc-huKpWtqBbh&sz=w512',
+    'СКА-СТРЕЛЬНА':'https://drive.google.com/thumbnail?id=1DH_sKpyVZsh6vnt8Q1_ovBpDuVkPHrNh&sz=w512',
+    'АКМ':'https://drive.google.com/thumbnail?id=1NmPj1OwI3C1yuNmgt2XX57HbEiiDauB7&sz=w512',
+    'ЦСКА':'https://drive.google.com/thumbnail?id=1bT6o4afTqonyA05keLbe_nfQ78sAmNda&sz=w512',
+    'АРМИЯ СКА':'https://drive.google.com/thumbnail?id=14XZX2FRyR5x_aVkU2SMLhW-Emk0RUkTo&sz=w512',
+    'НЕФТЕХИМИК':'https://drive.google.com/thumbnail?id=1csEdtjesEvgAFSsfnfhmWUnUE23Tnqeg&sz=w512',
+    'СЕВЕРСТАЛЬ':'https://drive.google.com/thumbnail?id=10xBTOFy_ps1G3LNaHV3WpbQkuZ74pjRn&sz=w512',
+    'КРАСНАЯ МАШИНА ЮНИОР':'https://drive.google.com/thumbnail?id=1qATM0WxWDCgYfemDQvhdy30Ub0sWSWWV&sz=w512'
+  };
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const validUrl=v=>{if(!v)return null;try{const u=new URL(String(v));return ['http:','https:'].includes(u.protocol)?u.toString():null}catch{return null}};
+  const normalize=x=>String(x||'').trim().replace(/ё/g,'е').replace(/Ё/g,'Е').replace(/\s+/g,' ').toUpperCase();
   const fmtDate=x=>x?new Date(x+'T12:00:00').toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
   const fmtTime=v=>String(v||'—').slice(0,5);
   const team=(D,id)=>D?.teams?.find(t=>Number(t.id)===Number(id))||{name:'—',city:'',logo_url:''};
   const group=(D,id)=>D?.groups?.find(g=>Number(g.id)===Number(id));
   const initials=name=>String(name||'').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,3).toUpperCase();
-  const img=t=>t?.logo_url?`<img src="${esc(t.logo_url)}" alt="${esc(t.name||'')}" loading="lazy">`:`<span>${esc(initials(t?.name))}</span>`;
+  const logoFor=t=>validUrl(t?.logo_url)||TEAM_LOGOS[normalize(t?.name)]||null;
+  const img=t=>{const src=logoFor(t);return src?`<img src="${esc(src)}" alt="Логотип ${esc(t?.name||'')}" loading="lazy" referrerpolicy="no-referrer">`:`<span>${esc(initials(t?.name))}</span>`};
   const events=(D,id)=>(D?.match_events||[]).filter(e=>Number(e.match_id)===Number(id)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)||(Number(a.id)||0)-(Number(b.id)||0));
   const goals=(D,id,teamId)=>events(D,id).filter(e=>String(e.event_type||'').toUpperCase()==='GOAL'&&Number(e.team_id)===Number(teamId));
   const finish=m=>m?.finish_type==='OT'?'ОТ':m?.finish_type==='SO'?'Б':'';
@@ -33,7 +57,7 @@
     if(document.getElementById('news-single-match-widgets-style'))return;
     const s=document.createElement('style');s.id='news-single-match-widgets-style';s.textContent=`
       .nwm{overflow:hidden}.nwm-top{padding:18px 20px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(47,111,237,.12),rgba(127,198,255,.025))}.nwm-kicker{color:var(--ice);font-size:9px;text-transform:uppercase;letter-spacing:.15em;font-weight:950;margin-bottom:5px}.nwm-top h3{margin:0;font-size:22px;line-height:1.1;letter-spacing:-.025em}.nwm-sub{margin-top:6px;color:var(--muted);font-size:10px}
-      .nwm-main{padding:24px 22px}.nwm-matchup{display:grid;grid-template-columns:minmax(0,1fr) 220px minmax(0,1fr);gap:18px;align-items:center}.nwm-team{display:grid;grid-template-columns:66px minmax(0,1fr);gap:13px;align-items:center;min-width:0}.nwm-team.away{grid-template-columns:minmax(0,1fr) 66px;text-align:right}.nwm-logo{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(127,198,255,.18);background:rgba(127,198,255,.045);font-size:12px;font-weight:950;color:#cfeaff}.nwm-logo img{width:82%;height:82%;object-fit:contain}.nwm-name{font-size:17px;font-weight:900;line-height:1.2}.nwm-city{margin-top:5px;color:var(--muted);font-size:10px}.nwm-center{text-align:center;min-width:0}.nwm-score{font-size:44px;line-height:1;font-weight:950;letter-spacing:-.04em}.nwm-time{font-size:42px;line-height:1;font-weight:950;letter-spacing:-.035em}.nwm-periods{margin-top:8px;color:#bdcad9;font-size:12px;word-spacing:8px}.nwm-finish{display:inline-flex;margin-top:8px;padding:4px 7px;border-radius:999px;background:rgba(127,198,255,.08);border:1px solid rgba(127,198,255,.16);color:#a9d9ff;font-size:9px;font-weight:900}.nwm-date{margin-top:8px;color:var(--muted);font-size:10px;text-transform:capitalize}
+      .nwm-main{padding:24px 22px}.nwm-matchup{display:grid;grid-template-columns:minmax(0,1fr) 220px minmax(0,1fr);gap:18px;align-items:center}.nwm-team{display:grid;grid-template-columns:66px minmax(0,1fr);gap:13px;align-items:center;min-width:0}.nwm-team.away{grid-template-columns:minmax(0,1fr) 66px;text-align:right}.nwm-logo{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(127,198,255,.18);background:rgba(127,198,255,.045);font-size:12px;font-weight:950;color:#cfeaff}.nwm-logo img{width:82%;height:82%;object-fit:contain;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.22))}.nwm-name{font-size:17px;font-weight:900;line-height:1.2}.nwm-city{margin-top:5px;color:var(--muted);font-size:10px}.nwm-center{text-align:center;min-width:0}.nwm-score{font-size:44px;line-height:1;font-weight:950;letter-spacing:-.04em}.nwm-time{font-size:42px;line-height:1;font-weight:950;letter-spacing:-.035em}.nwm-periods{margin-top:8px;color:#bdcad9;font-size:12px;word-spacing:8px}.nwm-finish{display:inline-flex;margin-top:8px;padding:4px 7px;border-radius:999px;background:rgba(127,198,255,.08);border:1px solid rgba(127,198,255,.16);color:#a9d9ff;font-size:9px;font-weight:900}.nwm-date{margin-top:8px;color:var(--muted);font-size:10px;text-transform:capitalize}
       .nwm-goals{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.07)}.nwm-goal-side:last-child{text-align:right}.nwm-goal-label{color:#7890a8;font-size:9px;text-transform:uppercase;letter-spacing:.12em;font-weight:900;margin-bottom:8px}.nwm-goal{font-size:11px;line-height:1.7;color:#c7d2df}.nwm-no-goals{font-size:10px;color:#6f8296}
       .nwm-broadcast{margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.07)}.nwm-video{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:13px;align-items:center;padding:15px 17px;border-radius:16px;border:1px solid rgba(127,198,255,.24);background:linear-gradient(135deg,rgba(29,122,230,.28),rgba(47,111,237,.16));transition:.18s ease}.nwm-video.live:hover{transform:translateY(-1px);border-color:rgba(127,198,255,.46);background:linear-gradient(135deg,rgba(29,122,230,.38),rgba(47,111,237,.22))}.nwm-video-icon{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#2489e9,#2860d8);box-shadow:0 10px 26px rgba(31,112,225,.24)}.nwm-video-icon:before{content:'';margin-left:3px;border-left:13px solid #fff;border-top:8px solid transparent;border-bottom:8px solid transparent}.nwm-video-kicker{color:#9fd7ff;font-size:9px;text-transform:uppercase;letter-spacing:.13em;font-weight:950}.nwm-video-title{margin-top:4px;font-size:16px;font-weight:950}.nwm-video-note{margin-top:4px;color:#9fb1c5;font-size:10px}.nwm-video-action{color:#fff;font-size:11px;font-weight:900;padding:9px 11px;border-radius:10px;background:rgba(255,255,255,.10);white-space:nowrap}.nwm-video.off{opacity:.72;background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.08)}.nwm-video.off .nwm-video-icon{background:#34475c;box-shadow:none}.nwm-venue{margin-top:13px;text-align:center;color:var(--muted);font-size:10px;line-height:1.5}
       @media(max-width:700px){.nwm-main{padding:18px 13px}.nwm-matchup{grid-template-columns:1fr 100px 1fr;gap:7px}.nwm-team{grid-template-columns:44px minmax(0,1fr);gap:7px}.nwm-team.away{grid-template-columns:minmax(0,1fr) 44px}.nwm-logo{width:44px;height:44px}.nwm-name{font-size:12px}.nwm-city{font-size:8px}.nwm-score{font-size:30px}.nwm-time{font-size:28px}.nwm-periods{font-size:9px;word-spacing:2px}.nwm-date{font-size:8px}.nwm-goals{gap:12px}.nwm-goal{font-size:9px}.nwm-video{grid-template-columns:42px 1fr;padding:12px;gap:10px}.nwm-video-icon{width:42px;height:42px;border-radius:12px}.nwm-video-action{grid-column:1/-1;text-align:center}.nwm-video-title{font-size:13px}}
