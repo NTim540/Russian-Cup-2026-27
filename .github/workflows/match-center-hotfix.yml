@@ -1,0 +1,53 @@
+name: Match center hotfix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/match-center-hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  hotfix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply match center fixes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('match.html')
+          s=p.read_text()
+          s=s.replace('/match-page-v2.js?v=20260909-1','/match-page-v2.js?v=20260910-5')
+          s=s.replace('/match-score-restore.js?v=20260909-1','/match-score-restore.js?v=20260910-5')
+          p.write_text(s)
+
+          p=Path('match-page-v2.js')
+          s=p.read_text()
+          marker=".score-center{min-width:240px}"
+          extra=".score-center{min-width:240px}#rosters .section-head .section-note{display:none!important}#rosters .roster-head{position:relative;padding-right:175px;min-height:78px}#rosters .roster-head .roster-source{position:absolute;right:14px;top:14px;margin:0}@media(max-width:620px){#rosters .roster-head{padding-right:14px;padding-top:54px}#rosters .roster-head .roster-source{left:14px;right:auto;top:12px}}"
+          if marker in s and '#rosters .roster-head .roster-source' not in s:
+              s=s.replace(marker,extra)
+          p.write_text(s)
+
+          p=Path('match-score-restore.js')
+          s=p.read_text()
+          s=s.replace("loadScript('/match-penalty-animation.js?v=20260910-2'","loadScript('/match-penalty-animation.js?v=20260910-3'")
+          old="if((h.endsWith('vk.com')||h.endsWith('vkvideo.ru'))&&/video_ext\\.php/i.test(u.pathname))return url;"
+          new="if(h.endsWith('vk.com')||h.endsWith('vkvideo.ru')||h.endsWith('vk.ru')){if(/video_ext\\.php/i.test(u.pathname))return url;const m=u.pathname.match(/\\/video(-?\\d+)_(-?\\d+)/i);if(m)return `https://vkvideo.ru/video_ext.php?oid=${m[1]}&id=${m[2]}&hd=2`; }"
+          if old in s:
+              s=s.replace(old,new)
+          p.write_text(s)
+          PY
+      - name: Commit hotfix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add match.html match-page-v2.js match-score-restore.js
+          git diff --cached --quiet && exit 0
+          git commit -m 'Fix roster layout and VK stream embed in match center'
+          git push
