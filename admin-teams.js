@@ -12,6 +12,7 @@
   load('/admin-match-cards-v2.js?v=20260908-1').catch(e=>console.error('Match cards:',e));
   load('/admin-news-link.js?v=20260908-1').catch(e=>console.error('News link:',e));
   load('/admin-homepage.js?v=20260910-1').catch(e=>console.error('Homepage admin:',e));
+  load('/admin-infographics-panel.js?v=20260910-1').catch(e=>console.error('Infographics admin:',e));
 
   // Independent admin helpers: one failed module should not block the others.
   load('/admin-regulation-results.js?v=20260908-1').catch(e=>console.error('Regulation results:',e));
