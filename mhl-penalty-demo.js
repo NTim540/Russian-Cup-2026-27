@@ -18,7 +18,7 @@ function isPenalty(card){
  if(card.classList.contains('penalty'))return true;
  const label=(card.querySelector('.etype,.event-label')?.textContent||'').toLowerCase();
  const text=(card.textContent||'').toLowerCase();
- return label.includes('удален')||text.includes('удаление')||text.includes(' мин.');
+ return label.includes('удален')||text.includes('удаление')||/\b\d+(?:\+\d+)?\s*мин\.?/i.test(text);
 }
 function penaltyCards(){return [...document.querySelectorAll('.timeline>.event,.event-card')].filter(isPenalty)}
 function logoFor(card){return card.querySelector('.event-team-logo,.event-logo')?.src||''}
@@ -37,11 +37,14 @@ function ensureIcon(card){
  if(label.querySelector('.mpd-whistle-mark'))return;
  const mark=document.createElement('span');mark.className='mpd-whistle-mark';mark.innerHTML=whistle;label.prepend(mark);
 }
-function toolbar(){
+function toolbar(force=false){
  const timeline=document.querySelector('.timeline');if(!timeline)return;
  let box=document.getElementById('mhlPenaltyDemo');
- if(!box){box=document.createElement('div');box.id='mhlPenaltyDemo';box.className='mhl-penalty-demo';timeline.parentNode.insertBefore(box,timeline)}
- box.innerHTML=`<b>Тест удаления</b>${Object.entries(VARIANTS).map(([k,v])=>`<button type="button" class="mpd-btn${k===current?' active':''}" data-mpd-variant="${k}">${v.label}</button>`).join('')}<select class="mpd-reason" aria-label="Причина удаления">${cfg().reasons.map((r,i)=>`<option value="${i}"${i===reasonIndex?' selected':''}>${esc(r)}</option>`).join('')}</select><button type="button" class="mpd-next">Следующая причина</button><button type="button" class="mpd-play">Проиграть на первом удалении</button><span class="mpd-count">Найдено удалений: ${penaltyCards().length}</span><span class="mpd-hint">Можно также нажать на любое удаление</span>`;
+ if(!box){box=document.createElement('div');box.id='mhlPenaltyDemo';box.className='mhl-penalty-demo';timeline.parentNode.insertBefore(box,timeline);force=true}
+ const count=penaltyCards().length,key=`${current}|${reasonIndex}|${count}`;
+ if(!force&&box.dataset.stateKey===key)return;
+ box.dataset.stateKey=key;
+ box.innerHTML=`<b>Тест удаления</b>${Object.entries(VARIANTS).map(([k,v])=>`<button type="button" class="mpd-btn${k===current?' active':''}" data-mpd-variant="${k}">${v.label}</button>`).join('')}<select class="mpd-reason" aria-label="Причина удаления">${cfg().reasons.map((r,i)=>`<option value="${i}"${i===reasonIndex?' selected':''}>${esc(r)}</option>`).join('')}</select><button type="button" class="mpd-next">Следующая причина</button><button type="button" class="mpd-play">Проиграть на первом удалении</button><span class="mpd-count">Найдено удалений: ${count}</span><span class="mpd-hint">Можно также нажать на любое удаление</span>`;
 }
 function buildLayer(card){
  card.querySelector('.penalty-demo-layer')?.remove();
@@ -59,22 +62,16 @@ function play(card){
  buildLayer(card);card.classList.add('penalty-demo-playing');
  timers.set(card,setTimeout(()=>{card.classList.remove('penalty-demo-playing');card.querySelector('.penalty-demo-layer')?.remove()},5950));
 }
-function enhance(){
- installCss();
- penaltyCards().forEach(ensureIcon);
- toolbar();
-}
-installCss();
-let lastHtml='';
-setInterval(()=>{enhance();const box=document.getElementById('mhlPenaltyDemo');if(box){const now=penaltyCards().length;const key=`${current}|${reasonIndex}|${now}`;if(key!==lastHtml){lastHtml=key;toolbar()}}},350);
+function enhance(){installCss();penaltyCards().forEach(ensureIcon);toolbar(false)}
+installCss();enhance();
 const mo=new MutationObserver(()=>enhance());mo.observe(document.documentElement,{childList:true,subtree:true});
+setInterval(enhance,500);
 document.addEventListener('click',e=>{
- const vb=e.target.closest?.('[data-mpd-variant]');if(vb){current=vb.dataset.mpdVariant;reasonIndex=0;toolbar();return}
- if(e.target.closest?.('.mpd-next')){reasonIndex=(reasonIndex+1)%cfg().reasons.length;toolbar();return}
+ const vb=e.target.closest?.('[data-mpd-variant]');if(vb){current=vb.dataset.mpdVariant;reasonIndex=0;toolbar(true);return}
+ if(e.target.closest?.('.mpd-next')){reasonIndex=(reasonIndex+1)%cfg().reasons.length;toolbar(true);return}
  if(e.target.closest?.('.mpd-play')){const card=penaltyCards()[0];if(card)play(card);return}
  const card=e.target.closest?.('.timeline>.event,.event-card');if(card&&isPenalty(card)){e.preventDefault();play(card)}
 });
-document.addEventListener('change',e=>{if(e.target.matches?.('.mpd-reason')){reasonIndex=Number(e.target.value)||0;toolbar()}});
+document.addEventListener('change',e=>{if(e.target.matches?.('.mpd-reason')){reasonIndex=Number(e.target.value)||0;toolbar(true)}});
 document.addEventListener('keydown',e=>{const card=e.target.closest?.('.timeline>.event,.event-card');if(card&&isPenalty(card)&&(e.key==='Enter'||e.key===' ')){e.preventDefault();play(card)}});
-enhance();
 })();
