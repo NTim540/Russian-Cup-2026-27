@@ -15,33 +15,33 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply match center fixes
+      - name: Optimize stream rendering
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
           p=Path('match.html')
           s=p.read_text()
-          s=s.replace('/match-page-v2.js?v=20260910-5','/match-page-v2.js?v=20260910-6')
-          s=s.replace('/match-score-restore.js?v=20260910-5','/match-score-restore.js?v=20260910-6')
+          s=s.replace('/match-page-v2.js?v=20260910-6','/match-page-v2.js?v=20260910-7')
+          s=s.replace('/match-score-restore.js?v=20260910-6','/match-score-restore.js?v=20260910-7')
           p.write_text(s)
 
           p=Path('match-score-restore.js')
           s=p.read_text()
-          old="if(h.endsWith('vk.com')||h.endsWith('vkvideo.ru')||h.endsWith('vk.ru')){if(/video_ext\\.php/i.test(u.pathname))return url;const m=u.pathname.match(/\\/video(-?\\d+)_(-?\\d+)/i);if(m)return `https://vkvideo.ru/video_ext.php?oid=${m[1]}&id=${m[2]}&hd=2`; }"
-          new="if(h.endsWith('vk.com')||h.endsWith('vkvideo.ru')||h.endsWith('vk.ru')){if(/video_ext\\.php/i.test(u.pathname))return url;return''}"
-          if old in s:
-              s=s.replace(old,new)
-          s=s.replace('Трансляция доступна по внешней ссылке','Трансляция доступна')
-          s=s.replace('Этот источник нельзя встроить прямо в страницу. Открыть эфир можно по кнопке ниже.','Эта ссылка открывается на площадке трансляции. Если позже будет добавлен официальный embed-код, видео появится прямо здесь.')
-          s=s.replace('Открыть трансляцию</a>','Смотреть трансляцию</a>')
+          s=s.replace('box-shadow:0 22px 60px rgba(0,0,0,.22)','box-shadow:0 8px 24px rgba(0,0,0,.14)')
+          s=s.replace('function apply(){normalizeExtraPeriods();ensureMainScore();ensureStream()}','function applyFast(){normalizeExtraPeriods();ensureMainScore()}\nfunction applyLayout(){applyFast();ensureStream()}')
+          old="let queued=false;const main=document.getElementById('main');if(main)new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;apply()})}).observe(main,{childList:true,subtree:true});setInterval(apply,1000);apply();"
+          new="let queued=false;const main=document.getElementById('main');if(main)new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;applyLayout()})}).observe(main,{childList:true});applyLayout();"
+          if old not in s:
+              raise SystemExit('observer block not found')
+          s=s.replace(old,new)
           p.write_text(s)
           PY
-      - name: Commit hotfix
+      - name: Commit optimization
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add match.html match-score-restore.js
           git diff --cached --quiet && exit 0
-          git commit -m 'Replace black VK iframe with safe stream fallback'
+          git commit -m 'Reduce stream block render overhead'
           git push
