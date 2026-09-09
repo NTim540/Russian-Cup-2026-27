@@ -107,7 +107,7 @@ function enhanceCards(){
  if(cards.length&&!initialized)initialized=true;
 }
 function scoreAnimation(){
- const score=document.querySelector('.main-score');
+ const score=document.querySelector('.main-score,.main-score-restored');
  if(!score)return;
  const value=score.textContent.trim();
  if(lastMainScore&&value&&value!==lastMainScore){
