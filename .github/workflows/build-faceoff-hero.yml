@@ -1,0 +1,37 @@
+name: Build faceoff hero asset
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-faceoff-hero.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild WebP from text chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat hero-faceoff/0{1..9}.txt hero-faceoff/10.txt > /tmp/hero.txt
+          sed 's#^data:image/webp;base64,##' /tmp/hero.txt | tr -d '\n\r' | base64 -d > hero-faceoff.webp
+          file hero-faceoff.webp
+          test -s hero-faceoff.webp
+      - name: Commit binary asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hero-faceoff.webp
+          if git diff --cached --quiet; then
+            echo 'No changes'
+            exit 0
+          fi
+          git commit -m 'Build faceoff hero binary asset'
+          git push
