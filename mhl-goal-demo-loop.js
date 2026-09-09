@@ -57,28 +57,28 @@ function play(card,restart=true){
  nodes.forEach(({el})=>{el.style.opacity='0'});
  card.classList.add('mhl-goal-playing');
 
- const duration=2650;
+ const duration=5000;
  const stageAnim=stage.animate([
   {clipPath:'inset(0 0 100% 0)',offset:0},
-  {clipPath:'inset(0 0 100% 0)',offset:.07},
-  {clipPath:'inset(0 0 0 0)',offset:.28},
-  {clipPath:'inset(0 0 0 0)',offset:.62},
+  {clipPath:'inset(0 0 100% 0)',offset:.06},
+  {clipPath:'inset(0 0 0 0)',offset:.22},
+  {clipPath:'inset(0 0 0 0)',offset:.64},
   {clipPath:'inset(0 0 100% 0)',offset:1}
  ],{duration,easing:'cubic-bezier(.65,0,.35,1)',fill:'both'});
  const nodeAnimations=nodes.map(({el})=>el.animate([
-  {opacity:0,offset:0},{opacity:0,offset:.615},{opacity:1,offset:.625},{opacity:1,offset:1}
+  {opacity:0,offset:0},{opacity:0,offset:.64},{opacity:1,offset:.70},{opacity:1,offset:1}
  ],{duration,easing:'linear',fill:'both'}));
  const drop=card.animate([{transform:'translateY(-18px)',opacity:.25},{transform:'translateY(0)',opacity:1}],{duration:340,easing:'cubic-bezier(.18,.8,.25,1)'});
  const animations=[stageAnim,...nodeAnimations,drop];
- const timer=setTimeout(()=>stop(card),duration+80);
+ const timer=setTimeout(()=>stop(card),duration+100);
  states.set(card,{animations,timer,nodes});
  return true;
 }
 window.MHLGoalReplay=card=>play(card,true);
 
 let loopTimer=null,index=0;
-function schedule(delay=12000){clearTimeout(loopTimer);loopTimer=setTimeout(tick,delay)}
-function manual(card){play(card,true);schedule(12000)}
+function schedule(delay=15000){clearTimeout(loopTimer);loopTimer=setTimeout(tick,delay)}
+function manual(card){play(card,true);schedule(15000)}
 function bind(card){
  if(card.dataset.mhlGoalBound==='1')return;
  card.dataset.mhlGoalBound='1';card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label','Проиграть анимацию этого гола');card.title='Нажми, чтобы проиграть анимацию гола';
@@ -90,8 +90,8 @@ function bind(card){
  card.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;e.preventDefault();manual(card)});
 }
 function bindGoals(){document.querySelectorAll('.timeline>.event.goal,.event-card.goal').forEach(bind)}
-function tick(){bindGoals();const goals=[...document.querySelectorAll('.timeline>.event.goal,.event-card.goal')];if(goals.length){const card=goals[index%goals.length];if(play(card,false))index++}schedule(12000)}
+function tick(){bindGoals();const goals=[...document.querySelectorAll('.timeline>.event.goal,.event-card.goal')];if(goals.length){const card=goals[index%goals.length];if(play(card,false))index++}schedule(15000)}
 const root=document.getElementById('app')||document.body;
 new MutationObserver(bindGoals).observe(root,{childList:true,subtree:true});
-bindGoals();schedule(12000);
+bindGoals();schedule(15000);
 })();
