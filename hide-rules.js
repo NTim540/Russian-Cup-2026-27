@@ -17,7 +17,7 @@
 
   if((location.pathname==='/'||location.pathname.endsWith('/index.html'))&&!document.querySelector('script[data-home-ice-motion]')){
     const s=document.createElement('script');
-    s.src='/home-ice-motion.js?v=20260909-2';
+    s.src='/home-ice-motion.js?v=20260909-3';
     s.dataset.homeIceMotion='1';
     document.head.appendChild(s);
   }
