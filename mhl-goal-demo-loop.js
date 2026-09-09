@@ -1,6 +1,11 @@
 (()=>{
 'use strict';
 if(!/\/mhl-test\.html$/i.test(location.pathname))return;
+const style=document.createElement('style');style.id='mhl-demo-loop-style';style.textContent=`
+.timeline>.event{grid-template-columns:92px 58px minmax(0,1fr) auto!important}
+.timeline>.event .escore{font-size:28px!important;font-weight:950!important;min-width:54px;text-align:right;align-self:center}
+@media(max-width:760px){.timeline>.event{grid-template-columns:60px 42px minmax(0,1fr)!important}.timeline>.event .escore{grid-column:3!important;font-size:22px!important;text-align:left;margin-top:2px}}
+`;document.head.appendChild(style);
 const COLORS={
  'ска 1946':'#2367b1','сахалинские акулы':'#173b63','динамо москва':'#1b62ad','мах':'#2387d9','торпедо':'#1f74b5','локомотив':'#c92f38','авангард':'#df2e36','локомотив 2004':'#c92f38','крылья советов':'#2f6fb5','сибирь':'#2387c9','лада':'#215ea7','трактор':'#20242a','ак барс':'#18855a','спартак':'#c82433','динамо спб':'#2b6fb8','динамо джуниверс':'#315eaa','ска стрельна':'#2367b1','акм':'#b82f3b','цска':'#d32d38','армия ска':'#2367b1','нефтехимик':'#275aa8','северсталь':'#d9a51b','красная машина юниор':'#df2e36'
 };
