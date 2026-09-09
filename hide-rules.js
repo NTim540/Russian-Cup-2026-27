@@ -1,16 +1,17 @@
 (()=>{
   const style=document.createElement('style');
   style.id='hide-rules-section';
-  style.textContent='#rules{display:none!important}';
+  style.textContent='#rules,#maintenance-notice{display:none!important}';
   document.head.appendChild(style);
 
-  function linkRegulation(){
+  function cleanupLaunchUi(){
     document.querySelectorAll('.nav a[href="#rules"],.footer-nav a[href="#rules"]').forEach(a=>{
       a.href='/regulation.html';
       a.textContent='Регламент';
       a.style.display='';
     });
+    document.getElementById('maintenance-notice')?.remove();
   }
-  linkRegulation();
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',linkRegulation,{once:true});
+  cleanupLaunchUi();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanupLaunchUi,{once:true});
 })();
