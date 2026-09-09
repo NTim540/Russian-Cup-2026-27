@@ -8,4 +8,5 @@ function ensureMainScore(){const center=document.querySelector('.score-center'),
 function apply(){normalizeExtraPeriods();ensureMainScore()}
 const style=document.createElement('style');style.id='main-score-restore-style';style.textContent='.main-score-restored{font-size:clamp(58px,8vw,88px);font-weight:950;line-height:.9;letter-spacing:-.07em;margin:12px 0 4px}.main-score-restored.pending{color:#7f90a3}@media(max-width:820px){.main-score-restored{font-size:48px}}@media(max-width:520px){.main-score-restored{font-size:39px}}';document.head.appendChild(style);
 let queued=false;const main=document.getElementById('main');if(main)new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;apply()})}).observe(main,{childList:true,subtree:true});setInterval(apply,1000);apply();
+if(!document.querySelector('script[data-match-event-ui]')){const s=document.createElement('script');s.src='/match-event-ui.js?v=20260909-2';s.async=true;s.dataset.matchEventUi='1';document.body.appendChild(s)}
 })();
