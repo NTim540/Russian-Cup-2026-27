@@ -3,6 +3,28 @@
   // the old public "technical works" notice anymore.
   document.getElementById('maintenance-notice')?.remove();
 
+  // A numeric score during FHR LIVE is an interim score, not a completed match.
+  // Patch CupStandings synchronously before the first API response can render.
+  const R=window.CupStandings;
+  if(R&&!R.__liveGuardInstalled){
+    R.__liveGuardInstalled=true;
+    const original={done:R.done,stats:R.stats,resolve:R.resolve,rank:R.rank,groupRows:R.groupRows,overall:R.overall,competition:R.competition,finalStageComplete:R.finalStageComplete};
+    const liveState=m=>String(m?.fhr_live_state||'').toUpperCase();
+    const isLive=m=>{if(R.isTechnical(m))return false;if(m?.fhr_live_final_at||liveState(m)==='FINAL')return false;return m?.fhr_live_auto===true&&['WATCHING','ERROR'].includes(liveState(m))};
+    const scrub=m=>isLive(m)?{...m,home_score:null,away_score:null}:m;
+    const scrubMatches=ms=>(ms||[]).map(scrub);
+    const scrubData=d=>({...d,matches:scrubMatches(d?.matches),all_matches:Array.isArray(d?.all_matches)?scrubMatches(d.all_matches):d?.all_matches});
+    R.isLive=isLive;
+    R.done=m=>isLive(m)?false:original.done(m);
+    R.stats=(t,g,ms,s)=>original.stats(t,g,scrubMatches(ms),s);
+    R.resolve=(rows,ms,s,mode)=>original.resolve(rows,scrubMatches(ms),s,mode);
+    R.rank=(rows,ms,s,mode)=>original.rank(rows,scrubMatches(ms),s,mode);
+    R.groupRows=(d,g,s=d?.settings)=>original.groupRows(scrubData(d),g,s);
+    R.overall=(d,s=d?.settings)=>original.overall(scrubData(d),s);
+    R.competition=(d,opt={})=>original.competition(scrubData(d),opt);
+    R.finalStageComplete=d=>original.finalStageComplete(scrubData(d));
+  }
+
   const DJ_NAME='Динамо-Джуниверс';
   const DJ_LOGO='https://drive.google.com/thumbnail?id=1HTqvh6fg5ZzOLFwOtY62zucjnRZyOXmu&sz=w512';
   function addDynamoJuniorsLogos(){
@@ -35,6 +57,12 @@
   addDynamoJuniorsLogos();
 
   const path=location.pathname.replace(/\/+$/,'')||'/';
+  if((path==='/'||path==='/index.html'||path==='/team.html'||path==='/team')&&!document.querySelector('script[data-match-page-links]')){
+    const links=document.createElement('script');
+    links.src='/match-page-links.js?v=20260909-1';
+    links.dataset.matchPageLinks='1';
+    document.head.appendChild(links);
+  }
   if(path==='/'&&!document.querySelector('script[data-standings-help-cleanup]')){
     const help=document.createElement('script');
     help.src='/standings-help-cleanup.js?v=20260908-1';
