@@ -14,4 +14,11 @@
   }
   cleanupLaunchUi();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanupLaunchUi,{once:true});
+
+  if((location.pathname==='/'||location.pathname.endsWith('/index.html'))&&!document.querySelector('script[data-home-ice-motion]')){
+    const s=document.createElement('script');
+    s.src='/home-ice-motion.js?v=20260909-1';
+    s.dataset.homeIceMotion='1';
+    document.head.appendChild(s);
+  }
 })();
