@@ -20,7 +20,7 @@ window.fetch=(input,init)=>{
   return nativeFetch(input,init);
 };
 
-/* Neutralize legacy animation layers; production has one animation engine only. */
+/* Production has one animation engine only. */
 const style=document.createElement('style');style.id='cup-production-animation-controller-css';style.textContent=`
 #live .event-card.goal,#live .event-card.penalty{position:relative!important;overflow:hidden!important;cursor:pointer}
 #live .goal-celebrating{animation:none!important;pointer-events:auto!important}#live .goal-celebrating>.goal-celebration-layer{display:none!important}
@@ -36,12 +36,17 @@ function loadApprovedEngine(){
  if(window.CupMHLAnimations)return Promise.resolve(window.CupMHLAnimations);
  return new Promise(resolve=>{let s=document.querySelector('script[data-cup-mhl-engine]');if(!s){s=document.createElement('script');s.src='/clip-mhl-animations.js?v=20260910-4';s.async=true;s.dataset.cupMhlEngine='1';document.body.appendChild(s)}const done=()=>resolve(window.CupMHLAnimations||null);s.addEventListener('load',done,{once:true});setTimeout(done,1800)});
 }
-let enginePromise=loadApprovedEngine();
+const enginePromise=loadApprovedEngine();
 function teams(){return[...document.querySelectorAll('.score-team')].map(x=>({name:x.querySelector('h1')?.textContent?.trim()||'',logo:x.querySelector('.score-logo img')?.src||''}))}
 function teamForSide(side){const t=teams();return side==='away'?t[1]:t[0]}
 function identity(card){return[card.classList.contains('goal')?'goal':card.classList.contains('penalty')?'penalty':'event',card.querySelector('.event-time strong')?.textContent,card.querySelector('.event-copy strong')?.textContent].map(norm).join('|')}
 function identityEvent(ev){return[String(ev.event_type||'').toLowerCase(),ev.clock,`${ev.number?`№${ev.number} `:''}${ev.player||'Командный штраф'}`].map(norm).join('|')}
-function eventCard(ev){const type=String(ev.event_type||'').toUpperCase(),cards=[...document.querySelectorAll(`#live .event-card.${type==='GOAL'?'goal':type==='PENALTY'?'penalty':'goalkeeper'}`)];const wanted=identityEvent(ev);return cards.find(c=>identity(c)===wanted)||cards.find(c=>String(c.querySelector('.event-time strong')?.textContent||'').trim()===String(ev.clock||'').trim()&&(!ev.player||norm(c.querySelector('.event-copy strong')?.textContent).includes(norm(ev.player))))||null}
+function eventCard(ev){
+ const cls=String(ev.event_type||'').toUpperCase()==='GOAL'?'goal':String(ev.event_type||'').toUpperCase()==='PENALTY'?'penalty':'goalkeeper',cards=[...document.querySelectorAll(`#live .event-card.${cls}`)],wanted=identityEvent(ev);
+ const exact=cards.find(c=>identity(c)===wanted);if(exact)return exact;
+ const byPlayer=cards.find(c=>String(c.querySelector('.event-time strong')?.textContent||'').trim()===String(ev.clock||'').trim()&&(!ev.player||norm(c.querySelector('.event-copy strong')?.textContent).includes(norm(ev.player))));if(byPlayer)return byPlayer;
+ const sameTime=cards.filter(c=>String(c.querySelector('.event-time strong')?.textContent||'').trim()===String(ev.clock||'').trim());return sameTime.length===1?sameTime[0]:null;
+}
 function goalNarrative(ev,teamName){const s=ev.score;if(!Array.isArray(s))return`${teamName} забрасывает шайбу`;const [h,a]=s,sc=ev.side==='away'?a:h,opp=ev.side==='away'?h:a,total=h+a;if(total===1)return`${teamName} открывает счёт`;if(h===a)return`${teamName} сравнивает счёт`;if(sc===opp+1)return`${teamName} выходит вперёд`;if(sc>opp+1)return`${teamName} увеличивает преимущество`;if(sc<opp)return`${teamName} сокращает отставание`;return`${teamName} забрасывает шайбу`}
 function tagCard(card,ev){
  if(!card)return;const team=teamForSide(ev.side),logo=team?.logo||card.querySelector('.event-logo')?.src||'';card.dataset.eventKey=ev.key||identityEvent(ev);card.dataset.teamName=ev.team_name||team?.name||'';card.dataset.teamLogo=logo;
@@ -71,8 +76,8 @@ function scanForNew(){
 }
 function patchCurrent(data){
  const events=Array.isArray(data?.live?.events)?data.live.events:[];lastData=data;
- const keep=new Set();for(const ev of events){const c=eventCard(ev);if(c){tagCard(c,ev);keep.add(c)}}
- document.querySelectorAll('#live .event-card.goal,#live .event-card.penalty,#live .event-card.goalkeeper').forEach(c=>{if(!keep.has(c)&&!c.classList.contains('cup-system-marker')&&!c.classList.contains('cup-opening-marker')&&!c.classList.contains('cup-referee-card'))c.remove()});
+ for(const ev of events){const c=eventCard(ev);if(!c)continue;const oldId=identity(c),already=known.has(oldId);if(already)known.add(identityEvent(ev));tagCard(c,ev)}
+ const home=norm(data?.home_team?.name),away=norm(data?.away_team?.name);document.querySelectorAll('#live .event-card.goalkeeper').forEach(c=>{const title=norm(c.querySelector('.event-copy strong')?.textContent);const tm=norm(c.querySelector('.event-time strong')?.textContent);if(tm==='00:00'&&(title===home||title===away))c.remove()});
  scanForNew();renderOfficials();
 }
 async function refreshDetailed(){if(patchBusy||!Number.isInteger(matchId)||matchId<1)return;patchBusy=true;try{const r=await nativeFetch(`${EDGE_V2}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(r.ok)patchCurrent(b)}catch{}finally{patchBusy=false}}
@@ -85,6 +90,6 @@ async function refreshOfficials(){if(officialsBusy||!Number.isInteger(matchId)||
 
 /* Baseline what was already on screen; only future protocol additions auto-play. */
 baseline();refreshDetailed();refreshOfficials();
-let queued=false;const root=document.getElementById('main')||document.body;new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;if(lastData)patchCurrent(lastData);else scanForNew();renderOfficials()})}).observe(root,{childList:true,subtree:true});
+let queued=false;const root=document.getElementById('main')||document.body;new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;scanForNew();renderOfficials()})}).observe(root,{childList:true,subtree:true});
 setInterval(refreshDetailed,5000);setInterval(refreshOfficials,30000);
 })();
