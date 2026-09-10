@@ -29,12 +29,20 @@ function extract(html,base){
     if(/гол|наруш|штраф|удален|поднож|толчок|задерж|удар/i.test(text)) precise.push({time:m[1],snippet:text.slice(0,1200)});
   }
 
+  const meta=[];
+  const keyPattern=/(live[_A-Za-z]*|is[_A-Za-z]*live|start[_A-Za-z]*time|started[_A-Za-z]*|duration|date|timestamp|current[_A-Za-z]*time)/gi;
+  for(const m of html.matchAll(keyPattern)){
+    const i=m.index||0;
+    const chunk=html.slice(Math.max(0,i-90),Math.min(html.length,i+220)).replace(/\s+/g,' ');
+    if(/\d{6,}|duration|start|live|current/i.test(chunk)) meta.push(chunk);
+  }
+
   const interesting=[];
   for(const needle of ['mvData','m3u8','mp4','video_ext','js_api','currentTime','duration','live']){
     const i=html.toLowerCase().indexOf(needle.toLowerCase());
     if(i>=0) interesting.push({needle,snippet:html.slice(Math.max(0,i-500),Math.min(html.length,i+1800)).replace(/\s+/g,' ')});
   }
-  return{title,length:html.length,media,scripts,actions:actions.slice(0,60),precise:precise.slice(0,30),interesting:interesting.slice(0,16)};
+  return{title,length:html.length,media,scripts,actions:actions.slice(0,60),precise:precise.slice(0,30),meta:uniq(meta).slice(0,80),interesting:interesting.slice(0,16)};
 }
 
 async function get(url,referer){
