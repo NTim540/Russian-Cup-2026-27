@@ -48,6 +48,17 @@ function normalizeMarkers(){
     }
   });
 }
+function applyLiveScore(b){
+  const live=b?.live||{},pair=Array.isArray(live.headline_score)&&live.headline_score.length===2?live.headline_score:null;
+  const score=document.querySelector('.main-score-restored');if(score&&pair&&pair.every(Number.isInteger)){const v=`${pair[0]}:${pair[1]}`;if(score.textContent!==v)score.textContent=v;score.classList.remove('pending')}
+  const chips=[...document.querySelectorAll('.score-center .period-chip')];const ps=Array.isArray(live.period_scores)?live.period_scores:[];
+  for(let i=0;i<3;i++){const p=ps[i],strong=chips[i]?.querySelector('strong');if(strong&&Array.isArray(p)&&p.every(Number.isInteger)){const v=`${p[0]}:${p[1]}`;if(strong.textContent!==v)strong.textContent=v}}
+  const ot=chips.find(c=>/овертайм|\bот\b/i.test(c.querySelector('span')?.textContent||'')),so=chips.find(c=>/бул/i.test(c.querySelector('span')?.textContent||''));if(ot)ot.hidden=!protocol.ot;if(so)so.hidden=!protocol.so;
+  const state=document.querySelector('.match-state'),track=document.querySelector('.live-track'),current=String(live.current_period||'1').toUpperCase();
+  if(state&&live.status==='ACTIVE'){state.textContent=current==='OT'?'● LIVE · ОВЕРТАЙМ':current==='SO'?'● LIVE · БУЛЛИТЫ':`● LIVE · ${current} ПЕРИОД`;state.classList.add('live');state.classList.remove('preparation');track?.classList.add('show')}
+  if(state&&live.status==='FINAL'){state.textContent='МАТЧ ЗАВЕРШЁН';state.classList.remove('live','preparation');track?.classList.remove('show')}
+  const mini=document.querySelector('.mini-game.current');if(mini&&pair&&pair.every(Number.isInteger)){const top=mini.querySelector('.mini-score');if(top)top.textContent=live.status==='ACTIVE'?`● ${pair[0]}:${pair[1]}`:`${pair[0]}:${pair[1]}`;const nums=[...mini.querySelectorAll('.mini-team > b')];if(nums[0])nums[0].textContent=String(pair[0]);if(nums[1])nums[1].textContent=String(pair[1])}
+}
 async function refreshProtocol(){
   if(!Number.isInteger(matchId)||matchId<1)return;
   try{
@@ -59,7 +70,7 @@ async function refreshProtocol(){
     const final=String(b?.match?.fhr_live_state||'').toUpperCase()==='FINAL'||b?.live?.status==='FINAL';
     const so=eventSO||current==='SO'||(final&&regTie&&ft==='SO');
     const ot=so||eventOT||current==='OT'||(final&&regTie&&ft==='OT');
-    protocol={ot,so};normalizeMarkers();
+    protocol={ot,so};applyLiveScore(b);normalizeMarkers();
   }catch{}
 }
 let queued=false;function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;normalizeMarkers()})}
