@@ -28,4 +28,10 @@
     f.dataset.homepageHeroConfig='1';
     document.head.appendChild(f);
   }
+  if(homepage&&!document.querySelector('script[data-mobile-standings-fix]')){
+    const m=document.createElement('script');
+    m.src='/mobile-standings-fix.js?v=20260910-1';
+    m.dataset.mobileStandingsFix='1';
+    document.head.appendChild(m);
+  }
 })();
