@@ -44,9 +44,21 @@ function parse(html){
   const start=(html.match(/"startDate"\s*:\s*"([^"]+)"/)||[])[1]||'';
   const schemaStatus=(html.match(/"eventStatus"\s*:\s*"https:\/\/schema\.org\/([^"]+)"/)||[])[1]||'';
   const teams=parseTeams(title,html);
-  const matchEmbed=(html.match(/data-src=["']https:\/\/(?:vkvideo\.ru|vk\.com)\/video_ext\.php\?([^"']+)/i)||[])[1]||'';
+
   let oid=VIDEO.oid,id=VIDEO.id;
-  if(matchEmbed){try{const p=new URLSearchParams(decode(matchEmbed));oid=p.get('oid')||oid;id=p.get('id')||id}catch{}}
+  let embed=`https://vkvideo.ru/video_ext.php?oid=${encodeURIComponent(oid)}&id=${encodeURIComponent(id)}&hd=2&autoplay=0&js_api=1`;
+  let embedRaw=decode((html.match(/data-src=["']((?:https?:)?\/\/(?:vkvideo\.ru|vk\.com)\/video_ext\.php\?[^"']+)/i)||[])[1]||'');
+  if(embedRaw){
+    if(embedRaw.startsWith('//'))embedRaw='https:'+embedRaw;
+    try{
+      const u=new URL(embedRaw);
+      oid=u.searchParams.get('oid')||oid;
+      id=u.searchParams.get('id')||id;
+      u.searchParams.set('js_api','1');
+      u.searchParams.set('autoplay','0');
+      embed=u.toString();
+    }catch{}
+  }
 
   const rawActions=[];
   const actionRe=/<div class=["']action\s+([^"']+)["']>\s*<div([^>]*)data-action-name=["']([^"']+)["']([^>]*)><\/div>\s*<div[^>]*data-action-time=["']([^"']*)["'][^>]*>([\s\S]*?)<\/div>\s*<\/div>/gi;
@@ -106,12 +118,12 @@ function parse(html){
   }));
   const latestSeconds=Math.max(0,...events.map(e=>e.gameSeconds||0));
   const currentPeriod=Math.min(3,Math.max(1,Math.floor(latestSeconds/1200)+1));
-  const complete=/EventCompleted/i.test(schemaStatus)||events.some(e=>e.type==='MATCH_END');
+  const complete=events.some(e=>e.type==='MATCH_END');
 
   return{
     title,start,sourceUrl:SOURCE,teams,score:{home:homeScore,away:awayScore},periodScores,currentPeriod,
     status:complete?'FINAL':'LIVE',schemaStatus,
-    video:{oid,id,embed:`https://vk.com/video_ext.php?oid=${encodeURIComponent(oid)}&id=${encodeURIComponent(id)}&hd=2&autoplay=0&js_api=1`},
+    video:{oid,id,embed,sourceEmbed:embedRaw||null},
     events
   };
 }
@@ -124,6 +136,6 @@ export default async function handler(request){
     const data=parse(await r.text());
     return Response.json({...data,fetchedAt:new Date().toISOString()},{headers:{'Cache-Control':'no-store','Access-Control-Allow-Origin':'*'}});
   }catch(e){
-    return Response.json({error:String(e)},{status:502,headers:{'Cache-Control':'no-store'}});
+    return Response.json({error:String(e)},{status:502,headers:{'Cache-Control':'no-store','Access-Control-Allow-Origin':'*'}});
   }
 }
