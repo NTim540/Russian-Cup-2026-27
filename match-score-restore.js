@@ -21,3 +21,39 @@ loadMatchExtras();
 const existing=document.querySelector('script[data-match-event-ui]');
 if(!existing){const s=document.createElement('script');s.src='/match-event-ui.js?v=20260909-3';s.async=true;s.dataset.matchEventUi='1';s.onload=loadGoalV2;document.body.appendChild(s)}else if(existing.dataset.loaded==='1'){loadGoalV2()}else{existing.addEventListener('load',loadGoalV2,{once:true});setTimeout(loadGoalV2,1000)}
 })();
+
+/* Production match rules: pregame state and scored period/match markers. */
+(()=>{
+'use strict';
+const EDGE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-match-center';
+const matchId=Number(new URL(location.href).searchParams.get('id'));
+if(!Number.isInteger(matchId)||matchId<1)return;
+let D=null,lastMarkerSig='';
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const css=document.createElement('style');
+css.id='cup-live-rules-css';
+css.textContent=`
+.match-state.preparation{color:#bfe4ff!important}
+.timeline>.cup-system-marker{display:grid!important;grid-template-columns:82px minmax(0,1fr) auto!important;align-items:center!important;gap:14px!important;min-height:72px!important;padding:13px 17px!important;border:1px solid rgba(127,198,255,.15)!important;border-left:4px solid rgba(127,198,255,.6)!important;border-radius:12px!important;background:linear-gradient(90deg,rgba(23,54,78,.78),rgba(8,22,37,.94))!important}
+.cup-marker-time{font-size:20px;font-weight:950;letter-spacing:-.035em;white-space:nowrap}.cup-marker-label{font-size:13px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}.cup-marker-result{display:flex;align-items:center;justify-content:flex-end;gap:9px;white-space:nowrap}.cup-marker-result img{width:34px;height:34px;object-fit:contain}.cup-marker-result strong{min-width:58px;text-align:center;font-size:19px;font-weight:1000;letter-spacing:-.035em}.cup-system-marker.start .cup-marker-result strong{display:none}.cup-system-marker.final{border-left-color:rgba(72,195,139,.8)!important;background:linear-gradient(90deg,rgba(31,82,68,.35),rgba(8,22,37,.96))!important}
+@media(max-width:620px){.timeline>.cup-system-marker{grid-template-columns:57px minmax(0,1fr) auto!important;gap:8px!important;min-height:60px!important;padding:10px 11px!important}.cup-marker-time{font-size:16px}.cup-marker-label{font-size:9px;letter-spacing:.045em}.cup-marker-result{gap:5px}.cup-marker-result img{width:27px;height:27px}.cup-marker-result strong{min-width:47px;font-size:15px}}
+@media(max-width:390px){.timeline>.cup-system-marker{grid-template-columns:51px minmax(0,1fr) auto!important;gap:6px!important}.cup-marker-label{font-size:8px}.cup-marker-result img{width:24px;height:24px}.cup-marker-result strong{font-size:14px;min-width:42px}}
+`;
+document.head.appendChild(css);
+function startMs(){const m=D?.match,t=String(m?.start_time||'').slice(0,5);return m?.game_date&&/^\d{2}:\d{2}$/.test(t)?Date.parse(`${m.game_date}T${t}:00+03:00`):NaN}
+function isFinal(){const m=D?.match,l=D?.live,db=String(m?.fhr_live_state||'').toUpperCase();return l?.status==='FINAL'||Boolean(m?.fhr_live_final_at)||db==='FINAL'}
+function isActive(){const m=D?.match,l=D?.live,db=String(m?.fhr_live_state||'').toUpperCase();return !isFinal()&&(l?.status==='ACTIVE'||['WATCHING','ERROR'].includes(db))}
+function applyPregame(){const el=document.querySelector('.match-state');if(!el||!D)return;const start=startMs(),now=Date.now();if(!isFinal()&&!isActive()&&Number.isFinite(start)&&now>=start-15*60*1000&&now<start){el.textContent='ПОДГОТОВКА К МАТЧУ';el.classList.add('preparation')}else el.classList.remove('preparation')}
+function logos(){const xs=[...document.querySelectorAll('.score-team .score-logo img')].map(x=>x.src).filter(Boolean);return{x:xs[0]||'',y:xs[1]||''}}
+function periodPair(i){const live=D?.live||{},m=D?.match||{},p=Array.isArray(live.period_scores?.[i])?live.period_scores[i]:null;if(p&&Number.isInteger(p[0])&&Number.isInteger(p[1])){return live.orientation==='reverse'?[p[1],p[0]]:[p[0],p[1]]}const fb=[[m.p1_home,m.p1_away],[m.p2_home,m.p2_away],[m.p3_home,m.p3_away],[m.ot_home,m.ot_away],[m.so_home,m.so_away]][i];return fb&&Number.isInteger(fb[0])&&Number.isInteger(fb[1])?fb:null}
+function totalThrough(n){let h=0,a=0,found=false;for(let i=0;i<n;i++){const p=periodPair(i);if(!p)continue;h+=p[0];a+=p[1];found=true}return found?[h,a]:null}
+function finalPair(){const m=D?.match||{},l=D?.live||{};if(Number.isInteger(m.home_score)&&Number.isInteger(m.away_score))return[m.home_score,m.away_score];if(Array.isArray(l.headline_score)&&Number.isInteger(l.headline_score[0])&&Number.isInteger(l.headline_score[1]))return l.orientation==='reverse'?[l.headline_score[1],l.headline_score[0]]:[l.headline_score[0],l.headline_score[1]];return totalThrough(5)}
+function finishSuffix(){const ft=String(D?.match?.finish_type||'').toUpperCase(),txt=String(D?.live?.status_text||'');if(ft==='SO'||/буллит/i.test(txt))return'Б';if(ft==='OT'||/овертайм/i.test(txt))return'ОТ';return''}
+function marker({kind='period',time,label,pair=null,suffix=''}){const {x,y}=logos(),el=document.createElement('article');el.className=`event-card cup-system-marker ${kind}`;const score=pair?`${pair[0]}:${pair[1]}${suffix?` ${suffix}`:''}`:'';el.innerHTML=`<div class="cup-marker-time">${esc(time)}</div><div class="cup-marker-label">${esc(label)}</div><div class="cup-marker-result">${x?`<img src="${esc(x)}" alt="">`:''}${pair?`<strong>${esc(score)}</strong>`:''}${y?`<img src="${esc(y)}" alt="">`:''}</div>`;return el}
+function cardPeriod(card){const t=String(card.querySelector('.event-time span')?.textContent||'').toUpperCase();if(/БУЛ/.test(t))return 5;if(/\bОТ\b|ОВЕРТАЙМ/.test(t))return 4;const m=t.match(/([1-3])/);return m?Number(m[1]):0}
+function completedPeriods(){if(!D)return[];const l=D.live||{},raw=String(l.current_period||'1').toUpperCase(),txt=String(l.status_text||''),ft=String(D.match?.finish_type||'').toUpperCase(),fin=isFinal();let out=[];if(fin){out=ft==='OT'||ft==='SO'?[1,2,3]:[1,2];if(ft==='SO')out.push(4);return out}if(raw==='SO')return[1,2,3,4];if(raw==='OT')return[1,2,3];const n=Number(raw);if(Number.isInteger(n)&&n>=1){for(let p=1;p<n;p++)out.push(p);if(/перерыв/i.test(txt)&&n<=3)out.push(n)}return[...new Set(out)]}
+function applyMarkers(){const timeline=document.querySelector('#live .timeline');if(!timeline||!D)return;const base=[...timeline.querySelectorAll(':scope > .event-card:not(.cup-system-marker)')],periods=completedPeriods(),fin=isFinal(),sig=[base.map(c=>c.textContent).join('|'),periods.join(','),fin,JSON.stringify(D.live?.period_scores||[]),D.match?.home_score,D.match?.away_score,D.match?.finish_type].join('::');if(sig===lastMarkerSig&&timeline.querySelector('.cup-system-marker'))return;lastMarkerSig=sig;timeline.querySelectorAll(':scope > .cup-system-marker').forEach(x=>x.remove());const fresh=[...timeline.querySelectorAll(':scope > .event-card:not(.cup-system-marker)')];for(const p of periods){const isOT=p===4,label=isOT?'КОНЕЦ ОВЕРТАЙМА':`КОНЕЦ ${p} ПЕРИОДА`,time=isOT?'60:00':`${p*20}:00`,pair=totalThrough(p),mk=marker({time,label,pair});const ref=fresh.find(c=>cardPeriod(c)===p);if(ref)timeline.insertBefore(mk,ref);else timeline.appendChild(mk)}if(fin){const pair=finalPair(),mk=marker({kind:'final',time:'60:00',label:'КОНЕЦ МАТЧА',pair,suffix:finishSuffix()});timeline.prepend(mk)}if(isActive()||fin){timeline.appendChild(marker({kind:'start',time:'00:00',label:'НАЧАЛО МАТЧА'}))}}
+function apply(){applyPregame();applyMarkers()}
+async function refresh(){try{const r=await fetch(`${EDGE}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(r.ok){D=b;lastMarkerSig='';apply()}}catch{}}
+setInterval(apply,1000);setInterval(refresh,12000);refresh();
+})();
