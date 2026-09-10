@@ -1,7 +1,7 @@
 export const config={runtime:'edge'};
 
-const SOURCE='https://www.fhmoscow.com/game/17355';
-const VIDEO={oid:'-48703984',id:'456257600'};
+const SOURCE='https://www.fhmoscow.com/game/17349';
+const VIDEO={oid:'-48703984',id:'456257601'};
 const UA='Mozilla/5.0 (compatible; RussianCupU16/1.0; +https://russian-cup-2627.vercel.app/)';
 
 function decode(s=''){
@@ -87,7 +87,7 @@ function parse(html){
     if(a.type==='GOAL'){
       if(a.side==='away')awayScore++; else homeScore++;
     }
-    const score=a.type==='GOAL'?`${homeScore}:${awayScore}`:`${homeScore}:${awayScore}`;
+    const score=`${homeScore}:${awayScore}`;
     const e={...a,time,gameSeconds,period,score,penaltyMinutes:p?.penaltyMinutes||0};
     return{...e,key:eventKey(e)};
   });
