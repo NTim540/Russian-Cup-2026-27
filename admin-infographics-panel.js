@@ -85,7 +85,7 @@ function fillSelectors(){
 }
 function switchType(){const day=['gamesday','resultsday'].includes(currentType());q('#igMatchFields')?.classList.toggle('hidden',day);q('#igDayFields')?.classList.toggle('hidden',!day);const labels={announcement:'Анонс матча',result:'Результат матча',gamesday:'Игровой день',resultsday:'Итоги игрового дня'};q('#igPreviewTitle').textContent=labels[currentType()]||'Инфографика'}
 async function loadDetail(){DETAIL=null;if(!DATA||!['announcement','result'].includes(currentType()))return;const id=Number(q('#igMatch')?.value);if(!id)return;try{DETAIL=await matchDetail(id)}catch(e){console.warn('Infographics detail:',e)}}
-function updateDayHint(){const n=dayMatches().length;q('#igDayHint').textContent=n?`На эту дату: ${n} ${pluralWord(n,'матч','матча','матчей')}.`:'На эту дату матчей нет.'}
+function updateDayHint(){const n=dayMatches().length;q('#igDayHint').textContent=n?`На эту дату: ${n} ${pluralWord(n,'матч','матча','матчей')}. Макет автоматически подстроится под количество игр.`:'На эту дату матчей нет.'}
 function team(id){return DATA?.teams?.find(t=>Number(t.id)===Number(id))||{id,name:'—'}}
 function group(id){return DATA?.groups?.find(g=>Number(g.id)===Number(id))||null}
 function match(){return DATA?.matches?.find(m=>Number(m.id)===Number(q('#igMatch')?.value))||null}
@@ -125,8 +125,63 @@ function periodPairs(m){return [['1 ПЕРИОД',m.p1_home,m.p1_away],['2 ПЕ�
 function goalEvents(){const ev=DETAIL?.live?.events||[];return ev.filter(x=>String(x.event_type||'').toUpperCase()==='GOAL')}
 function goalLines(events){return events.slice(0,5).map(e=>{const tm=e.side==='away'?DETAIL?.away_team:DETAIL?.home_team;return `${e.clock||''}  ${e.player||tm?.name||'Гол'}`.trim()})}
 async function renderResult(ctx){const baseMatch=match();const m=DETAIL?.match||baseMatch;if(!m)return empty(ctx,'Выберите матч');const h=team(m.home_team_id),a=team(m.away_team_id),g=group(m.group_id);base(ctx,userEyebrow('МАТЧ ЗАВЕРШЁН'),'FINAL');await cupMark(ctx);const hl=await img(logo(h)),al=await img(logo(a));if(hl)contain(ctx,hl,90,292,230,210);if(al)contain(ctx,al,760,292,230,210);const hs=done(m)?m.home_score:'—',as=done(m)?m.away_score:'—';text(ctx,h.name,205,555,fitText(ctx,h.name,280,34,21), '950','#fff','center',280);text(ctx,a.name,875,555,fitText(ctx,a.name,280,34,21),'950','#fff','center',280);text(ctx,`${hs}:${as}`,540,485,118,'950','#fff','center');text(ctx,(m.finish_type==='OT'?'ОВЕРТАЙМ':m.finish_type==='SO'?'БУЛЛИТЫ':'ОСНОВНОЕ ВРЕМЯ'),540,548,19,'900','#7fc6ff','center');const ps=periodPairs(m);const totalW=Math.min(940,ps.length*170+(ps.length-1)*10),sx=(1080-totalW)/2;ps.forEach((p,i)=>{const x=sx+i*(170+10);rounded(ctx,x,640,170,78,16,'rgba(255,255,255,.035)','rgba(255,255,255,.09)');text(ctx,p[0],x+85,666,12,'900','#71879f','center');text(ctx,Number.isInteger(p[1])?`${p[1]}:${p[2]}`:'—',x+85,703,25,'950','#fff','center')});const goals=goalLines(goalEvents());let y=790;if(goals.length){text(ctx,'ГОЛЫ',70,y,16,'950','#70879f');goals.forEach((s,i)=>{rounded(ctx,70,y+25+i*61,660,50,12,'rgba(72,195,139,.055)','rgba(72,195,139,.13)');text(ctx,s,94,y+58+i*61,21,'800','#dff7eb','left',610)});y+=25+goals.length*61}else{rounded(ctx,70,y,660,70,14,'rgba(255,255,255,.028)','rgba(255,255,255,.07)');text(ctx,'Авторы голов появятся после синхронизации протокола ФХР',95,y+43,18,'700','#8296aa','left',610);y+=95}rounded(ctx,760,790,250,170,20,'rgba(35,135,217,.07)','rgba(127,198,255,.13)');text(ctx,fmtDateShort(m.game_date),885,837,24,'950','#7fc6ff','center');text(ctx,time(m),885,884,42,'950','#fff','center');text(ctx,(g?.code||'').toUpperCase(),885,925,18,'900','#8699ad','center');const n=userNote();if(n)text(ctx,n,70,1195,24,'800','#cbd7e4','left',820)}
-function drawDayRow(ctx,m,y,result){const h=team(m.home_team_id),a=team(m.away_team_id);rounded(ctx,70,y,940,116,18,'rgba(255,255,255,.033)','rgba(255,255,255,.075)');text(ctx,'№'+(m.game_no||'—'),98,y+35,15,'900','#6f859c');text(ctx,time(m),98,y+83,27,'950','#fff');const hs=result&&done(m)?m.home_score:null,as=result&&done(m)?m.away_score:null;text(ctx,h.name,205,y+48,fitText(ctx,h.name,280,24,17),'850','#f5f7fb','left',280);text(ctx,a.name,205,y+88,fitText(ctx,a.name,280,24,17),'850','#f5f7fb','left',280);if(result){text(ctx,hs===null?'—':hs,690,y+49,29,'950','#fff','center');text(ctx,as===null?'—':as,690,y+90,29,'950','#fff','center')}else{text(ctx,'—',690,y+68,24,'800','#72869b','center')}const g=group(m.group_id);text(ctx,(g?.code||'').toUpperCase(),805,y+37,14,'900','#7fc6ff','center');text(ctx,m.city||'',805,y+77,18,'750','#9aabba','center',270);if(q('#igShowStream')?.checked&&m.stream_url){text(ctx,'● LIVE',968,y+91,13,'950','#ff7d87','right')}}
-async function renderDay(ctx,result=false){const ms=dayMatches(),date=q('#igDate')?.value;base(ctx,userEyebrow(result?'ИТОГИ ИГРОВОГО ДНЯ':'ИГРОВОЙ ДЕНЬ'),result?'RESULTS':'GAMES');await cupMark(ctx);text(ctx,fmtDateLong(date).toUpperCase(),70,244,28,'900','#cfe8ff');text(ctx,(ms.length+' '+pluralWord(ms.length,'МАТЧ','МАТЧА','МАТЧЕЙ')).toUpperCase(),1010,244,20,'850','#798da2','right');if(!ms.length)return emptyBody(ctx,'Матчей на выбранную дату нет');const max=7,start=300,gap=128;ms.slice(0,max).forEach((m,i)=>drawDayRow(ctx,m,start+i*gap,result));if(ms.length>max)text(ctx,`+ ЕЩЁ ${ms.length-max}`,1010,1235,18,'900','#7fc6ff','right');const n=userNote();if(n)text(ctx,n,70,1260,20,'800','#cbd7e4','left',650)}
+
+function dayLayout(count){
+  const top=300,bottom=1218,gap=18,usable=bottom-top;
+  if(count===1)return[{x:70,y:top,w:940,h:usable}];
+  if(count===2){const h=(usable-gap)/2;return[0,1].map(i=>({x:70,y:top+i*(h+gap),w:940,h}))}
+  if(count===3){const h=(usable-gap)/2,w=(940-gap)/2;return[{x:70,y:top,w:940,h},{x:70,y:top+h+gap,w,h},{x:70+w+gap,y:top+h+gap,w,h}]}
+  const cols=2,rows=Math.ceil(count/cols),w=(940-gap)/2,h=(usable-gap*(rows-1))/rows;
+  return Array.from({length:count},(_,i)=>({x:70+(i%2)*(w+gap),y:top+Math.floor(i/2)*(h+gap),w,h}));
+}
+function dayCardMetrics(h,count){
+  if(count===1)return{logo:220,name:34,main:74,meta:20,pad:42};
+  if(count===2)return{logo:132,name:29,main:58,meta:18,pad:32};
+  if(count<=4)return{logo:105,name:24,main:46,meta:15,pad:24};
+  if(count<=6)return{logo:80,name:20,main:38,meta:13,pad:18};
+  return{logo:62,name:17,main:31,meta:11,pad:14};
+}
+async function drawDayCard(ctx,m,box,result,count,index){
+  const hTeam=team(m.home_team_id),aTeam=team(m.away_team_id),g=group(m.group_id),M=dayCardMetrics(box.h,count);
+  const [hl,al]=await Promise.all([img(logo(hTeam)),img(logo(aTeam))]);
+  const {x,y,w,h}=box,large=count<=2;
+  const grad=ctx.createLinearGradient(x,y,x+w,y+h);grad.addColorStop(0,index%2?'rgba(226,58,71,.055)':'rgba(35,135,217,.075)');grad.addColorStop(1,'rgba(255,255,255,.026)');
+  rounded(ctx,x,y,w,h,large?28:20,grad,'rgba(255,255,255,.09)');
+  ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,large?28:20);ctx.clip();ctx.fillStyle=index%2?'rgba(226,58,71,.7)':'rgba(35,135,217,.75)';ctx.fillRect(x,y,7,h);ctx.restore();
+  text(ctx,'№'+(m.game_no||'—'),x+M.pad,y+M.pad,Math.max(11,M.meta),'900','#6f859c');
+  text(ctx,(g?.code||'').toUpperCase(),x+w-M.pad,y+M.pad,Math.max(11,M.meta),'900','#7fc6ff','right');
+  const logoY=large?y+78:y+50;
+  const logoSize=Math.min(M.logo,h*(large?.42:.34));
+  const leftX=x+M.pad,rightX=x+w-M.pad-logoSize;
+  if(hl)contain(ctx,hl,leftX,logoY,logoSize,logoSize);else text(ctx,hTeam.name.slice(0,3),leftX+logoSize/2,logoY+logoSize*.62,34,'950','#7890a8','center');
+  if(al)contain(ctx,al,rightX,logoY,logoSize,logoSize);else text(ctx,aTeam.name.slice(0,3),rightX+logoSize/2,logoY+logoSize*.62,34,'950','#7890a8','center');
+  const center=x+w/2,main=result?(done(m)?`${m.home_score}:${m.away_score}`:'— : —'):time(m);
+  text(ctx,main,center,logoY+logoSize*.58,M.main,'950','#fff','center');
+  if(!result&&q('#igShowStream')?.checked&&m.stream_url)text(ctx,'● LIVE',center,logoY+logoSize*.78,Math.max(11,M.meta),'950','#ff7d87','center');
+  if(result&&m.finish_type&&m.finish_type!=='REG')text(ctx,m.finish_type==='OT'?'ОТ':'БУЛЛИТЫ',center,logoY+logoSize*.78,Math.max(11,M.meta),'900','#7fc6ff','center');
+  const nameY=large?logoY+logoSize+62:logoY+logoSize+34;
+  const nameMax=large?w*.38:w*.40;
+  const hSize=fitText(ctx,hTeam.name,nameMax,M.name,Math.max(14,M.name-7),'900'),aSize=fitText(ctx,aTeam.name,nameMax,M.name,Math.max(14,M.name-7),'900');
+  text(ctx,hTeam.name,x+M.pad,nameY,hSize,'900','#fff','left',nameMax);text(ctx,aTeam.name,x+w-M.pad,nameY,aSize,'900','#fff','right',nameMax);
+  if(large){text(ctx,'ХОЗЯЕВА',x+M.pad,nameY+34,14,'900','#607b95');text(ctx,'ГОСТИ',x+w-M.pad,nameY+34,14,'900','#607b95','right')}
+  const metaY=y+h-M.pad;
+  const location=q('#igShowVenue')?.checked?(m.arena||m.city||''):m.city||'';
+  if(location)text(ctx,location,x+M.pad,metaY,Math.max(11,M.meta),'750','#8da0b3','left',w*.58);
+  if(m.city&&location!==m.city)text(ctx,m.city,x+w-M.pad,metaY,Math.max(11,M.meta),'750','#8da0b3','right',w*.30);
+  if(count===1){
+    const lineY=y+h-115;ctx.strokeStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.moveTo(x+M.pad,lineY);ctx.lineTo(x+w-M.pad,lineY);ctx.stroke();
+    text(ctx,fmtDateLong(m.game_date).toUpperCase(),center,lineY+48,20,'850','#cde8ff','center');
+  }
+}
+async function renderDay(ctx,result=false){
+  const ms=dayMatches(),date=q('#igDate')?.value;base(ctx,userEyebrow(result?'ИТОГИ ИГРОВОГО ДНЯ':'ИГРОВОЙ ДЕНЬ'),result?'RESULTS':'GAMES');await cupMark(ctx);
+  text(ctx,fmtDateLong(date).toUpperCase(),70,244,28,'900','#cfe8ff');text(ctx,(ms.length+' '+pluralWord(ms.length,'МАТЧ','МАТЧА','МАТЧЕЙ')).toUpperCase(),1010,244,20,'850','#798da2','right');
+  if(!ms.length)return emptyBody(ctx,'Матчей на выбранную дату нет');
+  const shown=ms.slice(0,10),layout=dayLayout(shown.length);
+  for(let i=0;i<shown.length;i++)await drawDayCard(ctx,shown[i],layout[i],result,shown.length,i);
+  if(ms.length>shown.length)text(ctx,`+ ЕЩЁ ${ms.length-shown.length}`,1010,1248,16,'900','#7fc6ff','right');
+  const n=userNote();if(n){rounded(ctx,70,1227,720,48,12,'rgba(7,17,31,.78)','rgba(255,255,255,.06)');text(ctx,n,90,1258,18,'800','#cbd7e4','left',680)}
+}
 function empty(ctx,msg){base(ctx,'ИНФОГРАФИКА','PREVIEW');emptyBody(ctx,msg)}function emptyBody(ctx,msg){rounded(ctx,70,330,940,360,24,'rgba(255,255,255,.025)','rgba(255,255,255,.07)');text(ctx,msg,540,525,32,'850','#8296aa','center')}
 async function render(){const canvas=q('#igCanvas'),ctx=c();if(!canvas||!ctx)return;const my=++renderSeq;ctx.clearRect(0,0,1080,1350);try{const t=currentType();if(t==='announcement')await renderAnnouncement(ctx);else if(t==='result')await renderResult(ctx);else if(t==='gamesday')await renderDay(ctx,false);else await renderDay(ctx,true);if(my!==renderSeq)return}catch(e){console.error(e);empty(ctx,'Не удалось собрать макет');status(e.message||String(e),true)}}
 function download(){const canvas=q('#igCanvas');if(!canvas)return;render().then(()=>canvas.toBlob(blob=>{if(!blob)return status('Не удалось создать PNG',true);const a=document.createElement('a'),t=currentType(),m=match(),date=q('#igDate')?.value||m?.game_date||'card';a.href=URL.createObjectURL(blob);a.download=`cup-u16-${t}-${date}${m?'-'+m.game_no:''}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1200);status('PNG готов.')},'image/png'))}
