@@ -105,10 +105,29 @@
         line-height:26px!important;
       }
 
-      /* Keep zone/row colouring while making sticky cells opaque. */
+      /*
+       * Zone colouring uses semi-transparent backgrounds. On iOS those colours
+       * were winning over the sticky-cell background and the scrolled numeric
+       * columns became visible through the team column. Keep the same visual
+       * zones, but make both sticky columns fully opaque.
+       */
       #overallTable tbody tr:nth-child(-n+8) td:first-child,
       #overallTable tbody tr:nth-child(-n+8) td.team{
         background:#162b34!important;
+      }
+      #overallTable tbody tr:nth-child(n+9):nth-child(-n+20) td:first-child,
+      #overallTable tbody tr:nth-child(n+9):nth-child(-n+20) td.team{
+        background:#132536!important;
+      }
+      #overallTable tbody tr:nth-child(9) td:first-child,
+      #overallTable tbody tr:nth-child(9) td.team{
+        border-top:2px solid rgba(176,190,204,.30)!important;
+      }
+
+      /* Group tables have no final-zone tint, so their sticky cells stay opaque too. */
+      #groupTables table tbody td:first-child,
+      #groupTables table tbody td.team{
+        background:#0b1d30!important;
       }
 
       html[data-theme="light"] #overallTable th:first-child,
@@ -128,6 +147,15 @@
       html[data-theme="light"] #groupTables table thead th:first-child,
       html[data-theme="light"] #groupTables table thead th.team{
         background:#eaf2f9!important;
+      }
+
+      html[data-theme="light"] #overallTable tbody tr:nth-child(-n+8) td:first-child,
+      html[data-theme="light"] #overallTable tbody tr:nth-child(-n+8) td.team{
+        background:#f5eedc!important;
+      }
+      html[data-theme="light"] #overallTable tbody tr:nth-child(n+9):nth-child(-n+20) td:first-child,
+      html[data-theme="light"] #overallTable tbody tr:nth-child(n+9):nth-child(-n+20) td.team{
+        background:#eef3f7!important;
       }
     }
   `;
