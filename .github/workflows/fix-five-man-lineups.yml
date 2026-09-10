@@ -1,0 +1,51 @@
+name: Fix five-man lineup positions
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-five-man-lineups.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fill incomplete five-man combinations
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('match-lineups-live.js')
+          s = p.read_text()
+          old = "function linePlayers(side,line){const xs=list(side),d=xs.filter(p=>p.position==='D'&&Number(p.line)===line).slice(0,2),f=xs.filter(p=>p.position==='F'&&Number(p.line)===line).slice(0,3);return{d,f}}"
+          new = """function linePlayers(side,line){
+          const skaters=list(side).filter(p=>p.position!=='G'&&Number(p.line)===line);
+          const defenders=skaters.filter(p=>p.position==='D');
+          const forwards=skaters.filter(p=>p.position==='F');
+          const d=defenders.slice(0,2),f=forwards.slice(0,3),used=new Set([...d,...f]);
+          const extraForwards=forwards.filter(p=>!used.has(p));
+          while(d.length<2&&extraForwards.length){const p=extraForwards.shift();d.push(p);used.add(p)}
+          const extraDefenders=defenders.filter(p=>!used.has(p));
+          while(f.length<3&&extraDefenders.length){const p=extraDefenders.shift();f.push(p);used.add(p)}
+          const extras=skaters.filter(p=>!used.has(p));
+          while(d.length<2&&extras.length){const p=extras.shift();d.push(p);used.add(p)}
+          while(f.length<3&&extras.length){const p=extras.shift();f.push(p);used.add(p)}
+          return{d,f}}
+          """
+          if old not in s:
+              raise SystemExit('linePlayers block not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - name: Commit five-man lineup fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add match-lineups-live.js
+          git diff --cached --quiet && exit 0
+          git commit -m 'Keep five skaters visible in every combination'
+          git push
