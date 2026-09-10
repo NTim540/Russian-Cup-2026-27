@@ -45,15 +45,6 @@
       #groupTables table td.team.logo-ready{
         display:table-cell!important;
       }
-      #overallTable td.team.logo-ready .team-logo-img,
-      #groupTables table td.team.logo-ready .team-logo-img{
-        display:inline-block!important;
-        width:26px!important;
-        height:26px!important;
-        margin:0 8px 0 0!important;
-        vertical-align:middle!important;
-        flex:none!important;
-      }
 
       /* Fixed rank column. */
       #overallTable th:first-child,
@@ -70,7 +61,7 @@
         background:#0b1d30!important;
       }
 
-      /* Fixed team column. */
+      /* Mobile team column: logo only. */
       #overallTable th.team,
       #overallTable td.team,
       #groupTables table th.team,
@@ -78,12 +69,29 @@
         position:sticky!important;
         left:52px!important;
         z-index:6!important;
-        min-width:230px!important;
-        width:230px!important;
-        max-width:230px!important;
-        text-align:left!important;
+        min-width:82px!important;
+        width:82px!important;
+        max-width:82px!important;
+        padding:11px 8px!important;
+        text-align:center!important;
+        font-size:0!important;
+        line-height:0!important;
+        color:transparent!important;
         background:#0b1d30!important;
         box-shadow:1px 0 0 rgba(127,198,255,.16),10px 0 18px rgba(2,10,18,.18)!important;
+      }
+
+      #overallTable td.team.logo-ready .team-logo-img,
+      #groupTables table td.team.logo-ready .team-logo-img{
+        display:block!important;
+        width:36px!important;
+        height:36px!important;
+        max-width:36px!important;
+        max-height:36px!important;
+        margin:0 auto!important;
+        vertical-align:middle!important;
+        object-fit:contain!important;
+        flex:none!important;
       }
 
       #overallTable thead th:first-child,
@@ -92,17 +100,6 @@
       #groupTables table thead th.team{
         z-index:10!important;
         background:#0d2238!important;
-      }
-
-      #overallTable td.team,
-      #groupTables table td.team{
-        font-size:12px!important;
-        font-weight:850!important;
-      }
-
-      #overallTable td.team.logo-ready,
-      #groupTables table td.team.logo-ready{
-        line-height:26px!important;
       }
 
       /*
@@ -139,7 +136,7 @@
       html[data-theme="light"] #groupTables table th.team,
       html[data-theme="light"] #groupTables table td.team{
         background:#f4f8fc!important;
-        color:#102139!important;
+        color:transparent!important;
       }
 
       html[data-theme="light"] #overallTable thead th:first-child,
