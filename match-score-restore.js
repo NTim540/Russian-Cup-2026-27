@@ -16,7 +16,7 @@ const style=document.createElement('style');style.id='main-score-restore-style';
 let queued=false;const main=document.getElementById('main');if(main)new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;applyLayout()})}).observe(main,{childList:true});applyLayout();
 function loadScript(src,key){if(document.querySelector(`script[data-${key}]`))return;const s=document.createElement('script');s.src=src;s.async=true;s.setAttribute(`data-${key}`,'1');document.body.appendChild(s)}
 function loadGoalV2(){if(document.querySelector('script[data-goal-animation-v2]'))return;const g=document.createElement('script');g.src='/goal-animation-v2.js?v=20260909-1';g.async=true;g.dataset.goalAnimationV2='1';document.body.appendChild(g)}
-function loadMatchExtras(){loadScript('/match-penalty-animation.js?v=20260910-3','match-penalty-animation')}
+function loadMatchExtras(){loadScript('/match-penalty-animation.js?v=20260910-3','match-penalty-animation');loadScript('/match-lineups-live.js?v=20260910-1','match-lineups-live')}
 loadMatchExtras();
 const existing=document.querySelector('script[data-match-event-ui]');
 if(!existing){const s=document.createElement('script');s.src='/match-event-ui.js?v=20260909-3';s.async=true;s.dataset.matchEventUi='1';s.onload=loadGoalV2;document.body.appendChild(s)}else if(existing.dataset.loaded==='1'){loadGoalV2()}else{existing.addEventListener('load',loadGoalV2,{once:true});setTimeout(loadGoalV2,1000)}
