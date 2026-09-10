@@ -65,3 +65,19 @@ async function refreshProtocol(){
 let queued=false;function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;normalizeMarkers()})}
 queue();refreshProtocol();const main=document.getElementById('main');if(main)new MutationObserver(queue).observe(main,{childList:true,subtree:true,characterData:true});setInterval(refreshProtocol,5000);setInterval(normalizeMarkers,1000);
 })();
+
+/* Pregame status must follow scheduled Moscow time, never the technical FHR WATCHING flag. */
+(()=>{
+'use strict';
+if(!/\/match\.html$/i.test(location.pathname))return;
+function parseStart(){
+ const line=[...document.querySelectorAll('.score-footer,.score-meta,.match-meta')].map(x=>x.textContent||'').join(' ');
+ const m=line.match(/(\d{1,2}):([0-5]\d)/);if(!m)return NaN;
+ const date=document.querySelector('.match-kicker')?.textContent||line;
+ const dm=date.match(/(\d{1,2})\s+(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+(\d{4})/i);
+ if(!dm)return NaN;const months={января:0,февраля:1,марта:2,апреля:3,мая:4,июня:5,июля:6,августа:7,сентября:8,октября:9,ноября:10,декабря:11};
+ return Date.parse(`${dm[3]}-${String(months[dm[2].toLowerCase()]+1).padStart(2,'0')}-${String(dm[1]).padStart(2,'0')}T${String(m[1]).padStart(2,'0')}:${m[2]}:00+03:00`)
+}
+function enforce(){const el=document.querySelector('.match-state');if(!el)return;const start=parseStart();if(!Number.isFinite(start))return;const now=Date.now();if(now<start-15*60000){el.textContent='МАТЧ ЕЩЁ НЕ НАЧАЛСЯ';el.classList.remove('live','preparation');return}if(now<start){el.textContent='ПОДГОТОВКА К МАТЧУ';el.classList.remove('live');el.classList.add('preparation')}}
+enforce();setInterval(enforce,1000);const main=document.getElementById('main');if(main)new MutationObserver(enforce).observe(main,{childList:true,subtree:true,characterData:true});
+})();
