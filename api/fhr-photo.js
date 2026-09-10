@@ -1,8 +1,19 @@
-export default async function handler(req,res){
-  const raw=String(req.query?.src||'').trim();
+export const config={runtime:'edge'};
+
+export default async function handler(request){
+  if(request.method!=='GET'){
+    return new Response(null,{status:405,headers:{Allow:'GET'}});
+  }
+
+  const requestUrl=new URL(request.url);
+  const raw=String(requestUrl.searchParams.get('src')||'').trim();
   let u;
-  try{u=new URL(raw)}catch{return res.status(400).end()}
-  if(u.protocol!=='https:'||u.hostname!=='img.fhr.ru'||!u.pathname.startsWith('/players/'))return res.status(403).end();
+  try{u=new URL(raw)}catch{return new Response(null,{status:400})}
+
+  if(u.protocol!=='https:'||u.hostname!=='img.fhr.ru'||!u.pathname.startsWith('/players/')){
+    return new Response(null,{status:403});
+  }
+
   try{
     const r=await fetch(u.toString(),{
       redirect:'follow',
@@ -12,12 +23,20 @@ export default async function handler(req,res){
         'Referer':'https://junior.fhr.ru/'
       }
     });
-    if(!r.ok)return res.status(r.status===404?404:502).end();
+
+    if(!r.ok)return new Response(null,{status:r.status===404?404:502});
+
     const type=r.headers.get('content-type')||'image/webp';
-    if(!type.toLowerCase().startsWith('image/'))return res.status(502).end();
-    const body=Buffer.from(await r.arrayBuffer());
-    res.setHeader('Content-Type',type);
-    res.setHeader('Cache-Control','public, max-age=86400, s-maxage=604800, stale-while-revalidate=2592000');
-    return res.status(200).send(body);
-  }catch{return res.status(502).end()}
+    if(!type.toLowerCase().startsWith('image/'))return new Response(null,{status:502});
+
+    return new Response(r.body,{
+      status:200,
+      headers:{
+        'Content-Type':type,
+        'Cache-Control':'public, max-age=86400, s-maxage=604800, stale-while-revalidate=2592000'
+      }
+    });
+  }catch{
+    return new Response(null,{status:502});
+  }
 }
