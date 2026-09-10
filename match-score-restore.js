@@ -62,12 +62,59 @@ function ensureStream(){
   const nav=$('.section-tabs');if(nav&&!nav.querySelector('a[href="#stream"]')){const a=document.createElement('a');a.href='#stream';a.textContent='Трансляция';nav.appendChild(a)}
 }
 
+/* Keep the existing page and video iframe alive while the protocol refreshes. */
+function installStableMainUpdates(){
+  const main=$('#main');if(!main||main.dataset.stableLiveUpdates==='1')return;
+  const desc=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');if(!desc?.get||!desc?.set)return;
+  Object.defineProperty(main,'innerHTML',{
+    configurable:true,
+    get(){return desc.get.call(this)},
+    set(value){
+      const html=String(value??'');
+      if(!this.querySelector('.score-section')){desc.set.call(this,html);return}
+      const tpl=document.createElement('template');tpl.innerHTML=html;const next=tpl.content;
+      if(!next.querySelector('.score-section')){desc.set.call(this,html);return}
+      const replace=(selector,{always=false}={})=>{
+        const cur=this.querySelector(selector),fresh=next.querySelector(selector);if(!cur||!fresh)return;
+        if(!always&&cur.outerHTML===fresh.outerHTML)return;
+        cur.replaceWith(fresh.cloneNode(true));
+      };
+      replace('.dayrail');
+      replace('.score-section',{always:true});
+      replace('#live',{always:true});
+      replace('#rosters');
+      replace('#lines');
+      this.dispatchEvent(new CustomEvent('cup:soft-refresh'));
+    }
+  });
+  main.dataset.stableLiveUpdates='1';
+}
+installStableMainUpdates();
+
 /* Production LIVE rules. */
 let D=null,lastMarkerSig='';const observedCompleted=new Set();
 const liveCss=document.createElement('style');liveCss.id='cup-live-rules-css';liveCss.textContent=`
 .main-score-restored{font-size:clamp(58px,8vw,88px);font-weight:950;line-height:.9;letter-spacing:-.07em;margin:12px 0 4px}.main-score-restored.pending{color:#7f90a3}.match-state.preparation{color:#bfe4ff!important}
+.live-track.show{display:block!important;position:relative!important;width:190px!important;height:3px!important;margin:10px auto 15px!important;background:rgba(227,31,43,.12)!important;overflow:hidden!important;border-radius:999px!important}.live-track.show:after{content:""!important;position:absolute!important;left:0!important;top:0!important;width:72px!important;height:100%!important;background:linear-gradient(90deg,transparent,#ff4652 18%,#ff4652 82%,transparent)!important;animation:cupLivePingPong 1.45s ease-in-out infinite alternate!important;transform:none}@keyframes cupLivePingPong{from{transform:translateX(0)}to{transform:translateX(118px)}}
 .timeline>.cup-system-marker{display:grid!important;grid-template-columns:82px minmax(0,1fr) auto!important;align-items:center!important;gap:14px!important;min-height:72px!important;padding:13px 17px!important;border:1px solid rgba(127,198,255,.15)!important;border-left:4px solid rgba(127,198,255,.6)!important;border-radius:12px!important;background:linear-gradient(90deg,rgba(23,54,78,.78),rgba(8,22,37,.94))!important}.cup-marker-time{font-size:20px;font-weight:950;letter-spacing:-.035em;white-space:nowrap}.cup-marker-label{font-size:13px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}.cup-marker-result{display:flex;align-items:center;justify-content:flex-end;gap:9px;white-space:nowrap}.cup-marker-result img{width:34px;height:34px;object-fit:contain}.cup-marker-result strong{min-width:58px;text-align:center;font-size:19px;font-weight:1000;letter-spacing:-.035em}.cup-system-marker.final{border-left-color:rgba(72,195,139,.8)!important;background:linear-gradient(90deg,rgba(31,82,68,.35),rgba(8,22,37,.96))!important}
-@media(max-width:820px){.main-score-restored{font-size:48px}}@media(max-width:620px){.timeline>.cup-system-marker{grid-template-columns:57px minmax(0,1fr) auto!important;gap:8px!important;min-height:60px!important;padding:10px 11px!important}.cup-marker-time{font-size:16px}.cup-marker-label{font-size:9px;letter-spacing:.045em}.cup-marker-result{gap:5px}.cup-marker-result img{width:27px;height:27px}.cup-marker-result strong{min-width:47px;font-size:15px}}@media(max-width:520px){.main-score-restored{font-size:39px}}@media(max-width:390px){.timeline>.cup-system-marker{grid-template-columns:51px minmax(0,1fr) auto!important;gap:6px!important}.cup-marker-label{font-size:8px}.cup-marker-result img{width:24px;height:24px}.cup-marker-result strong{font-size:14px;min-width:42px}}
+@media(max-width:820px){.main-score-restored{font-size:48px}}
+@media(max-width:620px){
+  .score-card{padding:24px 14px!important}.match-kicker{margin-bottom:18px!important}
+  .score-grid{grid-template-columns:minmax(0,1fr) 94px minmax(0,1fr)!important;grid-template-rows:auto auto auto auto!important;gap:8px 10px!important;align-items:center!important}
+  .score-center{display:contents!important;min-width:0!important}.score-grid>.score-team:first-child{grid-column:1!important;grid-row:3!important}.score-grid>.score-team:last-child{grid-column:3!important;grid-row:3!important}
+  .score-grid .match-state{grid-column:1/-1!important;grid-row:1!important;justify-self:center!important;min-height:18px!important;text-align:center!important}.score-grid .live-track{grid-column:1/-1!important;grid-row:2!important;justify-self:center!important}
+  .score-grid .main-score-restored{grid-column:2!important;grid-row:3!important;align-self:center!important;justify-self:center!important;margin:0!important;font-size:50px!important;white-space:nowrap!important}
+  .score-grid .period-line{grid-column:1/-1!important;grid-row:4!important;justify-self:center!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:min(100%,330px)!important;margin:10px 0 0!important;gap:7px!important}
+  .score-grid .period-chip-main{min-width:0!important;width:100%!important;padding:8px 5px!important}.score-grid .period-chip-main span{font-size:7px!important;white-space:nowrap!important}.score-grid .period-chip-main strong{font-size:14px!important}
+  .score-grid .score-logo{height:68px!important;margin-bottom:8px!important}.score-grid .score-logo img{max-width:66px!important;max-height:66px!important}.score-grid .score-team h1{max-width:122px!important;margin:0 auto!important;font-size:16px!important;line-height:1.05!important}.score-grid .score-team p{margin-top:5px!important;font-size:9px!important}
+  .live-track.show{width:170px!important}.live-track.show:after{width:66px!important}@keyframes cupLivePingPong{from{transform:translateX(0)}to{transform:translateX(104px)}}
+  .timeline>.cup-system-marker{grid-template-columns:57px minmax(0,1fr) auto!important;gap:8px!important;min-height:60px!important;padding:10px 11px!important}.cup-marker-time{font-size:16px}.cup-marker-label{font-size:9px;letter-spacing:.045em}.cup-marker-result{gap:5px}.cup-marker-result img{width:27px;height:27px}.cup-marker-result strong{min-width:47px;font-size:15px}
+}
+@media(max-width:520px){.main-score-restored{font-size:39px}}
+@media(max-width:390px){
+  .score-grid{grid-template-columns:minmax(0,1fr) 82px minmax(0,1fr)!important;gap:7px!important}.score-grid .main-score-restored{font-size:44px!important}.score-grid .score-logo{height:58px!important}.score-grid .score-logo img{max-width:56px!important;max-height:56px!important}.score-grid .score-team h1{max-width:105px!important;font-size:14px!important}.score-grid .period-line{width:100%!important;gap:5px!important}.score-grid .period-chip-main{padding:7px 3px!important}.score-grid .period-chip-main span{font-size:6.5px!important}.live-track.show{width:156px!important}.live-track.show:after{width:60px!important}@keyframes cupLivePingPong{from{transform:translateX(0)}to{transform:translateX(96px)}}
+  .timeline>.cup-system-marker{grid-template-columns:51px minmax(0,1fr) auto!important;gap:6px!important}.cup-marker-label{font-size:8px}.cup-marker-result img{width:24px;height:24px}.cup-marker-result strong{font-size:14px;min-width:42px}
+}
 `;document.head.appendChild(liveCss);
 function scheduledStart(){const m=D?.match,t=String(m?.start_time||'').slice(0,5);return m?.game_date&&/^\d{2}:\d{2}$/.test(t)?Date.parse(`${m.game_date}T${t}:00+03:00`):NaN}
 function finalState(){const m=D?.match,l=D?.live,db=String(m?.fhr_live_state||'').toUpperCase();return l?.status==='FINAL'||Boolean(m?.fhr_live_final_at)||db==='FINAL'}
@@ -109,7 +156,7 @@ function applyMarkers(){
 async function refreshRules(){if(!Number.isInteger(matchId)||matchId<1)return;try{const r=await fetch(`${EDGE}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(r.ok){D=b;applyPregame();applyMarkers()}}catch{}}
 
 function applyLayout(){normalizeExtraPeriods();ensureMainScore();ensureStream();applyPregame();applyMarkers()}
-let queued=false;const main=$('#main');if(main)new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;applyLayout()})}).observe(main,{childList:true});
+let queued=false;const main=$('#main');if(main){new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;applyLayout()})}).observe(main,{childList:true});main.addEventListener('cup:soft-refresh',()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;applyLayout()})})}
 setInterval(()=>{applyPregame();applyMarkers()},1000);setInterval(refreshRules,12000);applyLayout();refreshRules();
 
 /* Existing approved goal / penalty / line-up enhancements. */
