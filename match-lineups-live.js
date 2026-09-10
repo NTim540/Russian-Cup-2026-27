@@ -72,7 +72,20 @@ function installCss(){if(document.getElementById('match-live-lineups-css'))retur
 function rows(xs){return xs.map(p=>`<div class="player-row"><span class="player-num">${p.number??'—'}</span><span class="player-avatar">${p.photo_proxy||p.photo?`<img src="${esc(p.photo_proxy||p.photo)}" alt="${esc(p.name)}" loading="lazy">`:(p.number??'')}</span><span class="player-name">${esc(p.name)}<small>${p.position==='G'?'Вратарь':p.position==='D'?'Защитник':p.position==='F'?'Нападающий':''}</small></span><span class="player-tag">${esc(p.goalie_role||p.captain||(p.line?`${p.line} зв.`:''))}</span></div>`).join('')}
 function roster(side){const t=team(side),xs=list(side),l=logo(t),groups=[['G','Вратари'],['D','Защитники'],['F','Нападающие']];return`<article class="roster-team"><div class="roster-head">${l?`<img src="${esc(l)}" alt="">`:''}<div><strong>${esc(t?.name||'Команда')}</strong></div><div class="roster-source">Состав на матч · ФХР</div></div>${xs.length?groups.map(([pos,title])=>{const ps=xs.filter(p=>p.position===pos);return ps.length?`<div class="roster-group-title">${title}</div>${rows(ps)}`:''}).join(''):'<div class="empty">Заявка этой команды пока не найдена в протоколе ФХР.</div>'}<div class="roster-sync-note">Официальная заявка конкретного матча</div></article>`}
 function availableLines(){return[1,2,3,4].filter(n=>list('home').some(p=>Number(p.line)===n)||list('away').some(p=>Number(p.line)===n))}
-function linePlayers(side,line){const xs=list(side),d=xs.filter(p=>p.position==='D'&&Number(p.line)===line).slice(0,2),f=xs.filter(p=>p.position==='F'&&Number(p.line)===line).slice(0,3);return{d,f}}
+function linePlayers(side,line){
+const skaters=list(side).filter(p=>p.position!=='G'&&Number(p.line)===line);
+const defenders=skaters.filter(p=>p.position==='D');
+const forwards=skaters.filter(p=>p.position==='F');
+const d=defenders.slice(0,2),f=forwards.slice(0,3),used=new Set([...d,...f]);
+const extraForwards=forwards.filter(p=>!used.has(p));
+while(d.length<2&&extraForwards.length){const p=extraForwards.shift();d.push(p);used.add(p)}
+const extraDefenders=defenders.filter(p=>!used.has(p));
+while(f.length<3&&extraDefenders.length){const p=extraDefenders.shift();f.push(p);used.add(p)}
+const extras=skaters.filter(p=>!used.has(p));
+while(d.length<2&&extras.length){const p=extras.shift();d.push(p);used.add(p)}
+while(f.length<3&&extras.length){const p=extras.shift();f.push(p);used.add(p)}
+return{d,f}}
+
 function primaryGoalie(side){const gs=list(side).filter(p=>p.position==='G');return gs.find(p=>{const role=String(p.goalie_role||'').toLocaleUpperCase('ru-RU').replace(/\s+/g,' ').trim();return role==='ОВ'||role.includes('ОСНОВ');})||null}
 function rinkPlayer(p,cls,away=false){if(!p)return'';const src=p.photo_proxy||p.photo||'',surname=String(p.name||'').split(' ')[0];return`<div class="rink-player ${away?'away':''} ${cls}"><div class="rink-avatar">${src?`<img src="${esc(src)}" alt="${esc(p.name)}">`:''}<span class="rink-number">${p.number??'—'}</span></div><div class="rink-name">${esc(surname)}</div></div>`}
 function goalieNet(){return`<div class="goalie-net" aria-hidden="true"><svg viewBox="0 0 72 58" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 48V16C9 11.6 12.6 8 17 8h38c4.4 0 8 3.6 8 8v32" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M9 18h54M18 8v40M27 8v40M36 8v40M45 8v40M54 8v40M9 28h54M9 38h54M7 48h58" stroke="currentColor" stroke-width="1.6" opacity=".55"/><path d="M6 49h60" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg></div>`}
