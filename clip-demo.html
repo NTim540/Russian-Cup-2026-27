@@ -3,52 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07111f">
-<title>LIVE-клипы · тест Кубка России U16</title>
-<style>
-:root{--bg:#07111f;--panel:#0d1b2d;--panel2:#10243a;--line:rgba(255,255,255,.1);--text:#f7f9fc;--muted:#8fa1b6;--ice:#79c8ff;--goal:#4bd09a;--pen:#ff737d}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% -5%,rgba(47,111,237,.19),transparent 30%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}.wrap{width:min(860px,calc(100% - 28px));margin:auto;padding:24px 0 60px}.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}.eyebrow{color:var(--ice);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.top h1{margin:7px 0 6px;font-size:clamp(26px,6vw,42px);line-height:1.02;letter-spacing:-.04em}.sub{color:var(--muted);font-size:12px;line-height:1.55}.live-pill{flex:none;display:flex;align-items:center;gap:7px;border:1px solid rgba(75,208,154,.28);background:rgba(75,208,154,.08);color:#8ce4ba;padding:8px 10px;border-radius:999px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(75,208,154,.09)}.player-card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:0 20px 60px rgba(0,0,0,.22)}.player-head{padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line)}.player-head strong{font-size:11px}.player-state{color:var(--muted);font-size:9px}.video{position:relative;aspect-ratio:16/9;background:#000}.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.clip-banner{display:none;padding:9px 13px;background:rgba(35,135,217,.12);border-top:1px solid rgba(121,200,255,.16);color:#cfeaff;font-size:9px;font-weight:800;align-items:center;justify-content:space-between;gap:10px}.clip-banner.show{display:flex}.back-live{border:1px solid rgba(121,200,255,.22);background:rgba(121,200,255,.07);color:#d8efff;border-radius:999px;padding:5px 8px;font-size:8px;font-weight:900}.section-title{display:flex;justify-content:space-between;gap:12px;align-items:end;margin:28px 0 11px}.section-title h2{margin:0;font-size:22px;letter-spacing:-.03em}.section-title span{color:var(--muted);font-size:9px}.feed{display:grid;gap:8px}.event{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--line);border-left:3px solid #456c89;background:linear-gradient(90deg,rgba(14,33,53,.96),rgba(8,22,37,.96));border-radius:11px;padding:12px}.event.goal{border-left-color:var(--goal)}.event.penalty{border-left-color:var(--pen)}.etime strong{font-size:13px}.etime small{display:block;margin-top:3px;color:var(--muted);font-size:7px;text-transform:uppercase;letter-spacing:.08em}.etype{font-size:7px;font-weight:950;letter-spacing:.11em;text-transform:uppercase}.goal .etype{color:#84dfb6}.penalty .etype{color:#ff9da4}.emain strong{display:block;margin-top:4px;font-size:13px}.emain p{margin:3px 0 0;color:var(--muted);font-size:9px;line-height:1.35}.score{color:#dff3ff;font-weight:950}.play{width:42px;height:42px;border-radius:50%;border:1px solid rgba(121,200,255,.34);background:#1766a8;color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 7px 18px rgba(0,0,0,.2);transition:.15s}.play:active{transform:scale(.95)}.play:before{content:"";margin-left:3px;border-left:10px solid currentColor;border-top:7px solid transparent;border-bottom:7px solid transparent}.play.wait{background:rgba(255,255,255,.035);border-color:var(--line);color:#536d85;box-shadow:none;cursor:default}.play.wait:before{display:none}.play.wait:after{content:"…";font-size:15px;font-weight:900}.hint{margin-top:12px;padding:12px 14px;border:1px dashed rgba(121,200,255,.16);border-radius:11px;color:#7f95aa;font-size:9px;line-height:1.55}.captured{color:#80d8ae}.sync{color:#79c8ff}.error{color:#ff8d96}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:11px;font-size:10px}@media(max-width:560px){.wrap{width:min(100% - 20px,860px);padding-top:18px}.top{display:block}.live-pill{width:max-content;margin-top:13px}.event{grid-template-columns:48px minmax(0,1fr) 38px;gap:8px;padding:10px}.play{width:36px;height:36px}.emain strong{font-size:11px}.emain p{font-size:8px}.section-title h2{font-size:19px}}
-</style>
+<meta name="theme-color" content="#06111f">
+<title>LIVE-протокол · тест Кубка России U16</title>
+<link rel="stylesheet" href="/clip-demo.css">
 </head>
 <body>
+<div class="flash" id="flash"><div class="fcard"><div class="fk" id="flashKicker"></div><div class="ft" id="flashTitle"></div><div class="fm" id="flashMain"></div><div class="fs" id="flashSub"></div><div class="fscore" id="flashScore"></div></div></div>
 <main class="wrap">
-  <div class="top"><div><div class="eyebrow">Эксперимент · LIVE-видео событий</div><h1 id="matchTitle">Матч ФХМ</h1><div class="sub">ФХМ даёт событие и точное игровое время. VK-плеер фиксирует позицию трансляции в момент появления события.</div></div><div class="live-pill"><span class="dot"></span><span id="watchStatus">Подключение</span></div></div>
-
-  <section class="player-card">
-    <div class="player-head"><strong>VK · синхронизация трансляции</strong><span class="player-state" id="playerState">Плеер загружается…</span></div>
-    <div class="video"><iframe id="vkPlayer" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock" allowfullscreen></iframe></div>
-    <div class="clip-banner" id="clipBanner"><span id="clipText">Видео события</span><button class="back-live" id="backLive" type="button">Вернуться в LIVE</button></div>
+  <div class="top"><div class="brand">Кубок России U16 · прототип LIVE</div><div class="status"><span class="dot"></span><span id="watchStatus">Подключение</span></div></div>
+  <section class="board">
+    <div class="meta"><span id="matchTitle">Матч ФХМ</span><span id="matchPhase">LIVE</span></div>
+    <div class="teams">
+      <div class="team" id="homeTeam"></div>
+      <div class="score" id="scoreBox"><strong id="mainScore">0:0</strong><small id="periodLabel">1 период</small></div>
+      <div class="team" id="awayTeam"></div>
+    </div>
+    <div class="periods" id="periodScores"></div>
   </section>
 
-  <div class="section-title"><h2>События матча</h2><span id="updated">—</span></div>
-  <section class="feed" id="feed"><div class="empty">Загружаю протокол ФХМ…</div></section>
-  <div class="hint"><b>Как работает тест.</b> События, которые уже были до запуска этой страницы, отображаются как обычный протокол. Для нового гола или удаления страница запоминает позицию VK-трансляции, и справа появляется активная кнопка ▶. Нажатие перематывает плеер на несколько секунд до эпизода и после просмотра возвращает его в LIVE. Один недавний эпизод может быть восстановлен по времени нашей серверной диагностики.</div>
+  <section class="player">
+    <div class="phead"><strong>Видео матча · VK</strong><span class="pstate" id="playerState">Плеер загружается…</span></div>
+    <div class="video"><iframe id="vkPlayer" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock" allowfullscreen></iframe></div>
+    <div class="clipbar" id="clipBar"><div class="cliptext" id="clipText">Видео события</div><div class="tools"><button id="clipBack" type="button">−10 сек</button><button id="clipForward" type="button">+10 сек</button><button id="backLive" type="button">В LIVE</button></div></div>
+  </section>
+
+  <div class="heading"><h2>Текстовая трансляция</h2><div class="updated" id="updated">—</div></div>
+  <section class="feed" id="feed"><div class="info">Загружаю LIVE-протокол…</div></section>
+  <div class="info"><b>Это макет будущего матч-центра Кубка России.</b> Протокол обновляется автоматически, новые голы и удаления сопровождаются анимацией, а к событиям можно привязывать видеоповтор. На этом тестовом матче ФХМ публикация события иногда запаздывает, поэтому тестовый клип берёт безопасный участок видео перед моментом появления записи.</div>
 </main>
 <script src="https://vk.com/js/api/videoplayer.js"></script>
-<script>
-(()=>{
-'use strict';
-const API='/api/fhm-clip-demo';
-const PRE={GOAL:18,PENALTY:12},POST={GOAL:26,PENALTY:20};
-const FIRST_SEEN={'PENALTY|38:32|28|Пономарев Д.':'2026-09-10T07:57:39.219Z'};
-const captures=new Map(Object.entries(JSON.parse(localStorage.getItem('fhmClipCaptures')||'{}')));
-let data=null,player=null,lastVideoTime=NaN,known=new Set(),booted=false,clipTimer=null,inClip=false;
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const save=()=>localStorage.setItem('fhmClipCaptures',JSON.stringify(Object.fromEntries(captures)));
-function fmtTime(s){return s||'—'}
-function eventLine(e){if(e.type==='GOAL'){const a=[e.assist1,e.assist2].filter(Boolean);return a.length?`Передачи: ${a.join(', ')}`:'Заброшенная шайба'}return `${e.penaltyMinutes?e.penaltyMinutes+' мин. · ':''}${e.violation||'Нарушение'}`}
-function render(){if(!data)return;$('#matchTitle').textContent=data.title||'Матч ФХМ';const evs=[...(data.events||[])].reverse();$('#feed').innerHTML=evs.length?evs.map(e=>{const cap=captures.get(e.key),active=cap&&Number.isFinite(Number(cap.start));return `<article class="event ${e.type==='GOAL'?'goal':'penalty'}"><div class="etime"><strong>${esc(fmtTime(e.time))}</strong><small>${e.type==='GOAL'?(e.score?`счёт ${esc(e.score)}`:'гол'):'штраф'}</small></div><div class="emain"><span class="etype">${e.type==='GOAL'?'Гол':'Удаление'}</span><strong>${e.number?`№${esc(e.number)} `:''}${esc(e.player||'Командное событие')}</strong><p>${esc(eventLine(e))}${active?' · <span class="captured">видео готово</span>':''}</p></div><button class="play ${active?'':'wait'}" type="button" data-key="${esc(e.key)}" ${active?'':'disabled'} aria-label="${active?'Смотреть видео события':'Видео ещё не зафиксировано'}"></button></article>`}).join(''):'<div class="empty">Событий пока нет.</div>'}
-function setStatus(text,cls=''){const el=$('#playerState');el.textContent=text;el.className='player-state '+cls}
-function current(){try{const n=Number(player?.getCurrentTime?.());if(Number.isFinite(n)){lastVideoTime=n;return n}}catch{}return lastVideoTime}
-function live(){if(!player)return;clearInterval(clipTimer);inClip=false;try{player.seekLive?.();player.mute?.();player.play?.()}catch{}$('#clipBanner').classList.remove('show');setStatus('LIVE-позиция синхронизируется','sync')}
-function captureEvent(e,videoTime,seenAt=Date.now(),wide=false){if(!Number.isFinite(videoTime)||captures.has(e.key))return;const pre=wide?55:(PRE[e.type]||15),post=wide?25:(POST[e.type]||22);captures.set(e.key,{start:Math.max(0,videoTime-pre),end:Math.max(0,videoTime+post),capturedAt:new Date(seenAt).toISOString(),auto:true});save()}
-function restoreRecent(){if(!data||!Number.isFinite(current()))return;for(const e of data.events||[]){const stamp=FIRST_SEEN[e.key];if(!stamp||captures.has(e.key))continue;const delta=(Date.now()-Date.parse(stamp))/1000;const estimated=current()-delta;if(estimated>0)captureEvent(e,estimated,Date.parse(stamp),true)}save();render()}
-async function poll(first=false){try{const r=await fetch(`${API}?_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(!r.ok)throw Error(b.error||'FHM feed error');data=b;$('#updated').textContent='обновлено '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});const keys=new Set((b.events||[]).map(e=>e.key));if(first){known=keys}else{for(const e of b.events||[]){if(!known.has(e.key)){const t=current();if(Number.isFinite(t))captureEvent(e,t,Date.now(),false)} }known=keys}render();if(first)restoreRecent();$('#watchStatus').textContent='LIVE-контроль'}catch(e){$('#watchStatus').textContent='Ошибка';setStatus(String(e),'error')}}
-function initPlayer(){if(!data)return;const frame=$('#vkPlayer');frame.src=data.video.embed+'&autoplay=1';const hook=()=>{try{if(!window.VK?.VideoPlayer)return setTimeout(hook,300);player=VK.VideoPlayer(frame);player.on?.('inited',()=>{setStatus('Плеер подключён · выхожу в LIVE','sync');setTimeout(()=>{live();restoreRecent()},500)});player.on?.('timeupdate',state=>{const n=Number(state?.time);if(Number.isFinite(n))lastVideoTime=n;if(!inClip&&Number.isFinite(n))setStatus(`LIVE · позиция ${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`,'sync')});player.on?.('error',()=>setStatus('Ошибка VK-плеера','error'));setTimeout(()=>{try{live();restoreRecent()}catch{}},1800)}catch{setTimeout(hook,500)}};hook()}
-function playClip(key){const cap=captures.get(key);if(!cap||!player)return;const e=data?.events?.find(x=>x.key===key);clearInterval(clipTimer);inClip=true;try{player.unmute?.();player.seek?.(Number(cap.start));player.play?.()}catch{}$('#clipText').textContent=`${e?.type==='GOAL'?'Гол':'Удаление'} · ${e?.time||''} · ${e?.player||''}`;$('#clipBanner').classList.add('show');setStatus('Воспроизводится видео события','captured');clipTimer=setInterval(()=>{const t=current();if(Number.isFinite(t)&&t>=Number(cap.end)){live()}},350)}
-$('#feed').addEventListener('click',e=>{const b=e.target.closest('.play[data-key]:not(.wait)');if(b)playClip(b.dataset.key)});$('#backLive').addEventListener('click',live);
-(async()=>{await poll(true);initPlayer();setInterval(()=>poll(false),5000)})();
-})();
-</script>
+<script src="/clip-demo.js"></script>
 </body>
 </html>
