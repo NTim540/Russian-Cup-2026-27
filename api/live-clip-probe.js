@@ -8,6 +8,23 @@ function uniq(xs){return[...new Set(xs.filter(Boolean))]}
 function abs(base,href){try{return new URL(href,base).toString()}catch{return''}}
 function attr(src,name){const m=src.match(new RegExp(`${name}=["']([^"']*)["']`,'i'));return m?m[1].replace(/&amp;/g,'&'):''}
 function strip(src){return src.replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&#x([0-9a-f]+);/gi,(_,h)=>String.fromCodePoint(parseInt(h,16))).replace(/&amp;/g,'&').replace(/\s+/g,' ').trim()}
+function timingValues(html){
+  const out={};
+  const keys=['duration','date','start_time','startTime','started_at','startedAt','live_start_time','liveStartTime','current_time','currentTime','is_live','isLive','live_status','liveStatus'];
+  for(const key of keys){
+    const patterns=[
+      new RegExp(`\\\\?"${key}\\\\?"\\s*:\\s*(true|false|-?\\d+(?:\\.\\d+)?|\\\\?"[^"\\\\]{0,120}\\\\?")`,'gi'),
+      new RegExp(`${key}\\s*[:=]\\s*(true|false|-?\\d+(?:\\.\\d+)?|["'][^"']{0,120}["'])`,'gi')
+    ];
+    const vals=[];
+    for(const re of patterns)for(const m of html.matchAll(re))vals.push(m[1]);
+    if(vals.length)out[key]=uniq(vals).slice(0,12);
+  }
+  const api=[];
+  for(const m of html.matchAll(/\\?"method\\?"\s*:\s*\\?"([^"\\]+)\\?"/gi))api.push(m[1]);
+  out.methods=uniq(api).slice(0,30);
+  return out;
+}
 function extract(html,base){
   const title=strip((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]||'');
   const urls=[];
@@ -26,30 +43,17 @@ function extract(html,base){
   for(const m of html.matchAll(/\b([0-5]?\d:[0-5]\d)\b/g)){
     const i=m.index||0,chunk=html.slice(Math.max(0,i-500),Math.min(html.length,i+900));
     const text=strip(chunk);
-    if(/гол|наруш|штраф|удален|поднож|толчок|задерж|удар/i.test(text)) precise.push({time:m[1],snippet:text.slice(0,1200)});
+    if(/гол|наруш|штраф|удален|поднож|толчок|задерж|удар|клюшкой/i.test(text)) precise.push({time:m[1],snippet:text.slice(0,1200)});
   }
 
-  const meta=[];
-  const keyPattern=/(live[_A-Za-z]*|is[_A-Za-z]*live|start[_A-Za-z]*time|started[_A-Za-z]*|duration|date|timestamp|current[_A-Za-z]*time)/gi;
-  for(const m of html.matchAll(keyPattern)){
-    const i=m.index||0;
-    const chunk=html.slice(Math.max(0,i-90),Math.min(html.length,i+220)).replace(/\s+/g,' ');
-    if(/\d{6,}|duration|start|live|current/i.test(chunk)) meta.push(chunk);
-  }
-
-  const interesting=[];
-  for(const needle of ['mvData','m3u8','mp4','video_ext','js_api','currentTime','duration','live']){
-    const i=html.toLowerCase().indexOf(needle.toLowerCase());
-    if(i>=0) interesting.push({needle,snippet:html.slice(Math.max(0,i-500),Math.min(html.length,i+1800)).replace(/\s+/g,' ')});
-  }
-  return{title,length:html.length,media,scripts,actions:actions.slice(0,60),precise:precise.slice(0,30),meta:uniq(meta).slice(0,80),interesting:interesting.slice(0,16)};
+  return{title,length:html.length,media,scripts,actions:actions.slice(0,60),precise:precise.slice(0,40),timing:timingValues(html)};
 }
 
 async function get(url,referer){
   try{
     const r=await fetch(url,{redirect:'follow',headers:{'User-Agent':UA,'Accept':'text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8',...(referer?{'Referer':referer}:{})},cache:'no-store'});
     const text=await r.text();
-    return{ok:r.ok,status:r.status,finalUrl:r.url,headers:{type:r.headers.get('content-type'),server:r.headers.get('server')},data:extract(text,r.url),head:text.slice(0,800)};
+    return{ok:r.ok,status:r.status,finalUrl:r.url,headers:{type:r.headers.get('content-type'),server:r.headers.get('server')},data:extract(text,r.url),head:text.slice(0,500)};
   }catch(e){return{ok:false,error:String(e)}}
 }
 
