@@ -56,13 +56,7 @@ function css(){if(document.getElementById('cup-opening-ceremony-css'))return;con
 `;document.head.appendChild(s)}
 function ceremonyMarker(item){const el=document.createElement('article');el.className='event-card cup-opening-marker ceremony';el.dataset.openingKey=item.time;el.innerHTML=`<div class="opening-time">${item.time}<small>МСК</small></div><div class="opening-text">${item.text}</div>${item.fhr?`<img class="opening-logo" src="${FHR_LOGO}" alt="ФХР">`:'<span></span>'}`;return el}
 function startMarker(){const ls=logos(),el=document.createElement('article');el.className='event-card cup-opening-marker match-start';el.dataset.openingKey='00:00';el.innerHTML=`<div class="opening-time">00:00</div><div class="opening-text">МАТЧ НАЧАЛСЯ</div><div class="opening-teams">${ls.map(src=>`<img src="${src}" alt="">`).join('')}</div>`;return el}
-function render(){if(!isMatchOne())return;css();const t=timeline();if(!t)return;
-  t.querySelectorAll('.cup-system-marker.start').forEach(x=>x.remove());
-  t.querySelectorAll('.cup-opening-marker').forEach(x=>x.remove());
-  const now=moscowMinutes(),shown=OPENING.filter(x=>now>=x.minutes);
-  if(now>=13*60+39)t.appendChild(startMarker());
-  shown.slice().reverse().forEach(item=>t.appendChild(ceremonyMarker(item)));
-}
+function render(){if(!isMatchOne())return;css();const t=timeline();if(!t)return;t.querySelectorAll('.cup-system-marker.start').forEach(x=>x.remove());const now=moscowMinutes(),items=[];if(now>=13*60+39)items.push({key:'00:00',node:startMarker});OPENING.filter(x=>now>=x.minutes).slice().reverse().forEach(item=>items.push({key:item.time,node:()=>ceremonyMarker(item)}));const desired=items.map(x=>x.key).join('|'),current=[...t.querySelectorAll(':scope > .cup-opening-marker')].map(x=>x.dataset.openingKey||'').join('|');if(desired===current)return;t.querySelectorAll(':scope > .cup-opening-marker').forEach(x=>x.remove());items.forEach(x=>t.appendChild(x.node()))}
 let busy=false;function queue(){if(busy)return;busy=true;requestAnimationFrame(()=>{busy=false;render()})}
 css();queue();const main=document.getElementById('main');if(main)new MutationObserver(queue).observe(main,{childList:true,subtree:true});setInterval(queue,1000);
 })();
