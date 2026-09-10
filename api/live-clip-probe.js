@@ -25,6 +25,7 @@ function timingValues(html){
   out.methods=uniq(api).slice(0,30);
   return out;
 }
+function around(html,needle,before=500,after=7000){const i=html.indexOf(needle);return i<0?'':html.slice(Math.max(0,i-before),Math.min(html.length,i+after)).replace(/\s+/g,' ')}
 function extract(html,base){
   const title=strip((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]||'');
   const urls=[];
@@ -46,7 +47,7 @@ function extract(html,base){
     if(/гол|наруш|штраф|удален|поднож|толчок|задерж|удар|клюшкой/i.test(text)) precise.push({time:m[1],snippet:text.slice(0,1200)});
   }
 
-  return{title,length:html.length,media,scripts,actions:actions.slice(0,60),precise:precise.slice(0,40),timing:timingValues(html)};
+  return{title,length:html.length,media,scripts,actions:actions.slice(0,60),precise:precise.slice(0,40),timing:timingValues(html),playerConfig:around(html,'video.getPlayerConfig'),hashConfig:around(html,'video.getHashes',300,1800)};
 }
 
 async function get(url,referer){
