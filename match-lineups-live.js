@@ -16,7 +16,37 @@ function installCss(){if(document.getElementById('match-live-lineups-css'))retur
 #rosters[data-live-lineups="1"] .roster-head{padding-right:155px}
 #rosters[data-live-lineups="1"] .roster-source{position:absolute;top:15px;right:15px;z-index:2;background:rgba(7,17,31,.72);backdrop-filter:blur(8px)}
 #rosters[data-live-lineups="1"] .roster-sync-note{padding:8px 14px;border-top:1px solid rgba(255,255,255,.045);color:#668097;font-size:8px;text-transform:uppercase;letter-spacing:.08em}
-@media(max-width:680px){#rosters[data-live-lineups="1"] .roster-head{padding-right:120px}#rosters[data-live-lineups="1"] .roster-source{top:13px;right:11px;font-size:7px;padding:4px 6px}}
+@media(max-width:680px){
+  #rosters[data-live-lineups="1"] .roster-head{padding-right:120px}
+  #rosters[data-live-lineups="1"] .roster-source{top:13px;right:11px;font-size:7px;padding:4px 6px}
+
+  /* Mobile rink: show the whole five-man unit at once, without horizontal panning. */
+  #rinkRoot{max-width:100%!important;overflow:hidden!important}
+  #rinkRoot .rink-shell{width:100%!important;max-width:100%!important;overflow:hidden!important;padding:10px!important}
+  #rinkRoot .line-tabs{justify-content:center!important;gap:4px!important;margin-bottom:10px!important}
+  #rinkRoot .line-tab{padding:6px 9px!important;font-size:8px!important}
+  #rinkRoot .rink{width:100%!important;min-width:0!important;max-width:100%!important;aspect-ratio:2/1!important;margin:0 auto!important;border-width:3px!important}
+  #rinkRoot .rink-player{width:54px!important}
+  #rinkRoot .rink-avatar{width:44px!important;height:44px!important;border-width:2px!important;box-shadow:0 3px 8px rgba(0,0,0,.14)!important}
+  #rinkRoot .rink-number{right:-8px!important;top:-5px!important;min-width:24px!important;width:auto!important;height:24px!important;padding:0 5px!important;font-size:10px!important}
+  #rinkRoot .rink-name{margin-top:3px!important;font-size:6.5px!important;line-height:1.1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  #rinkRoot .center-dot{width:7px!important;height:7px!important}
+  #rinkRoot .faceoff{border-width:1.5px!important}
+  #rinkRoot .goalies{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px!important;margin-top:10px!important}
+  #rinkRoot .goalie-card{min-width:0!important;padding:8px!important;font-size:7.5px!important;line-height:1.35!important}
+  #rinkRoot .goalie-card strong{font-size:8px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  #rinkRoot .rink-legend{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;gap:5px!important;align-items:center!important;font-size:6.5px!important;line-height:1.25!important}
+  #rinkRoot .rink-legend span{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  #rinkRoot .rink-legend span:nth-child(2){text-align:center!important}
+  #rinkRoot .rink-legend span:last-child{text-align:right!important}
+}
+@media(max-width:390px){
+  #rinkRoot .rink-shell{padding:8px!important}
+  #rinkRoot .rink-player{width:48px!important}
+  #rinkRoot .rink-avatar{width:40px!important;height:40px!important}
+  #rinkRoot .rink-number{min-width:22px!important;height:22px!important;font-size:9px!important}
+  #rinkRoot .rink-name{font-size:6px!important}
+}
 `;document.head.appendChild(s)}
 function rows(xs){return xs.map(p=>`<div class="player-row"><span class="player-num">${p.number??'—'}</span><span class="player-avatar">${p.photo_proxy||p.photo?`<img src="${esc(p.photo_proxy||p.photo)}" alt="${esc(p.name)}" loading="lazy">`:(p.number??'')}</span><span class="player-name">${esc(p.name)}<small>${p.position==='G'?'Вратарь':p.position==='D'?'Защитник':p.position==='F'?'Нападающий':''}</small></span><span class="player-tag">${esc(p.goalie_role||p.captain||(p.line?`${p.line} зв.`:''))}</span></div>`).join('')}
 function roster(side){const t=team(side),xs=list(side),l=logo(t),groups=[['G','Вратари'],['D','Защитники'],['F','Нападающие']];return`<article class="roster-team"><div class="roster-head">${l?`<img src="${esc(l)}" alt="">`:''}<div><strong>${esc(t?.name||'Команда')}</strong></div><div class="roster-source">Состав на матч · ФХР</div></div>${xs.length?groups.map(([pos,title])=>{const ps=xs.filter(p=>p.position===pos);return ps.length?`<div class="roster-group-title">${title}</div>${rows(ps)}`:''}).join(''):'<div class="empty">Заявка этой команды пока не найдена в протоколе ФХР.</div>'}<div class="roster-sync-note">Официальная заявка конкретного матча</div></article>`}
