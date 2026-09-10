@@ -43,6 +43,18 @@ function guardMainRefresh(){
 
 guardMainRefresh();
 
+function guardExtraPeriods(){
+ const chips=[...document.querySelectorAll('.score-center .period-chip')];if(!chips.length)return;
+ const ot=chips.find(c=>/овертайм|\bот\b/i.test(c.querySelector('span')?.textContent||''));
+ const so=chips.find(c=>/бул/i.test(c.querySelector('span')?.textContent||''));
+ const state=norm(document.querySelector('.match-state')?.textContent||'');
+ const eventPeriods=norm([...document.querySelectorAll('#live .event-time span')].map(x=>x.textContent||'').join(' '));
+ const finalScore=norm(document.querySelector('#live .cup-system-marker.final .cup-marker-result strong')?.textContent||'');
+ const soReal=state.includes('буллит')||eventPeriods.includes('буллит')||/(^|\s)б$/.test(finalScore);
+ const otReal=soReal||state.includes('овертайм')||/(^|\s)от(\s|$)/.test(state)||/(^|\s)от(\s|$)/.test(eventPeriods)||/(^|\s)от$/.test(finalScore);
+ if(ot)ot.hidden=!otReal;if(so)so.hidden=!soReal;
+}
+
 function eventKey(card){return card.dataset.eventKey||[card.classList.contains('goal')?'goal':card.classList.contains('penalty')?'penalty':'event',card.querySelector('.event-time strong')?.textContent,card.querySelector('.event-time span')?.textContent,card.querySelector('.event-copy strong')?.textContent,card.querySelector('.event-copy p')?.textContent].map(norm).join('|')}
 function teamFor(card){const src=card.querySelector('.event-logo')?.src||'';return [...document.querySelectorAll('.score-team')].map(x=>({name:x.querySelector('h1')?.textContent?.trim()||'',logo:x.querySelector('.score-logo img')?.src||''})).find(x=>src&&x.logo===src)||null}
 function inkFor(hex){const h=String(hex).replace('#','');if(h.length!==6)return'#fff';const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);return(.299*r+.587*g+.114*b)>175?'#07111f':'#fff'}
@@ -77,7 +89,7 @@ function renderOfficials(){
 }
 async function fetchOfficials(){if(!Number.isInteger(matchId)||matchId<1||officialsLoading)return;officialsLoading=true;try{const r=await fetch(`${OFFICIALS}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(r.ok){const next=b.officials||{main:[],lines:[]},sig=JSON.stringify(next);if(sig!==officialsSig){officials=next;officialsSig=sig;renderOfficials()}}}catch{}finally{officialsLoading=false}}
 
-let queued=false;function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;scanEvents();renderOfficials()})}
+let queued=false;function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;guardExtraPeriods();scanEvents();renderOfficials()})}
 const root=document.getElementById('main')||document.body;new MutationObserver(queue).observe(root,{childList:true,subtree:true});
 queue();fetchOfficials();setInterval(fetchOfficials,45000);setInterval(queue,1000);
 })();
