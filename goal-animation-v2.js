@@ -5,91 +5,42 @@ const matchId=Number(new URL(location.href).searchParams.get('id'));
 const EDGE_V2='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-match-center-v2';
 const OFFICIALS='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-officials';
 const norm=v=>String(v||'').toLocaleLowerCase('ru-RU').replace(/[«»"']/g,'').replace(/ё/g,'е').replace(/\s+/g,' ').trim();
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 
-/* All future match-center polls use the detailed FHR parser. */
 const nativeFetch=window.fetch.bind(window);
-window.fetch=(input,init)=>{
-  try{
-    const raw=typeof input==='string'?input:input instanceof URL?input.toString():input?.url||'';
-    if(/\/functions\/v1\/russian-cup-match-center(?:\?|$)/.test(raw)){
-      const u=new URL(raw,location.href);u.pathname='/functions/v1/russian-cup-match-center-v2';
-      return nativeFetch(typeof input==='string'||input instanceof URL?u.toString():new Request(u.toString(),input),init);
-    }
-  }catch{}
-  return nativeFetch(input,init);
-};
+window.fetch=(input,init)=>{try{const raw=typeof input==='string'?input:input instanceof URL?input.toString():input?.url||'';if(/\/functions\/v1\/russian-cup-match-center(?:\?|$)/.test(raw)){const u=new URL(raw,location.href);u.pathname='/functions/v1/russian-cup-match-center-v2';return nativeFetch(typeof input==='string'||input instanceof URL?u.toString():new Request(u.toString(),input),init)}}catch{}return nativeFetch(input,init)};
 
-/* Production has one animation engine only. */
 const style=document.createElement('style');style.id='cup-production-animation-controller-css';style.textContent=`
-#live .event-card.goal,#live .event-card.penalty{position:relative!important;overflow:hidden!important;cursor:pointer}
-#live .goal-celebrating{animation:none!important;pointer-events:auto!important}#live .goal-celebrating>.goal-celebration-layer{display:none!important}
-#live .match-penalty-layer{display:none!important}#live .match-penalty-playing{animation:none!important}
-#live .cup-referee-card{position:relative!important;display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;gap:14px!important;align-items:stretch!important;padding:0!important;min-height:118px!important;border:1px solid rgba(255,255,255,.18)!important;border-left:0!important;border-radius:14px!important;overflow:hidden!important;background:repeating-linear-gradient(90deg,#f5f5f2 0 15px,#121212 15px 30px)!important}
-#live .cup-referee-time{display:flex;align-items:center;justify-content:center;background:rgba(5,10,16,.88);font-size:20px;font-weight:950;letter-spacing:-.035em;white-space:nowrap}
-#live .cup-referee-body{margin:8px 8px 8px 0;padding:13px 15px;border-radius:9px;background:rgba(7,17,31,.96);display:grid;gap:12px;align-content:center}
-#live .cup-referee-row{display:flex;align-items:center;gap:11px;min-width:0;flex-wrap:wrap}.cup-referee-tag{flex:0 0 auto;padding:6px 9px;border-radius:4px;font-size:9px;font-weight:1000;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}.cup-referee-tag.main{background:#e87525;color:#fff}.cup-referee-tag.lines{border:1.5px solid rgba(255,255,255,.9);color:#fff;background:transparent}.cup-referee-names{font-size:13px;font-weight:850;line-height:1.35;color:#eef3f8;min-width:0}
+#live .event-card.goal,#live .event-card.penalty,#live .cup-referee-card{position:relative!important;overflow:hidden!important;cursor:pointer}
+#live .goal-celebrating{animation:none!important;pointer-events:auto!important}#live .goal-celebrating>.goal-celebration-layer{display:none!important}#live .match-penalty-layer{display:none!important}#live .match-penalty-playing{animation:none!important}
+#live .cup-referee-card{display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;gap:14px!important;align-items:stretch!important;padding:0!important;min-height:118px!important;border:1px solid rgba(255,255,255,.18)!important;border-left:0!important;border-radius:14px!important;background:repeating-linear-gradient(90deg,#f5f5f2 0 15px,#121212 15px 30px)!important}
+#live .cup-referee-time{display:flex;align-items:center;justify-content:center;background:rgba(5,10,16,.88);font-size:20px;font-weight:950;letter-spacing:-.035em;white-space:nowrap}#live .cup-referee-body{margin:8px 8px 8px 0;padding:13px 15px;border-radius:9px;background:rgba(7,17,31,.96);display:grid;gap:12px;align-content:center}#live .cup-referee-row{display:flex;align-items:center;gap:11px;min-width:0;flex-wrap:wrap}.cup-referee-tag{flex:0 0 auto;padding:6px 9px;border-radius:4px;font-size:9px;font-weight:1000;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}.cup-referee-tag.main{background:#e87525;color:#fff}.cup-referee-tag.lines{border:1.5px solid rgba(255,255,255,.9);color:#fff;background:transparent}.cup-referee-names{font-size:13px;font-weight:850;line-height:1.35;color:#eef3f8;min-width:0}
 @media(max-width:620px){#live .cup-referee-card{grid-template-columns:58px minmax(0,1fr)!important;gap:8px!important;min-height:108px!important}#live .cup-referee-time{font-size:16px}#live .cup-referee-body{margin:6px 6px 6px 0;padding:10px 11px;gap:9px}#live .cup-referee-row{gap:7px}.cup-referee-tag{font-size:7px;padding:5px 7px}.cup-referee-names{font-size:10px}}
 `;document.head.appendChild(style);
 
-function loadApprovedEngine(){
- if(window.CupMHLAnimations)return Promise.resolve(window.CupMHLAnimations);
- return new Promise(resolve=>{let s=document.querySelector('script[data-cup-mhl-engine]');if(!s){s=document.createElement('script');s.src='/clip-mhl-animations.js?v=20260910-4';s.async=true;s.dataset.cupMhlEngine='1';document.body.appendChild(s)}const done=()=>resolve(window.CupMHLAnimations||null);s.addEventListener('load',done,{once:true});setTimeout(done,1800)});
-}
+function loadApprovedEngine(){if(window.CupMHLAnimations)return Promise.resolve(window.CupMHLAnimations);return new Promise(resolve=>{let s=document.querySelector('script[data-cup-mhl-engine]');if(!s){s=document.createElement('script');s.src='/clip-mhl-animations.js?v=20260910-5';s.async=true;s.dataset.cupMhlEngine='1';document.body.appendChild(s)}const done=()=>resolve(window.CupMHLAnimations||null);s.addEventListener('load',done,{once:true});setTimeout(done,1800)})}
 const enginePromise=loadApprovedEngine();
 function teams(){return[...document.querySelectorAll('.score-team')].map(x=>({name:x.querySelector('h1')?.textContent?.trim()||'',logo:x.querySelector('.score-logo img')?.src||''}))}
 function teamForSide(side){const t=teams();return side==='away'?t[1]:t[0]}
 function identity(card){return[card.classList.contains('goal')?'goal':card.classList.contains('penalty')?'penalty':'event',card.querySelector('.event-time strong')?.textContent,card.querySelector('.event-copy strong')?.textContent].map(norm).join('|')}
 function identityEvent(ev){return[String(ev.event_type||'').toLowerCase(),ev.clock,`${ev.number?`№${ev.number} `:''}${ev.player||'Командный штраф'}`].map(norm).join('|')}
-function eventCard(ev){
- const cls=String(ev.event_type||'').toUpperCase()==='GOAL'?'goal':String(ev.event_type||'').toUpperCase()==='PENALTY'?'penalty':'goalkeeper',cards=[...document.querySelectorAll(`#live .event-card.${cls}`)],wanted=identityEvent(ev);
- const exact=cards.find(c=>identity(c)===wanted);if(exact)return exact;
- const byPlayer=cards.find(c=>String(c.querySelector('.event-time strong')?.textContent||'').trim()===String(ev.clock||'').trim()&&(!ev.player||norm(c.querySelector('.event-copy strong')?.textContent).includes(norm(ev.player))));if(byPlayer)return byPlayer;
- const sameTime=cards.filter(c=>String(c.querySelector('.event-time strong')?.textContent||'').trim()===String(ev.clock||'').trim());return sameTime.length===1?sameTime[0]:null;
-}
-function goalNarrative(ev,teamName){const s=ev.score;if(!Array.isArray(s))return`${teamName} забрасывает шайбу`;const [h,a]=s,sc=ev.side==='away'?a:h,opp=ev.side==='away'?h:a,total=h+a;if(total===1)return`${teamName} открывает счёт`;if(h===a)return`${teamName} сравнивает счёт`;if(sc===opp+1)return`${teamName} выходит вперёд`;if(sc>opp+1)return`${teamName} увеличивает преимущество`;if(sc<opp)return`${teamName} сокращает отставание`;return`${teamName} забрасывает шайбу`}
-function tagCard(card,ev){
- if(!card)return;const team=teamForSide(ev.side),logo=team?.logo||card.querySelector('.event-logo')?.src||'';card.dataset.eventKey=ev.key||identityEvent(ev);card.dataset.teamName=ev.team_name||team?.name||'';card.dataset.teamLogo=logo;
- card.classList.remove('goal-celebrating','match-penalty-playing');card.querySelector('.goal-celebration-layer')?.remove();card.querySelector('.match-penalty-layer')?.remove();
- const title=card.querySelector('.event-copy strong'),desc=card.querySelector('.event-copy p'),score=card.querySelector('.event-score'),main=card.querySelector('.event-main');
- if(title)title.textContent=`${ev.number?`№${ev.number} `:''}${ev.player||'Командный штраф'}`.trim();
- if(String(ev.event_type).toUpperCase()==='GOAL'){
-   if(score)score.textContent=Array.isArray(ev.score)?`${ev.score[0]}:${ev.score[1]}`:'';
-   if(desc){const tn=ev.team_name||team?.name||'Команда';desc.textContent=goalNarrative(ev,tn)+(ev.assistants?` · Передачи: ${ev.assistants}`:'')+(ev.power_play?' · В большинстве':'')}
- }else if(String(ev.event_type).toUpperCase()==='PENALTY'){
-   card.dataset.penaltyMinutes=String(ev.penalty_minutes||2);card.dataset.penaltyReason=ev.description||'Нарушение правил';if(score)score.textContent='';if(desc)desc.textContent=[ev.penalty_minutes?`${ev.penalty_minutes} мин.`:'',ev.description||''].filter(Boolean).join(' · ')
- }
- if(ev.player_photo&&main&&!/default\/players/i.test(ev.player_photo)){
-   let img=main.querySelector('.event-photo');if(!img){img=document.createElement('img');img.className='event-photo';main.prepend(img)}img.src=ev.player_photo;img.alt=ev.player||'';img.loading='lazy';
- }
- const logoEl=card.querySelector('.event-logo');if(logoEl&&logo)logoEl.src=logo;
-}
+function eventCard(ev){const cls=String(ev.event_type||'').toUpperCase()==='GOAL'?'goal':String(ev.event_type||'').toUpperCase()==='PENALTY'?'penalty':'goalkeeper',cards=[...document.querySelectorAll(`#live .event-card.${cls}`)],wanted=identityEvent(ev);const exact=cards.find(c=>identity(c)===wanted);if(exact)return exact;const byPlayer=cards.find(c=>String(c.querySelector('.event-time strong')?.textContent||'').trim()===String(ev.clock||'').trim()&&(!ev.player||norm(c.querySelector('.event-copy strong')?.textContent).includes(norm(ev.player))));if(byPlayer)return byPlayer;const sameTime=cards.filter(c=>String(c.querySelector('.event-time strong')?.textContent||'').trim()===String(ev.clock||'').trim());return sameTime.length===1?sameTime[0]:null}
+function goalNarrative(ev,teamName){const s=ev.score;if(!Array.isArray(s))return`${teamName} забрасывает шайбу`;const[h,a]=s,sc=ev.side==='away'?a:h,opp=ev.side==='away'?h:a,total=h+a;if(total===1)return`${teamName} открывает счёт`;if(h===a)return`${teamName} сравнивает счёт`;if(sc===opp+1)return`${teamName} выходит вперёд`;if(sc>opp+1)return`${teamName} увеличивает преимущество`;if(sc<opp)return`${teamName} сокращает отставание`;return`${teamName} забрасывает шайбу`}
+function tagCard(card,ev){if(!card)return;const team=teamForSide(ev.side),logo=team?.logo||card.querySelector('.event-logo')?.src||'';card.dataset.eventKey=ev.key||identityEvent(ev);card.dataset.teamName=ev.team_name||team?.name||'';card.dataset.teamLogo=logo;card.classList.remove('goal-celebrating','match-penalty-playing');card.querySelector('.goal-celebration-layer')?.remove();card.querySelector('.match-penalty-layer')?.remove();const title=card.querySelector('.event-copy strong'),desc=card.querySelector('.event-copy p'),score=card.querySelector('.event-score'),main=card.querySelector('.event-main');if(title)title.textContent=`${ev.number?`№${ev.number} `:''}${ev.player||'Командный штраф'}`.trim();if(String(ev.event_type).toUpperCase()==='GOAL'){if(score)score.textContent=Array.isArray(ev.score)?`${ev.score[0]}:${ev.score[1]}`:'';if(desc){const tn=ev.team_name||team?.name||'Команда';desc.textContent=goalNarrative(ev,tn)+(ev.assistants?` · Передачи: ${ev.assistants}`:'')+(ev.power_play?' · В большинстве':'')}}else if(String(ev.event_type).toUpperCase()==='PENALTY'){card.dataset.penaltyMinutes=String(ev.penalty_minutes||2);card.dataset.penaltyReason=ev.description||'Нарушение правил';if(score)score.textContent='';if(desc)desc.textContent=[ev.penalty_minutes?`${ev.penalty_minutes} мин.`:'',ev.description||''].filter(Boolean).join(' · ')}if(ev.player_photo&&main&&!/default\/players/i.test(ev.player_photo)){let img=main.querySelector('.event-photo');if(!img){img=document.createElement('img');img.className='event-photo';main.prepend(img)}img.src=ev.player_photo;img.alt=ev.player||'';img.loading='lazy'}const logoEl=card.querySelector('.event-logo');if(logoEl&&logo)logoEl.src=logo}
 
-const known=new Set();let armed=false,patchBusy=false,lastData=null;
+const known=new Set();let armed=false,patchBusy=false;
 function baseline(){for(const c of document.querySelectorAll('#live .event-card.goal,#live .event-card.penalty'))known.add(identity(c));armed=true}
-async function play(card,type){const eng=await enginePromise;if(!eng||!card?.isConnected)return;card.classList.remove('goal-celebrating','match-penalty-playing');card.querySelector('.goal-celebration-layer')?.remove();card.querySelector('.match-penalty-layer')?.remove();type==='goal'?eng.goal(card):eng.penalty(card)}
+let officials={main:[],lines:[]},officialsSig='',officialsBusy=false,refereeAutoPlayed=false;
+async function play(card,type){const eng=await enginePromise;if(!eng||!card?.isConnected)return;card.classList.remove('goal-celebrating','match-penalty-playing');card.querySelector('.goal-celebration-layer')?.remove();card.querySelector('.match-penalty-layer')?.remove();if(type==='goal')eng.goal(card);else if(type==='penalty')eng.penalty(card);else if(type==='judges')eng.judges?.(card,officials)}
 function bindReplay(card,type){if(card.dataset.mhlReplayBound==='1')return;card.dataset.mhlReplayBound='1';card.addEventListener('click',e=>{if(e.target.closest('a,button,summary,details'))return;play(card,type)})}
-function scanForNew(){
- const cards=[...document.querySelectorAll('#live .event-card.goal,#live .event-card.penalty')];cards.forEach(c=>bindReplay(c,c.classList.contains('goal')?'goal':'penalty'));
- if(!armed){baseline();return}
- for(const c of cards){const id=identity(c);if(known.has(id))continue;known.add(id);setTimeout(()=>play(c,c.classList.contains('goal')?'goal':'penalty'),120)}
-}
-function patchCurrent(data){
- const events=Array.isArray(data?.live?.events)?data.live.events:[];lastData=data;
- for(const ev of events){const c=eventCard(ev);if(!c)continue;const oldId=identity(c),already=known.has(oldId);if(already)known.add(identityEvent(ev));tagCard(c,ev)}
- const home=norm(data?.home_team?.name),away=norm(data?.away_team?.name);document.querySelectorAll('#live .event-card.goalkeeper').forEach(c=>{const title=norm(c.querySelector('.event-copy strong')?.textContent);const tm=norm(c.querySelector('.event-time strong')?.textContent);if(tm==='00:00'&&(title===home||title===away))c.remove()});
- scanForNew();renderOfficials();
-}
+function scanForNew(){const cards=[...document.querySelectorAll('#live .event-card.goal,#live .event-card.penalty')];cards.forEach(c=>bindReplay(c,c.classList.contains('goal')?'goal':'penalty'));if(!armed){baseline();return}for(const c of cards){const id=identity(c);if(known.has(id))continue;known.add(id);setTimeout(()=>play(c,c.classList.contains('goal')?'goal':'penalty'),120)}}
+function patchCurrent(data){const events=Array.isArray(data?.live?.events)?data.live.events:[];for(const ev of events){const c=eventCard(ev);if(c)tagCard(c,ev)}const home=norm(data?.home_team?.name),away=norm(data?.away_team?.name);document.querySelectorAll('#live .event-card.goalkeeper').forEach(c=>{const title=norm(c.querySelector('.event-copy strong')?.textContent),tm=norm(c.querySelector('.event-time strong')?.textContent);if(tm==='00:00'&&(title===home||title===away))c.remove()});scanForNew();renderOfficials()}
 async function refreshDetailed(){if(patchBusy||!Number.isInteger(matchId)||matchId<1)return;patchBusy=true;try{const r=await nativeFetch(`${EDGE_V2}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(r.ok)patchCurrent(b)}catch{}finally{patchBusy=false}}
 
-let officials={main:[],lines:[]},officialsSig='',officialsBusy=false;
 function startMarker(){return document.querySelector('#live .cup-opening-marker.match-start,#live .cup-system-marker.start')}
 function refereeCard(){const main=officials.main||[],lines=officials.lines||[];if(!main.length&&!lines.length)return null;const el=document.createElement('article');el.className='event-card cup-referee-card';el.dataset.officialsSig=officialsSig;el.innerHTML=`<div class="cup-referee-time">00:00</div><div class="cup-referee-body">${main.length?`<div class="cup-referee-row"><span class="cup-referee-tag main">Главные судьи</span><span class="cup-referee-names">${main.map(esc).join(' · ')}</span></div>`:''}${lines.length?`<div class="cup-referee-row"><span class="cup-referee-tag lines">Линейные судьи</span><span class="cup-referee-names">${lines.map(esc).join(' · ')}</span></div>`:''}</div>`;return el}
-function renderOfficials(){const start=startMarker(),timeline=document.querySelector('#live .timeline');if(!start||!timeline)return;const old=timeline.querySelector(':scope > .cup-referee-card');if(old?.dataset.officialsSig===officialsSig)return;old?.remove();const c=refereeCard();if(c)start.insertAdjacentElement('afterend',c)}
+function renderOfficials(){const start=startMarker(),timeline=document.querySelector('#live .timeline');if(!start||!timeline)return;const old=timeline.querySelector(':scope > .cup-referee-card');if(old?.dataset.officialsSig===officialsSig){bindReplay(old,'judges');return}old?.remove();const c=refereeCard();if(!c)return;start.insertAdjacentElement('afterend',c);bindReplay(c,'judges');if(!refereeAutoPlayed){refereeAutoPlayed=true;setTimeout(()=>play(c,'judges'),180)}}
 async function refreshOfficials(){if(officialsBusy||!Number.isInteger(matchId)||matchId<1)return;officialsBusy=true;try{const r=await nativeFetch(`${OFFICIALS}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(r.ok){const next=b.officials||{main:[],lines:[]},sig=JSON.stringify(next);if(sig!==officialsSig){officials=next;officialsSig=sig;renderOfficials()}}}catch{}finally{officialsBusy=false}}
 
-/* Baseline what was already on screen; only future protocol additions auto-play. */
-baseline();refreshDetailed();refreshOfficials();
-let queued=false;const root=document.getElementById('main')||document.body;new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;scanForNew();renderOfficials()})}).observe(root,{childList:true,subtree:true});
-setInterval(refreshDetailed,5000);setInterval(refreshOfficials,30000);
+baseline();refreshDetailed();refreshOfficials();let queued=false;const root=document.getElementById('main')||document.body;new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;scanForNew();renderOfficials()})}).observe(root,{childList:true,subtree:true});setInterval(refreshDetailed,5000);setInterval(refreshOfficials,30000);
 })();
