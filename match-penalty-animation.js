@@ -26,3 +26,23 @@ function render(){if(!isMatchOne())return;css();const t=timeline();if(!t)return;
 let busy=false;function queue(){if(busy)return;busy=true;requestAnimationFrame(()=>{busy=false;render()})}
 css();queue();const main=document.getElementById('main');if(main)new MutationObserver(queue).observe(main,{childList:true,subtree:true});setInterval(queue,1000);
 })();
+
+/* LIVE timeline rule: the match always ends at 60:00. No OT/SO labels or suffixes in the text broadcast. */
+(()=>{
+'use strict';
+if(!/\/match\.html$/i.test(location.pathname))return;
+function normalizeEndMarkers(){
+  const timeline=document.querySelector('#live .timeline');if(!timeline)return;
+  timeline.querySelectorAll(':scope > .cup-system-marker').forEach(card=>{
+    const label=card.querySelector('.cup-marker-label');
+    const text=String(label?.textContent||'').trim().toUpperCase();
+    if(/ОВЕРТАЙМ|БУЛЛИТ/.test(text)){card.remove();return}
+    if(card.classList.contains('final')||text==='КОНЕЦ МАТЧА'){
+      const time=card.querySelector('.cup-marker-time');if(time)time.textContent='60:00';if(label)label.textContent='КОНЕЦ МАТЧА';
+      const score=card.querySelector('.cup-marker-result strong');if(score)score.textContent=String(score.textContent||'').replace(/\s+(ОТ|Б)\s*$/i,'').trim();
+    }
+  });
+}
+let queued=false;function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;normalizeEndMarkers()})}
+queue();const main=document.getElementById('main');if(main)new MutationObserver(queue).observe(main,{childList:true,subtree:true,characterData:true});setInterval(normalizeEndMarkers,1000);
+})();
