@@ -27,22 +27,41 @@ let busy=false;function queue(){if(busy)return;busy=true;requestAnimationFrame((
 css();queue();const main=document.getElementById('main');if(main)new MutationObserver(queue).observe(main,{childList:true,subtree:true});setInterval(queue,1000);
 })();
 
-/* LIVE timeline rule: the match always ends at 60:00. No OT/SO labels or suffixes in the text broadcast. */
+/* LIVE timeline rule: OT/SO are shown only when the official FHR protocol actually reaches them. */
 (()=>{
 'use strict';
 if(!/\/match\.html$/i.test(location.pathname))return;
-function normalizeEndMarkers(){
+const EDGE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-match-center-v2';
+const matchId=Number(new URL(location.href).searchParams.get('id'));
+let protocol={ot:false,so:false};
+function normalizeMarkers(){
   const timeline=document.querySelector('#live .timeline');if(!timeline)return;
   timeline.querySelectorAll(':scope > .cup-system-marker').forEach(card=>{
     const label=card.querySelector('.cup-marker-label');
     const text=String(label?.textContent||'').trim().toUpperCase();
-    if(/ОВЕРТАЙМ|БУЛЛИТ/.test(text)){card.remove();return}
+    if(/БУЛЛИТ/.test(text)&&!protocol.so){card.remove();return}
+    if(/ОВЕРТАЙМ/.test(text)&&!protocol.ot){card.remove();return}
     if(card.classList.contains('final')||text==='КОНЕЦ МАТЧА'){
       const time=card.querySelector('.cup-marker-time');if(time)time.textContent='60:00';if(label)label.textContent='КОНЕЦ МАТЧА';
-      const score=card.querySelector('.cup-marker-result strong');if(score)score.textContent=String(score.textContent||'').replace(/\s+(ОТ|Б)\s*$/i,'').trim();
+      const score=card.querySelector('.cup-marker-result strong');
+      if(score){let base=String(score.textContent||'').replace(/\s+(ОТ|Б)\s*$/i,'').trim();if(protocol.so)base+=' Б';else if(protocol.ot)base+=' ОТ';score.textContent=base}
     }
   });
 }
-let queued=false;function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;normalizeEndMarkers()})}
-queue();const main=document.getElementById('main');if(main)new MutationObserver(queue).observe(main,{childList:true,subtree:true,characterData:true});setInterval(normalizeEndMarkers,1000);
+async function refreshProtocol(){
+  if(!Number.isInteger(matchId)||matchId<1)return;
+  try{
+    const r=await fetch(`${EDGE}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(!r.ok)return;
+    const events=Array.isArray(b?.live?.events)?b.live.events:[],current=String(b?.live?.current_period||'').toUpperCase(),ft=String(b?.match?.finish_type||'').toUpperCase();
+    const eventOT=events.some(e=>String(e?.period||'').toUpperCase()==='OT'),eventSO=events.some(e=>String(e?.period||'').toUpperCase()==='SO');
+    const p1=Array.isArray(b?.live?.period_scores?.[0])?b.live.period_scores[0]:[b?.match?.p1_home,b?.match?.p1_away],p2=Array.isArray(b?.live?.period_scores?.[1])?b.live.period_scores[1]:[b?.match?.p2_home,b?.match?.p2_away],p3=Array.isArray(b?.live?.period_scores?.[2])?b.live.period_scores[2]:[b?.match?.p3_home,b?.match?.p3_away];
+    const regKnown=[p1,p2,p3].every(p=>Array.isArray(p)&&Number.isInteger(p[0])&&Number.isInteger(p[1])),regTie=regKnown&&p1[0]+p2[0]+p3[0]===p1[1]+p2[1]+p3[1];
+    const final=String(b?.match?.fhr_live_state||'').toUpperCase()==='FINAL'||b?.live?.status==='FINAL';
+    const so=eventSO||current==='SO'||(final&&regTie&&ft==='SO');
+    const ot=so||eventOT||current==='OT'||(final&&regTie&&ft==='OT');
+    protocol={ot,so};normalizeMarkers();
+  }catch{}
+}
+let queued=false;function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;normalizeMarkers()})}
+queue();refreshProtocol();const main=document.getElementById('main');if(main)new MutationObserver(queue).observe(main,{childList:true,subtree:true,characterData:true});setInterval(refreshProtocol,5000);setInterval(normalizeMarkers,1000);
 })();
