@@ -3,18 +3,39 @@
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* Compact match start/end markers: time + label + both team logos. */
+/* Compact match start/end markers. End marker: home logo + final score + OT/SO suffix + away logo. */
 const css=document.createElement('style');
 css.id='clip-live-polish-style';
 css.textContent=`
 .timeline>.event.match-marker{display:grid!important;grid-template-columns:74px minmax(0,1fr) auto!important;align-items:center!important;gap:14px!important;min-height:74px!important;padding:14px 18px!important;border-left:4px solid rgba(127,198,255,.55)!important;background:rgba(11,29,48,.7)!important}
-.match-marker .match-marker-time{font-size:20px;font-weight:1000;letter-spacing:-.035em;color:#fff;white-space:nowrap}.match-marker .match-marker-label{font-size:15px;font-weight:1000;letter-spacing:.07em;text-transform:uppercase;color:#fff}.match-marker .match-marker-logos{display:flex;align-items:center;gap:8px}.match-marker .match-marker-logos img{width:34px;height:34px;object-fit:contain;display:block}
-@media(max-width:580px){.timeline>.event.match-marker{grid-template-columns:58px minmax(0,1fr) auto!important;gap:9px!important;min-height:62px!important;padding:11px 13px!important}.match-marker .match-marker-time{font-size:17px}.match-marker .match-marker-label{font-size:12px;letter-spacing:.055em}.match-marker .match-marker-logos{gap:5px}.match-marker .match-marker-logos img{width:28px;height:28px}}
+.match-marker .match-marker-time{font-size:20px;font-weight:1000;letter-spacing:-.035em;color:#fff;white-space:nowrap}.match-marker .match-marker-label{font-size:15px;font-weight:1000;letter-spacing:.07em;text-transform:uppercase;color:#fff}.match-marker .match-marker-logos{display:flex;align-items:center;justify-content:flex-end;gap:8px;white-space:nowrap}.match-marker .match-marker-logos img{width:34px;height:34px;object-fit:contain;display:block}.match-marker .match-marker-score{font-size:19px;font-weight:1000;letter-spacing:-.035em;color:#fff;white-space:nowrap}.match-marker .match-marker-suffix{margin-left:3px;font-size:12px;font-weight:1000;letter-spacing:.04em;color:#9fd1ff;vertical-align:middle}
+@media(max-width:580px){.timeline>.event.match-marker{grid-template-columns:58px minmax(0,1fr) auto!important;gap:9px!important;min-height:62px!important;padding:11px 13px!important}.match-marker .match-marker-time{font-size:17px}.match-marker .match-marker-label{font-size:11px;letter-spacing:.045em}.match-marker .match-marker-logos{gap:5px}.match-marker .match-marker-logos img{width:27px;height:27px}.match-marker .match-marker-score{font-size:16px}.match-marker .match-marker-suffix{font-size:10px;margin-left:2px}}
 `;
 document.head.appendChild(css);
 
-function teamLogos(){
-  return [$('#homeTeam img')?.src,$('#awayTeam img')?.src].filter(Boolean);
+function teamLogos(){return [$('#homeTeam img')?.src,$('#awayTeam img')?.src].filter(Boolean)}
+function resultSuffix(){
+  const explicit=String(document.documentElement.dataset.resultType||window.__cupLiveResultType||'').trim().toUpperCase();
+  if(['Б','SO','SHOOTOUT','БУЛЛИТЫ'].includes(explicit))return'Б';
+  if(['ОТ','OT','OVERTIME'].includes(explicit))return'ОТ';
+  const txt=[document.querySelector('#matchPhase')?.textContent,document.querySelector('#periodLabel')?.textContent,document.querySelector('#periodScores')?.textContent,document.querySelector('#feed')?.textContent].filter(Boolean).join(' ');
+  if(/буллит|shootout/i.test(txt))return'Б';
+  if(/овертайм|\bOT\b|\bОТ\b/i.test(txt))return'ОТ';
+  return'';
+}
+function scoreHtml(){
+  const score=$('#mainScore')?.textContent?.trim()||'';
+  const suffix=resultSuffix();
+  return score?`<span class="match-marker-score">${esc(score)}${suffix?` <span class="match-marker-suffix">${esc(suffix)}</span>`:''}</span>`:'';
+}
+function markerVisual(type){
+  const logos=teamLogos();
+  if(type==='end'){
+    const left=logos[0]?`<img src="${esc(logos[0])}" alt="">`:'';
+    const right=logos[1]?`<img src="${esc(logos[1])}" alt="">`:'';
+    return `${left}${scoreHtml()}${right}`;
+  }
+  return logos.map(src=>`<img src="${esc(src)}" alt="">`).join('');
 }
 function polishMatchMarkers(){
   document.querySelectorAll('#feed .event.system:not(.match-marker)').forEach(card=>{
@@ -22,13 +43,15 @@ function polishMatchMarkers(){
     const type=main==='начало матча'?'start':(main==='матч завершён'||main==='конец матча')?'end':'';
     if(!type)return;
     const time=card.querySelector('.etime strong')?.textContent?.trim()||(type==='start'?'00:00':'60:00');
-    const logos=teamLogos();
     card.className='event system match-marker';
-    card.innerHTML=`<div class="match-marker-time">${esc(time)}</div><div class="match-marker-label">${type==='start'?'НАЧАЛО МАТЧА':'КОНЕЦ МАТЧА'}</div><div class="match-marker-logos">${logos.map(src=>`<img src="${esc(src)}" alt="">`).join('')}</div>`;
+    card.dataset.markerType=type;
+    card.innerHTML=`<div class="match-marker-time">${esc(time)}</div><div class="match-marker-label">${type==='start'?'НАЧАЛО МАТЧА':'КОНЕЦ МАТЧА'}</div><div class="match-marker-logos">${markerVisual(type)}</div>`;
   });
+  document.querySelectorAll('#feed .match-marker[data-marker-type="end"] .match-marker-logos').forEach(box=>{box.innerHTML=markerVisual('end')});
 }
 const feed=$('#feed');
 if(feed){new MutationObserver(polishMatchMarkers).observe(feed,{childList:true,subtree:true});polishMatchMarkers()}
+new MutationObserver(polishMatchMarkers).observe(document.documentElement,{attributes:true,attributeFilter:['data-result-type']});
 
 /* Same approved penalty animation, but the penalty detail screen stays readable longer. */
 const RED='#e31f2b';
