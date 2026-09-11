@@ -15,33 +15,49 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Restore optimized VK embed
+      - name: Switch match center to verified API
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
-          p=Path('match.html')
-          s=p.read_text()
-          s=s.replace('/match-page-v2.js?v=20260910-7','/match-page-v2.js?v=20260910-8')
-          s=s.replace('/match-score-restore.js?v=20260910-7','/match-score-restore.js?v=20260910-8')
+          old_edge = 'https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-match-center'
+          new_edge = 'https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-match-center-v3'
+
+          for name in ('match-page-v2.js', 'match-score-restore.js'):
+              p = Path(name)
+              s = p.read_text()
+              s = s.replace("const EDGE='" + old_edge + "';", "const EDGE='" + new_edge + "';")
+              p.write_text(s)
+
+          p = Path('match-page-v2.js')
+          s = p.read_text()
+          old_done = "function gameDone(g){return String(g.fhr_live_state||'').toUpperCase()==='FINAL'||Boolean(g.fhr_live_final_at)||(Number.isInteger(g.home_score)&&Number.isInteger(g.away_score)&&g.home_score!==g.away_score)}"
+          new_done = "function gameDone(g){return String(g.fhr_live_state||'').toUpperCase()==='FINAL'||Boolean(g.fhr_live_final_at)||Boolean(g.protocol_archived_at)}"
+          if old_done in s:
+              s = s.replace(old_done, new_done)
+          elif new_done not in s:
+              raise SystemExit('gameDone block not found')
           p.write_text(s)
 
-          p=Path('match-score-restore.js')
-          s=p.read_text()
-          old="if(h.endsWith('vk.com')||h.endsWith('vkvideo.ru')||h.endsWith('vk.ru')){if(/video_ext\\.php/i.test(u.pathname))return url;return''}"
-          new="if(h.endsWith('vk.com')||h.endsWith('vkvideo.ru')||h.endsWith('vk.ru')){if(/video_ext\\.php/i.test(u.pathname))return url;const m=u.pathname.match(/\\/video(-?\\d+)_(-?\\d+)/i);if(m)return `https://vk.com/video_ext.php?oid=${m[1]}&id=${m[2]}&hd=2&autoplay=0`;return''}"
-          if old not in s:
-              raise SystemExit('VK parser block not found')
-          s=s.replace(old,new)
-          s=s.replace('allow="autoplay; encrypted-media; picture-in-picture; fullscreen"','allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock"')
-          s=s.replace(' loading="lazy" referrerpolicy="strict-origin-when-cross-origin"','')
+          p = Path('match-score-restore.js')
+          s = p.read_text()
+          s = s.replace("if(/video_ext\\.php/i.test(u.pathname)){u.hostname='vk.com';u.protocol='https:';return u.toString()}", "if(/video_ext\\.php/i.test(u.pathname)){u.hostname='vk.com';u.protocol='https:';return u.toString()}")
+          s = s.replace('allow="autoplay; encrypted-media; picture-in-picture; fullscreen"','allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock"')
+          s = s.replace(' loading="lazy" referrerpolicy="strict-origin-when-cross-origin"','')
+          p.write_text(s)
+
+          p = Path('match.html')
+          s = p.read_text()
+          s = re.sub(r'/match-page-v2\.js\?v=[^"\']+', '/match-page-v2.js?v=20260911-2', s)
+          s = re.sub(r'/match-score-restore\.js\?v=[^"\']+', '/match-score-restore.js?v=20260911-2', s)
           p.write_text(s)
           PY
-      - name: Commit VK embed fix
+      - name: Commit verified match center switch
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add match.html match-score-restore.js
+          git add match.html match-page-v2.js match-score-restore.js
           git diff --cached --quiet && exit 0
-          git commit -m 'Restore optimized VK player in match center'
+          git commit -m 'Use verified match center API on match pages'
           git push
