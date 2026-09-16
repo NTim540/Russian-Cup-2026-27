@@ -156,7 +156,7 @@ function applyMarkers(){
   if(!D)return;const timeline=ensureTimeline();if(!timeline)return;const periods=detectedCompleted(),fin=finalState(),base=[...timeline.querySelectorAll(':scope > .event-card:not(.cup-system-marker)')];
   const sig=[base.map(c=>c.textContent).join('|'),periods.join(','),fin,JSON.stringify(D.live?.period_scores||[]),D.match?.home_score,D.match?.away_score,D.match?.finish_type].join('::');if(sig===lastMarkerSig&&timeline.querySelector('.cup-system-marker'))return;lastMarkerSig=sig;
   timeline.querySelectorAll(':scope > .cup-system-marker').forEach(x=>x.remove());const cards=[...timeline.querySelectorAll(':scope > .event-card:not(.cup-system-marker)')];
-  for(const p of periods){const isOT=p===4,time=isOT?'60:00':`${p*20}:00`,label=isOT?'КОНЕЦ ОВЕРТАЙМА':`КОНЕЦ ${p} ПЕРИОДА`,mk=marker('period',time,label,totalThrough(p)),ref=cards.find(c=>cardPeriod(c)===p);if(ref)timeline.insertBefore(mk,ref);else timeline.appendChild(mk)}
+  for(const p of [...periods].sort((a,b)=>b-a)){const isOT=p===4,time=isOT?'60:00':`${p*20}:00`,label=isOT?'КОНЕЦ ОВЕРТАЙМА':`КОНЕЦ ${p} ПЕРИОДА`,mk=marker('period',time,label,totalThrough(p)),ref=cards.find(c=>cardPeriod(c)===p)||cards.find(c=>{const cp=cardPeriod(c);return cp>0&&cp<p});if(ref)timeline.insertBefore(mk,ref);else timeline.appendChild(mk)}
   if(fin)timeline.prepend(marker('final','60:00','КОНЕЦ МАТЧА',finalPair(),finishSuffix()));
   if(activeState()||fin)timeline.appendChild(marker('start','00:00','НАЧАЛО МАТЧА'));
 }
