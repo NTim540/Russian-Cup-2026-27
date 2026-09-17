@@ -50,7 +50,6 @@ function matchMapEventTitle(ev){
 }
 function matchMapHtml(){
   const evs=Array.isArray(DATA?.live?.events)?DATA.live.events:[];if(!evs.length)return'<div class="match-map-empty">Карта матча появится после первых событий протокола.</div>';
-  const extended=String(DATA?.match?.finish_type||'').toUpperCase()!=='REG'||evs.some(e=>matchMapEventTitle(e)&&matchMapEventTitle(e).includes('Буллиты'))||Math.max(...evs.map(matchMapEventTitle=>0),0)>3600;
   const maxSec=Math.max(3600,...evs.map(eventAbsSeconds));const duration=maxSec>3600?3900:3600;
   const grouped=new Map(),items=[];
   for(const ev of evs){
