@@ -1,7 +1,9 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/enhanced" },
-    { "source": "/base-source", "destination": "/index" }
+    {
+      "source": "/((?!maintenance|admin|api|.*\\.(?:js|css|png|jpg|jpeg|webp|svg|ico|gif|woff|woff2|ttf|map)$).*)",
+      "destination": "/maintenance"
+    }
   ]
 }
