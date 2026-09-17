@@ -1,9 +1,11 @@
 {
   "cleanUrls": true,
-  "rewrites": [
+  "routes": [
+    { "src": "^/$", "dest": "/maintenance.html" },
     {
-      "source": "/((?!maintenance|admin|api|.*\\.(?:js|css|png|jpg|jpeg|webp|svg|ico|gif|woff|woff2|ttf|map)$).*)",
-      "destination": "/maintenance"
-    }
+      "src": "/((?!maintenance|admin|api|.*\\.(?:js|css|png|jpg|jpeg|webp|svg|ico|gif|woff|woff2|ttf|map)$).*)",
+      "dest": "/maintenance.html"
+    },
+    { "handle": "filesystem" }
   ]
 }
