@@ -2,7 +2,6 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/", "destination": "/enhanced" },
-    { "source": "/base-source", "destination": "/index" },
-    { "source": "/stats", "destination": "/stats-v2" }
+    { "source": "/base-source", "destination": "/index" }
   ]
 }
