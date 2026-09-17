@@ -1,11 +1,11 @@
 {
   "cleanUrls": true,
-  "routes": [
-    { "src": "^/$", "dest": "/maintenance.html" },
+  "redirects": [
+    { "source": "/", "destination": "/maintenance", "permanent": false },
     {
-      "src": "/((?!maintenance|admin|api|.*\\.(?:js|css|png|jpg|jpeg|webp|svg|ico|gif|woff|woff2|ttf|map)$).*)",
-      "dest": "/maintenance.html"
-    },
-    { "handle": "filesystem" }
+      "source": "/((?!maintenance|admin|api|.*\\.(?:js|css|png|jpg|jpeg|webp|svg|ico|gif|woff|woff2|ttf|map)$).*)",
+      "destination": "/maintenance",
+      "permanent": false
+    }
   ]
 }
