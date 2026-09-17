@@ -5,7 +5,7 @@
   const visitor=stored(localStorage,'rc_analytics_visitor');
   const session=stored(sessionStorage,'rc_analytics_session');
   const device=(()=>{const ua=navigator.userAgent||'',w=Math.min(screen.width||innerWidth,screen.height||innerHeight);if(/iPad|Tablet|PlayBook|Silk/i.test(ua)||(w>=600&&/Android/i.test(ua)))return'tablet';if(/Mobi|iPhone|Android/i.test(ua)||w<600)return'mobile';return'desktop'})();
-  const source=(()=>{if(!document.referrer)return'direct';try{const u=new URL(document.referrer);return u.hostname===location.hostname?'internal':u.hostname.replace(/^www\./,'')}catch{return'direct'}})();
+  const entry=(()=>{const q=new URLSearchParams(location.search);let refSource='direct',referrer_url=null;if(document.referrer){try{const u=new URL(document.referrer);if(u.hostname===location.hostname){refSource='internal'}else{refSource=u.hostname.replace(/^www\./,'');if(/^https?:$/.test(u.protocol))referrer_url=(u.origin+u.pathname).slice(0,500)}}catch{}}const utm_source=(q.get('utm_source')||'').trim().slice(0,120)||null;const utm_medium=(q.get('utm_medium')||'').trim().slice(0,120)||null;const utm_campaign=(q.get('utm_campaign')||'').trim().slice(0,180)||null;const utm_content=(q.get('utm_content')||'').trim().slice(0,180)||null;return{source:utm_source||refSource,referrer_url,utm_source,utm_medium,utm_campaign,utm_content}})();
   function trackedPath(){
     const p=location.pathname||'/';
     if(p==='/news.html'||p==='/news'){
@@ -21,7 +21,7 @@
   window.rcAnalyticsSession=session;
   function currentMatch(){const overlay=document.querySelector('#matchCenterOverlay.open,.mc-overlay.open');if(!overlay)return null;const marker=overlay.querySelector('#mcH2H[data-match-id]');const match_id=Number(marker?.dataset.matchId);if(!Number.isInteger(match_id)||match_id<1)return null;const match_label=(overlay.querySelector('#mcTitle')?.textContent||'').trim();return{match_id,match_label}}
   function heartbeat(){if(document.visibilityState==='hidden')return;send('heartbeat',currentMatch()||{})}
-  send('pageview',{source});
+  send('pageview',entry);
   heartbeat();
   setInterval(heartbeat,30000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')heartbeat()});
