@@ -1,11 +1,7 @@
 {
   "cleanUrls": true,
-  "redirects": [
-    { "source": "/", "destination": "/maintenance", "permanent": false },
-    {
-      "source": "/((?!maintenance|admin|api|.*\\.(?:js|css|png|jpg|jpeg|webp|svg|ico|gif|woff|woff2|ttf|map)$).*)",
-      "destination": "/maintenance",
-      "permanent": false
-    }
+  "rewrites": [
+    { "source": "/", "destination": "/enhanced" },
+    { "source": "/base-source", "destination": "/index" }
   ]
 }
