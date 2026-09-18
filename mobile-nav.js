@@ -2,7 +2,7 @@
   if(window.__cupMobileNav)return;window.__cupMobileNav=true;
   const style=document.createElement('style');style.id='cup-mobile-nav-style';style.textContent=`
     .mobile-menu-toggle,.mobile-theme-entry{display:none}
-    @media(max-width:820px){
+    @media(max-width:1100px), (pointer:coarse){
       html .site-header{overflow:visible!important}
       html .header-inner{
         min-height:58px!important;
