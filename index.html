@@ -38,6 +38,21 @@
     .brand-mark{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(127,198,255,.24),rgba(47,111,237,.18));border:1px solid rgba(127,198,255,.24);font-size:11px;font-weight:900;letter-spacing:.06em;color:#dff2ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
     .brand-copy{min-width:0}.brand-copy small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.16em;font-weight:750;margin-bottom:2px}.brand-copy strong{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .nav{display:flex;align-items:center;gap:4px;color:#9eacc0;font-size:13px}.nav a{padding:10px 11px;border-radius:11px;transition:.18s ease}.nav a:hover{color:#fff;background:rgba(255,255,255,.055)}
+    /* MOBILE HEADER FALLBACK */
+    .mobile-menu-toggle{display:none;border:0;background:transparent;color:inherit}
+    @media(max-width:1100px){
+      .header-inner{min-height:58px!important;display:flex!important;align-items:center!important;gap:10px!important;position:relative!important}
+      .brand{flex:1 1 auto!important;min-width:0!important;overflow:hidden!important}
+      .brand-mark{width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:8px!important}
+      .brand-copy small{display:none!important}.brand-copy strong{font-size:12px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+      .theme-toggle{display:none!important}
+      .mobile-menu-toggle{display:grid!important;width:38px!important;height:38px!important;flex:0 0 38px!important;place-items:center!important;padding:9px!important;border:1px solid rgba(126,190,255,.14)!important;border-radius:8px!important;background:rgba(255,255,255,.025)!important;z-index:130!important}
+      .mobile-menu-toggle span{display:block;width:18px;height:1.5px;background:currentColor;border-radius:2px;transition:.18s ease}.mobile-menu-toggle span+span{margin-top:4px}
+      .mobile-menu-toggle.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}.mobile-menu-toggle.open span:nth-child(2){opacity:0}.mobile-menu-toggle.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+      .nav{position:absolute!important;left:-9px!important;right:-9px!important;top:calc(100% + 1px)!important;z-index:120!important;display:none!important;max-width:none!important;width:auto!important;margin:0!important;padding:8px!important;grid-template-columns:1fr!important;gap:5px!important;max-height:calc(100vh - 72px)!important;overflow:auto!important;background:rgba(4,14,24,.99)!important;border:1px solid rgba(126,190,255,.12)!important;border-top:0!important;box-shadow:0 24px 60px rgba(0,0,0,.48)!important;backdrop-filter:blur(20px)!important}
+      .nav.mobile-open{display:grid!important}.nav a{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:42px!important;padding:0 12px!important;border:1px solid rgba(126,190,255,.07)!important;border-radius:5px!important;background:rgba(255,255,255,.016)!important;color:#a8b8c9!important;font-size:9px!important;font-weight:850!important;letter-spacing:.055em!important;white-space:nowrap!important;text-transform:uppercase!important}.nav a:after{content:"→"!important;position:static!important;width:auto!important;height:auto!important;background:none!important;color:#4d7394!important;font-size:12px!important}.nav a.concept-home{display:flex!important;color:#fff!important;border-left:2px solid #e31f2b!important}.nav a.concept-home:after{display:block!important}
+      body.mobile-menu-open{overflow:hidden!important}
+    }
 
     .hero{position:relative;padding:74px 0 48px;min-height:650px;display:flex;align-items:center;isolation:isolate}
     .hero:before{content:"";position:absolute;right:-90px;top:28px;width:min(48vw,600px);aspect-ratio:1;border-radius:50%;border:1px solid rgba(127,198,255,.10);box-shadow:0 0 0 86px rgba(127,198,255,.025),0 0 0 170px rgba(127,198,255,.018);z-index:-1}
@@ -95,6 +110,7 @@
     <nav class="nav" aria-label="Основная навигация">
       <a href="#upcoming">Матчи</a><a href="#overall">Таблица</a><a href="#groups">Группы</a><a href="/teams.html">Команды</a><a href="/stats">Статистика</a><a href="/tour-path.html">Путь во 2-й тур</a><a href="#rules">Регламент</a><a href="#history">История</a>
     </nav>
+    <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </header>
 
@@ -222,7 +238,9 @@ $('#tournament').onchange=e=>loadStages(e.target.value);$('#stage').onchange=e=>
 <script src="/hide-rules.js?v=20260820-1"></script>
 <script src="/concept-final.js?v=20260820-1"></script>
 <script src="/contacts.js?v=20260820-1"></script>
-<script src="/mobile-nav.js?v=20260918-2"></script>
+<script>
+(()=>{if(window.__baseMobileMenu)return;window.__baseMobileMenu=true;const b=document.getElementById('mobileMenuToggle'),n=document.querySelector('.header-inner .nav');if(!b||!n)return;const close=()=>{n.classList.remove('mobile-open');b.classList.remove('open');b.setAttribute('aria-expanded','false');document.body.classList.remove('mobile-menu-open')};b.addEventListener('click',()=>{const open=!n.classList.contains('mobile-open');n.classList.toggle('mobile-open',open);b.classList.toggle('open',open);b.setAttribute('aria-expanded',String(open));document.body.classList.toggle('mobile-menu-open',open)});n.addEventListener('click',e=>{if(e.target.closest('a'))close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});window.addEventListener('resize',()=>{if(innerWidth>1100)close()})})();
+</script>
 <script src="/analytics.js?v=20260820-1"></script>
 <script src="/maintenance.js?v=20260827-1"></script>
 <script src="/vote.js?v=20260822-1"></script>
