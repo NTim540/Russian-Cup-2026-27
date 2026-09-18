@@ -174,8 +174,6 @@
     return true;
   }
 
-  if(!addCountdown()){
-    let tries=0;
-    const wait=setInterval(()=>{tries++;if(addCountdown()||tries>80)clearInterval(wait)},250);
-  }
+  // Турнир уже идёт: предстартовый таймер больше не показываем.
+  document.getElementById('tournament-countdown')?.remove();
 })();
