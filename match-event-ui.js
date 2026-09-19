@@ -12,9 +12,7 @@ const ICONS={
  timeout:svg('<circle cx="12" cy="13" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 13V8.8M12 13l3.1 1.8M9 3.5h6M17.2 6.5l1.5-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'),
  event:svg('<circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" fill="currentColor"/>')
 };
-const TEAM_COLORS={
- 'ска 1946':'#2367b1','сахалинские акулы':'#173b63','динамо москва':'#1b62ad','мах':'#2387d9','торпедо':'#1f74b5','локомотив':'#c92f38','авангард':'#df2e36','локомотив 2004':'#c92f38','крылья советов':'#2f6fb5','сибирь':'#2387c9','лада':'#215ea7','трактор':'#20242a','ак барс':'#18855a','спартак':'#c82433','динамо спб':'#2b6fb8','динамо джуниверс':'#315eaa','ска стрельна':'#2367b1','акм':'#b82f3b','цска':'#d32d38','армия ска':'#2367b1','нефтехимик':'#275aa8','северсталь':'#d9a51b','красная машина юниор':'#df2e36'
-};
+
 function getType(card){
  if(card.classList.contains('goal'))return'goal';
  if(card.classList.contains('penalty'))return'penalty';
@@ -38,7 +36,7 @@ function testTeamFor(card){
 function addTestLogo(card,team){if(!team?.logo||card.querySelector('.event-team-logo'))return;const img=document.createElement('img');img.className='event-team-logo';img.src=team.logo;img.alt=team.name?`Логотип ${team.name}`:'';card.querySelector('time')?.insertAdjacentElement('afterend',img)}
 function addTeamName(card,team){if(!team?.name||card.querySelector('.event-team-name'))return;const host=card.querySelector('.event-copy,.eventperson>div'),title=host?.querySelector('strong');if(!host||!title)return;const el=document.createElement('span');el.className='event-team-name';el.textContent=team.name;title.insertAdjacentElement('afterend',el)}
 function signature(card,type,team){return[type,card.querySelector('.event-time strong,time')?.textContent,card.querySelector('.event-copy strong,.eventperson strong')?.textContent,team?.name].map(norm).join('|')}
-function teamColor(team){return TEAM_COLORS[norm(team?.name)]||'#2387d9'}
+function teamColor(team){return window.RussianCupTeamBranding?.get?.(team?.name)?.color||'#2387d9'}
 function inkFor(hex){const h=String(hex).replace('#','');if(h.length!==6)return'#fff';const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);return(.299*r+.587*g+.114*b)>175?'#07111f':'#fff'}
 function buildGoalLayer(card,team){
  card.querySelector('.goal-celebration-layer')?.remove();
