@@ -128,7 +128,7 @@ function finalState(){const m=D?.match,l=D?.live,db=String(m?.fhr_live_state||''
 function activeState(){if(finalState())return false;const start=scheduledStart();if(Number.isFinite(start)&&Date.now()<start)return false;const m=D?.match,l=D?.live,db=String(m?.fhr_live_state||'').toUpperCase();return l?.status==='ACTIVE'||['WATCHING','ERROR'].includes(db)}
 function applyPregame(){
   const el=$('.match-state');if(!el||!D)return;const start=scheduledStart(),now=Date.now();
-  if(!finalState()&&Number.isFinite(start)&&now>=start-15*60*1000&&now<start){el.textContent='ПОДГОТОВКА К МАТЧУ';el.classList.remove('live');el.classList.add('preparation')}
+  if(!finalState()&&Number.isFinite(start)&&now>=start-45*60*1000&&now<start){el.textContent='ПОДГОТОВКА К МАТЧУ';el.classList.remove('live');el.classList.add('preparation')}
   else el.classList.remove('preparation');
 }
 function teamLogos(){const xs=[...document.querySelectorAll('.score-team .score-logo img')].map(x=>x.src).filter(Boolean);return[xs[0]||'',xs[1]||'']}
