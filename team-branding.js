@@ -3,6 +3,7 @@
 const TEAMS=[
  {name:'Северсталь',color:'#000000',logo:'https://drive.google.com/thumbnail?id=10xBTOFy_ps1G3LNaHV3WpbQkuZ74pjRn&sz=w512'},
  {name:'Армия СКА',color:'#074A8A',logo:'https://drive.google.com/thumbnail?id=14XZX2FRyR5x_aVkU2SMLhW-Emk0RUkTo&sz=w512'},
+ {name:'СКА-Стрельна',color:'#074A8A',logo:'',aliases:['СКА Стрельна']},
  {name:'Спартак',color:'#D10000',logo:'https://drive.google.com/thumbnail?id=19kJ3uz-yyb1Z2y8qvRbFwuw_2kjUUD2f&sz=w512'},
  {name:'Динамо Москва',color:'#FFFFFF',logo:'https://drive.google.com/thumbnail?id=1I3KuJZEajmksDKtoBsdj4h_75fU0e_KY&sz=w512'},
  {name:'Динамо СПБ',color:'#30466A',logo:'https://drive.google.com/thumbnail?id=1x4KaAFMJ_qfmi26oVjnsc-huKpWtqBbh&sz=w512'},
