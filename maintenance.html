@@ -7,27 +7,112 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Технические работы · Кубок России U16</title>
 <style>
-:root{--bg:#06101d;--panel:#0c1c30;--line:rgba(255,255,255,.1);--text:#f7f9fc;--muted:#91a3b8;--ice:#7fc6ff;--blue:#2f6fed;--red:#e23a47}*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);background:var(--bg)}body{min-height:100vh;min-height:100svh;overflow:hidden;background:radial-gradient(circle at 12% -8%,rgba(47,111,237,.34),transparent 34%),radial-gradient(circle at 90% 4%,rgba(226,58,71,.13),transparent 28%),linear-gradient(180deg,#07111f,#081526 58%,#050d17)}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;background-image:linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to bottom,black,transparent 80%)}.shell{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:grid;place-items:center;padding:24px}.card{position:relative;width:min(760px,100%);overflow:hidden;border:1px solid rgba(127,198,255,.17);border-radius:28px;background:linear-gradient(145deg,rgba(13,32,53,.94),rgba(7,21,37,.94));box-shadow:0 34px 100px rgba(0,0,0,.42);padding:clamp(28px,6vw,56px);text-align:center;backdrop-filter:blur(18px)}.card:after{content:"U16";position:absolute;right:-16px;top:-66px;font-size:220px;font-weight:950;letter-spacing:-.09em;color:rgba(127,198,255,.025);pointer-events:none}.brand{position:relative;z-index:1;display:inline-flex;align-items:center;gap:12px;margin-bottom:30px}.logo{width:56px;height:56px;border:1px solid rgba(127,198,255,.22);border-radius:17px;display:grid;place-items:center;background:rgba(127,198,255,.06)}.logo img{width:43px;height:43px;object-fit:contain}.brand-copy{text-align:left}.brand-copy small{display:block;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.brand-copy strong{display:block;margin-top:3px;font-size:15px}.status{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(127,198,255,.18);border-radius:999px;background:rgba(127,198,255,.055);color:#cceaff;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.dot{width:7px;height:7px;border-radius:50%;background:var(--ice);box-shadow:0 0 18px rgba(127,198,255,.95);animation:pulse 1.8s ease-in-out infinite}@keyframes pulse{50%{opacity:.35;transform:scale(.72)}}h1{position:relative;z-index:1;margin:22px 0 14px;font-size:clamp(38px,7vw,70px);line-height:.94;letter-spacing:-.055em}.lead{position:relative;z-index:1;max-width:590px;margin:0 auto;color:#b8c6d6;font-size:clamp(14px,2vw,17px);line-height:1.6}.return{position:relative;z-index:1;margin-top:24px;color:#dbeeff;font-size:12px;font-weight:800}.return b{color:var(--ice)}.countdown{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:520px;margin:22px auto 0}.unit{padding:18px 10px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.035)}.unit strong{display:block;font-size:clamp(30px,6vw,48px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.04em}.unit span{display:block;margin-top:8px;color:#72869c;font-size:9px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.foot{position:relative;z-index:1;margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:#718399;font-size:10px;line-height:1.5}@media(max-width:560px){.shell{padding:14px}.card{border-radius:22px;padding:30px 18px}.brand{margin-bottom:24px}.logo{width:48px;height:48px}.logo img{width:36px;height:36px}.countdown{gap:7px}.unit{padding:15px 6px;border-radius:13px}.lead br{display:none}}
+:root{--bg:#06101d;--panel:#0c1c30;--line:rgba(255,255,255,.10);--text:#f7f9fc;--muted:#91a3b8;--ice:#7fc6ff;--blue:#2f6fed;--green:#53d69b;--gold:#f0c96b}
+*{box-sizing:border-box}html{scroll-behavior:smooth}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);background:var(--bg)}
+body{min-height:100vh;background:radial-gradient(circle at 12% -8%,rgba(47,111,237,.34),transparent 34%),radial-gradient(circle at 90% 4%,rgba(127,198,255,.12),transparent 28%),linear-gradient(180deg,#07111f,#081526 58%,#050d17)}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.26;background-image:linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to bottom,black,transparent 80%)}
+.wrap{position:relative;z-index:1;width:min(1180px,calc(100% - 28px));margin:auto;padding:34px 0 56px}
+.hero{position:relative;overflow:hidden;border:1px solid rgba(127,198,255,.17);border-radius:28px;background:linear-gradient(145deg,rgba(13,32,53,.95),rgba(7,21,37,.95));box-shadow:0 34px 100px rgba(0,0,0,.4);padding:clamp(28px,5vw,52px)}
+.hero:after{content:"U16";position:absolute;right:-18px;top:-78px;font-size:230px;font-weight:950;letter-spacing:-.09em;color:rgba(127,198,255,.025);pointer-events:none}
+.top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:12px}.logo{width:54px;height:54px;border:1px solid rgba(127,198,255,.22);border-radius:17px;display:grid;place-items:center;background:rgba(127,198,255,.06)}.logo img{width:42px;height:42px;object-fit:contain}.brand-copy small{display:block;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.brand-copy strong{display:block;margin-top:3px;font-size:15px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(127,198,255,.18);border-radius:999px;background:rgba(127,198,255,.055);color:#cceaff;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.dot{width:7px;height:7px;border-radius:50%;background:var(--ice);box-shadow:0 0 18px rgba(127,198,255,.95);animation:pulse 1.8s ease-in-out infinite}@keyframes pulse{50%{opacity:.35;transform:scale(.72)}}
+h1{position:relative;z-index:1;margin:34px 0 12px;max-width:760px;font-size:clamp(42px,7vw,76px);line-height:.92;letter-spacing:-.055em;text-transform:uppercase}.lead{position:relative;z-index:1;max-width:730px;margin:0;color:#b8c6d6;font-size:clamp(14px,2vw,17px);line-height:1.6}.return{position:relative;z-index:1;margin-top:24px;color:#dbeeff;font-size:12px;font-weight:800}.return b{color:var(--ice)}
+.timer-label{position:relative;z-index:1;margin-top:28px;color:#7f94aa;font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.countdown{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,150px));gap:10px;margin-top:9px}.unit{padding:17px 10px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);text-align:center}.unit strong{display:block;font-size:clamp(30px,5vw,46px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.04em}.unit span{display:block;margin-top:8px;color:#72869c;font-size:8px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+.section{margin-top:18px;padding:25px;border:1px solid var(--line);border-radius:22px;background:rgba(8,24,41,.9);box-shadow:0 22px 65px rgba(0,0,0,.22)}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:17px}.kicker{color:var(--ice);font-size:9px;font-weight:950;letter-spacing:.15em;text-transform:uppercase}.section h2{margin:5px 0 0;font-size:clamp(24px,4vw,36px);letter-spacing:-.04em}.verified{color:var(--green);font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.group{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.025)}.group-head{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.07)}.group-head small{display:block;color:#71879d;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.12em}.group-head strong{display:block;margin-top:3px;font-size:17px}
+.row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.055)}.row:last-child{border-bottom:0}.place{color:#71859b;font-weight:950;text-align:center;font-size:11px}.team{min-width:0;font-size:10px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pts{color:#a9bad0;font-size:9px;font-weight:800}.new .row{grid-template-columns:24px minmax(0,1fr)}.new .place{color:var(--ice)}.new .team{font-size:11px}.note{margin-top:14px;color:#75899e;font-size:9px;line-height:1.55}.foot{margin-top:18px;padding:18px 4px 0;color:#718399;font-size:9px;line-height:1.55;text-align:center}
+@media(max-width:920px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.wrap{width:calc(100% - 18px);padding-top:16px}.hero{border-radius:22px;padding:26px 18px}.top{align-items:flex-start;flex-direction:column}.status{align-self:flex-start}h1{margin-top:26px}.countdown{grid-template-columns:repeat(3,1fr)}.section{padding:18px 12px;border-radius:18px}.section-head{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.unit{padding:14px 5px}}
 </style>
 </head>
 <body>
-<main class="shell">
-<section class="card" aria-live="polite">
-<div class="brand"><span class="logo"><img src="https://drive.google.com/thumbnail?id=1hwFp1ukBAQ_Qd-nI5okdiejSRlUrfLeB&sz=w512" alt=""></span><span class="brand-copy"><small>2026/27</small><strong>КУБОК РОССИИ U16</strong></span></div>
-<div class="status"><span class="dot"></span>Технические работы</div>
-<h1>Скоро вернёмся</h1>
-<p class="lead">Готовим сайт к следующему игровому дню: проверяем LIVE-центр, протоколы и стабильность системы.</p>
-<div class="return">Работа сайта восстановится <b>18 сентября в 10:00 МСК</b></div>
-<div class="countdown" id="countdown">
-<div class="unit"><strong id="hh">00</strong><span>часов</span></div>
-<div class="unit"><strong id="mm">00</strong><span>минут</span></div>
-<div class="unit"><strong id="ss">00</strong><span>секунд</span></div>
+<main class="wrap">
+<section class="hero" aria-live="polite">
+<div class="top">
+  <div class="brand"><span class="logo"><img src="https://drive.google.com/thumbnail?id=1hwFp1ukBAQ_Qd-nI5okdiejSRlUrfLeB&sz=w512" alt=""></span><span class="brand-copy"><small>2026/27</small><strong>КУБОК РОССИИ U16</strong></span></div>
+  <div class="status"><span class="dot"></span>Технические работы</div>
 </div>
-<div class="foot">Спасибо за ожидание. Все данные турнира и протоколы сохранены.</div>
+<h1>Готовим<br>второй тур</h1>
+<p class="lead">Проводим техническое обновление сайта и базы турнира. Протоколы первого тура уже перепроверены, итоговые места зафиксированы, состав групп второго тура сформирован.</p>
+<div class="return">Плановое окончание работ — <b>25 сентября в 12:36 МСК</b></div>
+<div class="timer-label">До окончания технических работ</div>
+<div class="countdown" id="countdown">
+  <div class="unit"><strong id="hh">00</strong><span>часов</span></div>
+  <div class="unit"><strong id="mm">00</strong><span>минут</span></div>
+  <div class="unit"><strong id="ss">00</strong><span>секунд</span></div>
+</div>
 </section>
+
+<section class="section">
+<div class="section-head"><div><div class="kicker">1-й тур · итог</div><h2>Итоговые места групп</h2></div><div class="verified">Протоколы проверены</div></div>
+<div class="grid">
+<article class="group"><div class="group-head"><small>Первый тур</small><strong>Группа А1</strong></div>
+<div class="row"><span class="place">1</span><span class="team">Динамо Москва</span><span class="pts">6 очк.</span></div>
+<div class="row"><span class="place">2</span><span class="team">Авангард</span><span class="pts">6</span></div>
+<div class="row"><span class="place">3</span><span class="team">Торпедо</span><span class="pts">4</span></div>
+<div class="row"><span class="place">4</span><span class="team">МАХ</span><span class="pts">2</span></div>
+<div class="row"><span class="place">5</span><span class="team">Локомотив</span><span class="pts">2</span></div></article>
+
+<article class="group"><div class="group-head"><small>Первый тур</small><strong>Группа Б1</strong></div>
+<div class="row"><span class="place">1</span><span class="team">Локомотив 2004</span><span class="pts">8 очк.</span></div>
+<div class="row"><span class="place">2</span><span class="team">СКА-Стрельна</span><span class="pts">7</span></div>
+<div class="row"><span class="place">3</span><span class="team">Трактор</span><span class="pts">4</span></div>
+<div class="row"><span class="place">4</span><span class="team">Крылья Советов</span><span class="pts">2</span></div>
+<div class="row"><span class="place">5</span><span class="team">Сибирь</span><span class="pts">0</span></div></article>
+
+<article class="group"><div class="group-head"><small>Первый тур</small><strong>Группа В1</strong></div>
+<div class="row"><span class="place">1</span><span class="team">Ак Барс</span><span class="pts">8 очк.</span></div>
+<div class="row"><span class="place">2</span><span class="team">АКМ</span><span class="pts">7</span></div>
+<div class="row"><span class="place">3</span><span class="team">Спартак</span><span class="pts">5</span></div>
+<div class="row"><span class="place">4</span><span class="team">Динамо-Джуниверс</span><span class="pts">2</span></div>
+<div class="row"><span class="place">5</span><span class="team">Динамо СПБ</span><span class="pts">1</span></div></article>
+
+<article class="group"><div class="group-head"><small>Первый тур</small><strong>Группа Г1</strong></div>
+<div class="row"><span class="place">1</span><span class="team">Красная Машина Юниор</span><span class="pts">8 очк.</span></div>
+<div class="row"><span class="place">2</span><span class="team">ЦСКА</span><span class="pts">7</span></div>
+<div class="row"><span class="place">3</span><span class="team">Армия СКА</span><span class="pts">4</span></div>
+<div class="row"><span class="place">4</span><span class="team">Северсталь</span><span class="pts">2</span></div>
+<div class="row"><span class="place">5</span><span class="team">Нефтехимик</span><span class="pts">1</span></div></article>
+</div>
+<div class="note">При равенстве очков применены критерии Регламента: в А1 «Динамо Москва» выше «Авангарда» по личной встрече 4:2, МАХ выше «Локомотива» по личной встрече 3:0.</div>
+</section>
+
+<section class="section new">
+<div class="section-head"><div><div class="kicker">Следующий этап</div><h2>Группы второго тура</h2></div><div class="verified">Состав зафиксирован</div></div>
+<div class="grid">
+<article class="group"><div class="group-head"><small>2-й тур</small><strong>Группа 1</strong></div>
+<div class="row"><span class="place">1</span><span class="team">Динамо Москва</span></div>
+<div class="row"><span class="place">2</span><span class="team">Локомотив 2004</span></div>
+<div class="row"><span class="place">3</span><span class="team">Ак Барс</span></div>
+<div class="row"><span class="place">4</span><span class="team">Красная Машина Юниор</span></div>
+<div class="row"><span class="place">5</span><span class="team">Нефтехимик</span></div></article>
+
+<article class="group"><div class="group-head"><small>2-й тур</small><strong>Группа 2</strong></div>
+<div class="row"><span class="place">1</span><span class="team">Авангард</span></div>
+<div class="row"><span class="place">2</span><span class="team">СКА-Стрельна</span></div>
+<div class="row"><span class="place">3</span><span class="team">АКМ</span></div>
+<div class="row"><span class="place">4</span><span class="team">ЦСКА</span></div>
+<div class="row"><span class="place">5</span><span class="team">Динамо СПБ</span></div></article>
+
+<article class="group"><div class="group-head"><small>2-й тур</small><strong>Группа 3</strong></div>
+<div class="row"><span class="place">1</span><span class="team">Торпедо</span></div>
+<div class="row"><span class="place">2</span><span class="team">Трактор</span></div>
+<div class="row"><span class="place">3</span><span class="team">Спартак</span></div>
+<div class="row"><span class="place">4</span><span class="team">Армия СКА</span></div>
+<div class="row"><span class="place">5</span><span class="team">Сибирь</span></div></article>
+
+<article class="group"><div class="group-head"><small>2-й тур</small><strong>Группа 4</strong></div>
+<div class="row"><span class="place">1</span><span class="team">МАХ</span></div>
+<div class="row"><span class="place">2</span><span class="team">Крылья Советов</span></div>
+<div class="row"><span class="place">3</span><span class="team">Динамо-Джуниверс</span></div>
+<div class="row"><span class="place">4</span><span class="team">Северсталь</span></div>
+<div class="row"><span class="place">5</span><span class="team">Локомотив</span></div></article>
+</div>
+</section>
+
+<div class="foot">Независимый информационный проект · Все данные первого тура сохранены и прошли автоматическую проверку протоколов.</div>
 </main>
 <script>
-(()=>{const target=Date.parse('2026-09-18T10:00:00+03:00'),hh=document.getElementById('hh'),mm=document.getElementById('mm'),ss=document.getElementById('ss');let reloading=false;function tick(){const left=Math.max(0,target-Date.now()),s=Math.floor(left/1000);hh.textContent=String(Math.floor(s/3600)).padStart(2,'0');mm.textContent=String(Math.floor((s%3600)/60)).padStart(2,'0');ss.textContent=String(s%60).padStart(2,'0');if(left<=0&&!reloading){reloading=true;document.querySelector('.status').innerHTML='<span class="dot"></span>Возвращаем сайт';document.querySelector('.return').innerHTML='Технические работы завершены. <b>Обновляем страницу…</b>';setTimeout(()=>location.reload(),12000)}}tick();setInterval(tick,1000)})();
+(()=>{const target=Date.parse('2026-09-25T12:36:00+03:00'),hh=document.getElementById('hh'),mm=document.getElementById('mm'),ss=document.getElementById('ss');let expired=false;function tick(){const left=Math.max(0,target-Date.now()),s=Math.floor(left/1000);hh.textContent=String(Math.floor(s/3600)).padStart(2,'0');mm.textContent=String(Math.floor((s%3600)/60)).padStart(2,'0');ss.textContent=String(s%60).padStart(2,'0');if(left<=0&&!expired){expired=true;document.querySelector('.status').innerHTML='<span class="dot"></span>Финальная проверка';document.querySelector('.return').innerHTML='Плановое окно завершено. <b>Проверяем систему перед открытием…</b>';setInterval(()=>location.reload(),15000)}}tick();setInterval(tick,1000)})();
 </script>
 </body>
 </html>
