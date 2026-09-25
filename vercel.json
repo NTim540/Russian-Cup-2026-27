@@ -1,7 +1,6 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/enhanced" },
-    { "source": "/base-source", "destination": "/index" }
+    { "source": "/(.*)", "destination": "/maintenance.html" }
   ]
 }
