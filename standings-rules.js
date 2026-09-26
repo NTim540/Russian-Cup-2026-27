@@ -59,9 +59,15 @@
     const personal=(matches||[]).filter(m=>done(m)&&ids.has(String(m.home_team_id))&&ids.has(String(m.away_team_id)));
     const mini=new Map(rows.map(r=>[r.team_id,stats({id:r.team_id,name:r.team},null,personal,s)]));
 
-    // Article 17: when tied teams in the general tournament table have not
-    // played each other, use RW -> GD -> GF.
-    const usePersonal=mode==='group'||mode==='competition'||personal.length>0;
+    // Article 17: in the GENERAL tournament table, head-to-head criteria
+    // apply only when every team in the currently tied set has played every
+    // other tied team. If even one required matchup has not taken place, the
+    // Regulation skips directly to criteria 7-9: regulation wins -> overall
+    // goal difference -> goals scored.
+    const pairKey=(a,b)=>[String(a),String(b)].sort().join('::');
+    const playedPairs=new Set(personal.map(m=>pairKey(m.home_team_id,m.away_team_id)));
+    const completeRoundRobin=rows.every((r,i)=>rows.slice(i+1).every(x=>playedPairs.has(pairKey(r.team_id,x.team_id))));
+    const usePersonal=mode==='group'||mode==='competition'||completeRoundRobin;
     const keys=usePersonal
       ? [r=>mini.get(r.team_id).pts,r=>mini.get(r.team_id).gd,r=>r.gd,r=>r.w,r=>r.rw,r=>r.gf]
       : [r=>r.rw,r=>r.gd,r=>r.gf];
