@@ -51,26 +51,44 @@
     return [...groups.entries()].sort((a,b)=>b[0]-a[0]).map(x=>x[1]);
   }
 
-  // Articles 17-18: after any criterion separates one or more teams, the
-  // remaining tied subgroup is evaluated again from criterion 1.
+  // Regulation, Article 17 (2026/27) — SINGLE SOURCE OF TRUTH FOR TIE-BREAKS.
+  // Tour/group table, criteria 1-6:
+  // 1) H2H points; 2) H2H goal difference; 3) overall goal difference;
+  // 4) all wins; 5) regulation wins; 6) goals scored.
+  // General/overall table when the tied set has NOT played the required H2H
+  // mini-tournament, criteria 7-9:
+  // 7) regulation wins; 8) overall goal difference; 9) goals scored.
+  // If a criterion separates one or more teams, every still-tied subgroup
+  // restarts from the first applicable criterion (last paragraph of Art. 17).
+  const ARTICLE_17=Object.freeze({
+    group:['H2H_POINTS','H2H_GD','OVERALL_GD','WINS','REGULATION_WINS','GOALS_FOR'],
+    overallWithoutCompleteH2H:['REGULATION_WINS','OVERALL_GD','GOALS_FOR']
+  });
+
   function resolve(rows,matches,s,mode='overall'){
     if(rows.length<2)return rows;
     const ids=new Set(rows.map(r=>String(r.team_id)));
     const personal=(matches||[]).filter(m=>done(m)&&ids.has(String(m.home_team_id))&&ids.has(String(m.away_team_id)));
     const mini=new Map(rows.map(r=>[r.team_id,stats({id:r.team_id,name:r.team},null,personal,s)]));
 
-    // Article 17: in the GENERAL tournament table, head-to-head criteria
-    // apply only when every team in the currently tied set has played every
-    // other tied team. If even one required matchup has not taken place, the
-    // Regulation skips directly to criteria 7-9: regulation wins -> overall
-    // goal difference -> goals scored.
+    // For two tied teams one played H2H game is a complete H2H set.
+    // For 3+ tied teams every pair in the CURRENT tied subgroup must have met.
+    // A lone match inside a larger tied set (for example MAX–Lokomotiv inside
+    // a five-team tie) must not incorrectly promote those two teams.
     const pairKey=(a,b)=>[String(a),String(b)].sort().join('::');
     const playedPairs=new Set(personal.map(m=>pairKey(m.home_team_id,m.away_team_id)));
-    const completeRoundRobin=rows.every((r,i)=>rows.slice(i+1).every(x=>playedPairs.has(pairKey(r.team_id,x.team_id))));
-    const usePersonal=mode==='group'||mode==='competition'||completeRoundRobin;
-    const keys=usePersonal
-      ? [r=>mini.get(r.team_id).pts,r=>mini.get(r.team_id).gd,r=>r.gd,r=>r.w,r=>r.rw,r=>r.gf]
-      : [r=>r.rw,r=>r.gd,r=>r.gf];
+    const hasCompleteH2H=rows.every((r,i)=>rows.slice(i+1).every(x=>playedPairs.has(pairKey(r.team_id,x.team_id))));
+    const usePersonal=mode==='group'||mode==='competition'||hasCompleteH2H;
+    const criterionNames=usePersonal?ARTICLE_17.group:ARTICLE_17.overallWithoutCompleteH2H;
+    const criterion={
+      H2H_POINTS:r=>mini.get(r.team_id).pts,
+      H2H_GD:r=>mini.get(r.team_id).gd,
+      OVERALL_GD:r=>r.gd,
+      WINS:r=>r.w,
+      REGULATION_WINS:r=>r.rw,
+      GOALS_FOR:r=>r.gf
+    };
+    const keys=criterionNames.map(name=>criterion[name]);
 
     for(const key of keys){
       const groups=split(rows,key);
@@ -169,7 +187,7 @@
     return m?.finish_type==='OT'?'ОТ':m?.finish_type==='SO'?'буллиты':'осн. время';
   }
 
-  const api={TECH_TYPES,hasNumericScore,technicalType,isTechnical,done,finish,winnerId,goalsCount,points,stats,resolve,rank,isCrossover,groupRows,matchesThroughSelectedTour,currentGroup,finalStageComplete,hasVerifiedCountries,overall,competition,matchScore,technicalReasonLabel,matchFinishLabel};
+  const api={TECH_TYPES,ARTICLE_17,hasNumericScore,technicalType,isTechnical,done,finish,winnerId,goalsCount,points,stats,resolve,rank,isCrossover,groupRows,matchesThroughSelectedTour,currentGroup,finalStageComplete,hasVerifiedCountries,overall,competition,matchScore,technicalReasonLabel,matchFinishLabel};
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.CupStandings=api;
 
@@ -212,7 +230,7 @@
   function applyRegulationHelp(){
     if(typeof document==='undefined')return;
     const overallTip=document.querySelector('#overall .help .tip');
-    if(overallTip)overallTip.textContent='Общая турнирная таблица — накопительная: очки выбранного тура суммируются с очками предыдущих туров. Во 2-м и 3-м турах стыковые матчи учитываются в общей таблице, но не влияют на места внутри группы данного тура. При равенстве очков, если между сравниваемыми командами были матчи: очки в личных встречах → разница шайб в личных встречах → общая разница шайб → все победы → победы в основное время → заброшенные шайбы. Если личных встреч не было: победы в основное время → общая разница шайб → заброшенные шайбы. Для оставшейся равной подгруппы критерии применяются заново с первого пункта. Техническое поражение за участие неоформленного или дисквалифицированного хоккеиста не входит в разницу шайб (ст. 34). Техническая победа учитывается как победа, но Регламент отдельно не говорит, что она является «победой в основное время», поэтому без отдельного официального решения она не увеличивает этот показатель. Очки дисквалифицированной за пропуск тура команды сохраняются в истории, но не учитываются при итоговом распределении мест после всех туров (ст. 38). После трёх отборочных туров места 1–8 выходят в «Золотой финал», 9–20 — в «Серебряный финал». В итоговой классификации иностранные команды располагаются после российских; победитель Кубка — победитель пятого тура в группе «Золотого финала». Основание: статьи 4, 17, 18, 34 и 38 Регламента.';
+    if(overallTip)overallTip.textContent='Общая турнирная таблица — накопительная: очки выбранного тура суммируются с очками предыдущих туров. Во 2-м и 3-м турах стыковые матчи учитываются в общей таблице, но не влияют на места внутри группы данного тура. При равенстве очков: если все команды текущей равной подгруппы провели необходимые матчи между собой, применяются пп. 1–6: очки в личных встречах → разница шайб в личных встречах → общая разница шайб → все победы → победы в основное время → заброшенные шайбы. Если полного набора личных встреч между командами текущей равной подгруппы нет, применяются пп. 7–9: победы в основное время → общая разница шайб → заброшенные шайбы. Для оставшейся равной подгруппы критерии применяются заново с первого пункта. Техническое поражение за участие неоформленного или дисквалифицированного хоккеиста не входит в разницу шайб (ст. 34). Техническая победа учитывается как победа, но Регламент отдельно не говорит, что она является «победой в основное время», поэтому без отдельного официального решения она не увеличивает этот показатель. Очки дисквалифицированной за пропуск тура команды сохраняются в истории, но не учитываются при итоговом распределении мест после всех туров (ст. 38). После трёх отборочных туров места 1–8 выходят в «Золотой финал», 9–20 — в «Серебряный финал». В итоговой классификации иностранные команды располагаются после российских; победитель Кубка — победитель пятого тура в группе «Золотого финала». Основание: статьи 4, 17, 18, 34 и 38 Регламента.';
     const groupTip=document.querySelector('#groups .help .tip');
     if(groupTip)groupTip.textContent='Таблица группы показывает результат именно выбранного тура. Во 2-м и 3-м турах стыковые матчи не влияют на итоговые места в группе. При равенстве очков: очки в личных встречах → разница шайб в личных встречах → общая разница шайб → все победы → победы в основное время → заброшенные шайбы. Если одна из трёх и более равных команд отделилась, оставшиеся сравниваются заново с первого критерия. Технический результат учитывается как победа/поражение; при техническом поражении по ст. 34 результат не включается в разницу забитых и пропущенных шайб. Техническая победа без отдельного официального указания не приравнивается к победе в основное время для отдельного критерия. Основание: статьи 4, 17 и 34 Регламента.';
     const points=document.querySelector('#pointsRule');
