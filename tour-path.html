@@ -42,7 +42,6 @@ function build(){
  const teams=[...DATA.teams].sort((a,b)=>a.name.localeCompare(b.name,'ru'));$('#teamPicker').innerHTML='<option value="">Выберите команду</option>'+teams.map(t=>'<option value="'+t.id+'">'+esc(t.name)+'</option>').join('');
 }
 function renderRoute(){const id=Number($('#teamPicker').value),box=$('#teamRoute');if(!id){box.textContent='Выберите команду — покажем её текущий путь в третий тур.';return}const team=DATA.teams.find(t=>Number(t.id)===id),a=ASSIGNMENTS.find(x=>Number(x.team?.id)===id);if(!a){box.innerHTML='<strong>'+esc(team?.name||'Команда')+'</strong>: позиция в общей таблице пока не определена.';return}box.innerHTML='<strong>'+esc(team.name)+'</strong>: сейчас '+a.place+' место в общей таблице → <strong>Группа '+a.target+' третьего тура</strong>. '+(a.confirmed?'Второй тур завершён, поэтому распределение зафиксировано.':'Это предварительный сценарий по текущей общей таблице.')}
-}
 async function load(){try{const c=await get('/api/catalog'),t=c.tournaments.find(x=>x.slug==='kubok-rossii-2026-27')||c.tournaments[0],stages=c.stages.filter(s=>Number(s.tournament_id)===Number(t.id)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)),stage=stages.find(s=>Number(s.sort_order)===2)||stages[stages.length-1];DATA=await get('/api/data?tournament_slug='+encodeURIComponent(t.slug)+'&stage_id='+stage.id);build();renderRoute()}catch(e){$('#pathGrid').innerHTML='<div class="loading">Не удалось загрузить данные: '+esc(e.message)+'</div>'}}
 $('#teamPicker').addEventListener('change',renderRoute);load();setInterval(load,30000);
 </script>
