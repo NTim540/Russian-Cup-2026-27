@@ -18,7 +18,7 @@
 <script src="/analytics.js?v=20260908-2" data-site-analytics="1"></script>
 <script src="/news-article-tracking.js?v=20260908-1" data-news-article-tracking="1"></script>
 <script src="/news-richtext.js?v=20260909-1" data-news-richtext="1"></script>
-<script src="/cup-fallback.js?v=20260929-2"></script>
+<script src="/cup-fallback.js?v=20260929-3"></script>
 <script>
 const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-news';
 async function newsReq(q){try{const r=await fetch(API+q,{cache:'default'}),b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка');return b}catch(e){if(!window.CupFallback)throw e;const u=new URL(q,location.origin),id=Number(u.searchParams.get('id')),limit=Number(u.searchParams.get('limit'))||50;if(Number.isInteger(id)&&id>0){const b=await CupFallback.news(null,500);return{ok:true,item:(b.items||[]).find(x=>Number(x.id)===id)}}return CupFallback.news(null,limit)}}
