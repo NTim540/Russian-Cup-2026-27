@@ -31,7 +31,7 @@
   }
   async function loadItem(){
     const id=Number(new URLSearchParams(location.search).get('id'));if(!Number.isInteger(id)||id<1||loading)return null;if(item&&Number(item.id)===id)return item;loading=true;
-    try{const r=await fetch(API+'?id='+id,{cache:'no-store'}),b=await r.json();if(r.ok&&b.item)item=b.item}catch(e){console.warn('Rich news text:',e)}finally{loading=false}return item;
+    try{try{const r=await fetch(API+'?id='+id,{cache:'default'}),b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка');if(b.item)item=b.item}catch(primary){if(window.CupFallback){const b=await CupFallback.news(null,500);item=(b.items||[]).find(x=>Number(x.id)===Number(id))||item}else throw primary}}catch(e){console.warn('Rich news text:',e)}finally{loading=false}return item;
   }
   async function apply(){
     const n=await loadItem();if(!n)return;
