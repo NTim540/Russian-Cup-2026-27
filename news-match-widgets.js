@@ -64,7 +64,7 @@
     `;document.head.appendChild(s);
   }
 
-  async function j(url){const r=await fetch(url,{cache:'no-store'}),b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка загрузки');return b}
+  async function j(url){try{const r=await fetch(url,{cache:'default'}),b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка загрузки');return b}catch(e){if(!window.CupFallback)throw e;const u=new URL(url,location.href),marker='/functions/v1/russian-cup',i=u.pathname.indexOf(marker);if(i<0)throw e;return CupFallback.request(u.pathname.slice(i+marker.length)+u.search)}}
   function titleFor(w,m,h,a){return w?.title||(w?.type===RESULT?`${h.name} — ${a.name}`:`${h.name} — ${a.name}`)}
   function header(w,D,m,h,a,label){const g=group(D,m.group_id),sub=[g?.name||g?.code,m.game_no?`Матч №${m.game_no}`:'',fmtDate(m.game_date)].filter(Boolean).join(' · ');return`<div class="nwm-top"><div class="nwm-kicker">${esc(label)}</div><h3>${esc(titleFor(w,m,h,a))}</h3><div class="nwm-sub">${esc(sub)}</div></div>`}
   function teamHtml(t,away=false){return`<div class="nwm-team${away?' away':''}">${away?`<div><div class="nwm-name">${esc(t.name)}</div><div class="nwm-city">${esc(t.city||'')}</div></div><div class="nwm-logo">${img(t)}</div>`:`<div class="nwm-logo">${img(t)}</div><div><div class="nwm-name">${esc(t.name)}</div><div class="nwm-city">${esc(t.city||'')}</div></div>`}</div>`}
