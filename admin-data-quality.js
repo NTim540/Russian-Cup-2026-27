@@ -48,7 +48,7 @@
     if(!D)return[];if(scope.value==='current')return[D];
     const stages=(C?.stages||[]).filter(s=>Number(s.tournament_id)===Number(D.tournament.id)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
     progress.textContent='Загружаю все туры…';
-    const out=[];for(const s of stages){try{out.push(await req('/api/data?tournament_slug='+encodeURIComponent(D.tournament.slug)+'&stage_id='+s.id))}catch(e){add('error','system','Не удалось загрузить тур',s.name+': '+(e.message||String(e)),{stageId:s.id})}}return out;
+    const out=[];for(const s of stages){try{out.push(await req('/api/data?tournament_slug='+encodeURIComponent(D.tournament.slug)+'&stage_id='+s.id+'&include_events=1'))}catch(e){add('error','system','Не удалось загрузить тур',s.name+': '+(e.message||String(e)),{stageId:s.id})}}return out;
   }
 
   function auditStructure(data){
