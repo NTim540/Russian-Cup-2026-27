@@ -25,7 +25,7 @@ async function request(path){
       const t=s.catalog.tournaments.find(x=>!slug||x.slug===slug)||s.catalog.tournaments[0];
       id=s.catalog.stages.filter(x=>Number(x.tournament_id)===Number(t?.id)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0))[0]?.id;
     }
-    return dataForStage(s,id);
+    const d=dataForStage(s,id),order=Number(d.stage?.sort_order)||0;d.all_matches=Object.values(s.stages_data||{}).filter(x=>(Number(x.stage?.sort_order)||0)<=order).flatMap(x=>clone(x.matches||[]));return d;
   }
   throw Error('Резервный API не поддерживает этот запрос');
 }
