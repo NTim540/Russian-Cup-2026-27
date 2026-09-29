@@ -20,7 +20,7 @@
   const $=s=>document.querySelector(s);
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
   const done=m=>Number.isInteger(m.home_score)&&Number.isInteger(m.away_score)&&m.home_score!==m.away_score;
-  async function get(path){const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
+  async function get(path){try{const r=await fetch(API+path,{cache:'default'});if(!r.ok)throw Error(await r.text());return await r.json()}catch(e){if(window.CupFallback)return CupFallback.request(path);throw e}}
   function fmtDate(x){return new Date(x+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}
   function time(m){return String(m.start_time||'').slice(0,5)}
   function finish(m){return m.finish_type==='OT'?'ОТ':m.finish_type==='SO'?'буллиты':''}
