@@ -56,7 +56,7 @@
     `;document.head.appendChild(s);
   }
 
-  async function j(url){const r=await fetch(url,{cache:'no-store'}),b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка загрузки');return b}
+  async function j(url){try{const r=await fetch(url,{cache:'default'}),b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка загрузки');return b}catch(e){if(!window.CupFallback)throw e;const u=new URL(url,location.href),marker='/functions/v1/russian-cup',i=u.pathname.indexOf(marker);if(i<0)throw e;return CupFallback.request(u.pathname.slice(i+marker.length)+u.search)}}
 
 
 
