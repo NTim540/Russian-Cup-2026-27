@@ -41,7 +41,7 @@
     if(!tid||loadedFor===tid)return;
     loadedFor=tid;
     try{
-      const r=await fetch(NEWS_API+'?tournament_id='+tid+'&limit=4',{cache:'no-store'});const b=await r.json();if(!r.ok)throw Error(b.error||'Ошибка');
+      let b;try{const r=await fetch(NEWS_API+'?tournament_id='+tid+'&limit=4',{cache:'default'});b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка')}catch(primary){if(!window.CupFallback)throw primary;b=await CupFallback.news(tid,4)};
       const items=b.items||[],grid=document.getElementById('homeNewsGrid');if(!grid)return;
       grid.innerHTML=items.length?items.map(n=>`<a class="news-home-card" href="/news.html?id=${n.id}"><div class="news-home-cover">${n.cover_url?`<img src="${esc(n.cover_url)}" alt="" loading="lazy">`:''}</div><div class="news-home-body"><div class="news-home-date">${esc(fmtDate(n.published_at||n.created_at))}</div><h3>${esc(n.title)}</h3>${n.excerpt?`<p>${esc(n.excerpt)}</p>`:''}<div class="news-home-more">Читать →</div></div></a>`).join(''):'<div class="news-home-empty">Опубликованных новостей пока нет.</div>';
       if(typeof activateReveal==='function')activateReveal();
