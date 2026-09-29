@@ -24,7 +24,7 @@
 
   function row(p){
     const photo=safePhoto(p.photo),proxy=proxyPhoto(photo);
-    return `<div class="roster-player" data-photo="${esc(photo)}"><span class="roster-num">${esc(p.number)}</span><span class="roster-avatar">${photo?`<img src="${esc(proxy)}" data-direct-photo="${esc(photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`:''}</span><span class="roster-name">${esc(p.name)}</span></div>`;
+    return `<div class="roster-player" data-photo="${esc(photo)}"><span class="roster-num">${esc(p.number)}</span><span class="roster-avatar">${photo?`<img src="${esc(photo)}" data-direct-photo="${esc(photo)}" data-proxy-photo="${esc(proxy)}" alt="${esc(p.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`:''}</span><span class="roster-name">${esc(p.name)}</span></div>`;
   }
 
   function render(players){
@@ -40,7 +40,7 @@
 
   async function load(){
     try{
-      const r=await fetch(`${EDGE}?team=${team}&v=2`,{mode:'cors',cache:'no-store'});
+      const r=await fetch(`${EDGE}?team=${team}&v=2`,{mode:'cors',cache:'default'});
       if(!r.ok){let detail='';try{detail=await r.text()}catch{};throw Error(`Roster ${r.status} ${detail}`)}
       const b=await r.json();
       if(!Array.isArray(b.players)||!b.players.length)throw Error('Empty roster');
