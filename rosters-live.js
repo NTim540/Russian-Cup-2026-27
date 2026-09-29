@@ -5,7 +5,7 @@
   const EDGE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-fhr-roster';
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safePhoto=url=>{try{const u=new URL(url);const h=u.hostname.toLowerCase();return u.protocol==='https:'&&(h==='img.fhr.ru'||h==='junior.fhr.ru'||h==='fhr.ru'||h.endsWith('.fhr.ru'))?u.toString():''}catch{return''}};
-  const proxyPhoto=url=>url?`${EDGE}?photo=${encodeURIComponent(url)}`:'';
+  const proxyPhoto=url=>url?`/api/fhr-photo?src=${encodeURIComponent(url)}`:'';
   const labels={G:'Вратари',D:'Защитники',F:'Нападающие',U:'Игроки'};
   const classes={G:'g',D:'d',F:'f',U:'u'};
 
