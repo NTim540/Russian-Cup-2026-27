@@ -31,7 +31,7 @@
   const UNKNOWN='Участник не определен';
   const $=s=>document.querySelector(s);
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  async function get(path){const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
+  async function get(path){try{const r=await fetch(API+path,{cache:'default'});if(!r.ok)throw Error(await r.text());return await r.json()}catch(e){if(window.CupFallback)return CupFallback.request(path);throw e}}
   function initials(name){return name.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()}
   function card(team){
     const unknown=team.name===UNKNOWN;
