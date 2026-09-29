@@ -24,7 +24,7 @@
   }
   if(homepage&&!document.querySelector('script[data-homepage-hero-config]')){
     const f=document.createElement('script');
-    f.src='/homepage-hero-config.js?v=20260910-1';
+    f.src='/homepage-hero-config.js?v=20260929-2';
     f.dataset.homepageHeroConfig='1';
     document.head.appendChild(f);
   }
