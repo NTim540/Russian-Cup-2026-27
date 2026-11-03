@@ -90,7 +90,7 @@ async function stats(stageId='all'){
   }
   const players=[...pmap.values()].map(p=>({...p,points:p.goals+p.assists})).sort((a,b)=>b.points-a.points||b.goals-a.goals||a.pim-b.pim||a.name.localeCompare(b.name,'ru'));
   const teams=[...tmap.values()].filter(t=>t.gp>0).map(t=>({...t,gd:t.gf-t.ga,gf_per_game:t.gp?Number((t.gf/t.gp).toFixed(2)):0,form:t.form.slice(-5)}));
-  return {ok:true,stage:all?{...d.stage,id:0,name:'Все туры · 1-й и 2-й'}:clone(d.stage),updated_at:snapshotData.generated_at||new Date().toISOString(),summary:{played_matches:played.length,goals,penalties,penalty_minutes:pims,players:players.length,teams:teams.length},players,teams,fallback:true};
+  return {ok:true,stage:all?{...d.stage,id:0,name:'Все туры · 1-й и 2-й'}:clone(d.stage),updated_at:snapshotData.generated_at||new Date().toISOString(),summary:{played_matches:played.length,goals:played.reduce((total,m)=>total+Number(m.home_score)+Number(m.away_score),0),penalties,penalty_minutes:pims,players:players.length,teams:teams.length},players,teams,fallback:true};
 }
 async function news(tournamentId,limit=20){
   const n=await newsData();let items=(n.items||[]).filter(x=>!tournamentId||Number(x.tournament_id)===Number(tournamentId));items=items.slice(0,limit);return {ok:true,items:clone(items),fallback:true};
