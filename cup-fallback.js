@@ -59,8 +59,8 @@ async function stats(stageId='all'){
   const matches=all?[...(snapshotData.stages_data?.['1']?.matches||[]),...(snapshotData.stages_data?.['2']?.matches||[])]:d.matches||[];
   const played=matches.filter(m=>Number.isInteger(m.home_score)&&Number.isInteger(m.away_score)&&m.home_score!==m.away_score&&String(m.technical_result_type||'NONE')==='NONE');
   const pmap=new Map(),tmap=new Map(),meta=new Map();
-  const norm=x=>String(x||'').trim().toLowerCase().replace(/ё/g,'е').replace(/\\s+/g,' ');
-  const isTeamPenalty=x=>/^(командн(?:ый|ого)\\s+штраф|team\\s+penalty)$/i.test(norm(x));
+  const norm=x=>String(x||'').trim().toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ');
+  const isTeamPenalty=x=>/^(командн(?:ый|ого)\s+штраф|team\s+penalty)$/i.test(norm(x));
   for(const t of d.teams||[])tmap.set(Number(t.id),{team_id:Number(t.id),team:t.name,gp:0,gf:0,ga:0,gd:0,gf_per_game:0,pim:0,form:[]});
   for(const m of played)for(const ev of eventsData.matches?.[String(m.id)]||[]){
     const tid=Number(ev.side==='away'?m.away_team_id:m.home_team_id),name=ev.player;
