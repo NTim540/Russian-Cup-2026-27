@@ -52,28 +52,45 @@ async function match(id){
   return {ok:true,tournament:clone(d.tournament),stage:clone(d.stage),group:clone(d.groups.find(g=>Number(g.id)===Number(m.group_id))||{}),match:clone(m),home_team:clone(home),away_team:clone(away),schedule,stored_events:events,lineups:{home:[],away:[]},fhr_error:null,refreshed_at:s.generated_at||new Date().toISOString(),archive_fast:final,protocol_health:'OK',fallback:true,live:{status,status_text:status==='FINAL'?'Матч завершён':status==='SCHEDULED'?'Не начался':'Идёт',headline_score:started?[Number(m.home_score)||0,Number(m.away_score)||0]:null,period_scores:periodScores(m,started),current_period:current,events,orientation:'direct',extra_periods:{ot:ft==='OT'||ft==='SO',so:ft==='SO'},parser:'static-fallback-v1'}};
 }
 function splitAssistants(v){return String(v||'').split(/[,;\/]+/).map(x=>x.trim()).filter(Boolean)}
-async function stats(stageId=1){
-  const [s,e]=await Promise.all([snapshot(),eventData()]),d=dataForStage(s,stageId),pmap=new Map(),tmap=new Map();
-  const ensurePlayer=(name,teamId,teamName,number,photo)=>{const key=teamId+'|'+String(name||'').toLocaleLowerCase('ru');if(!pmap.has(key))pmap.set(key,{name:name||'—',number:number??null,team_id:teamId,team:teamName,photo:photo||'',goals:0,assists:0,points:0,pim:0});const p=pmap.get(key);if(!p.photo&&photo)p.photo=photo;if(p.number==null&&number!=null)p.number=number;return p};
-  const played=(d.matches||[]).filter(m=>Number.isInteger(m.home_score)&&Number.isInteger(m.away_score)&&m.home_score!==m.away_score);
+async function stats(stageId='all'){
+  const [snapshotData,eventsData]=await Promise.all([snapshot(),eventData()]);
+  const all=String(stageId)==='all'||Number(stageId)===0;
+  const d=dataForStage(snapshotData,all?2:Number(stageId));
+  const matches=all?[...(snapshotData.stages_data?.['1']?.matches||[]),...(snapshotData.stages_data?.['2']?.matches||[])]:d.matches||[];
+  const played=matches.filter(m=>Number.isInteger(m.home_score)&&Number.isInteger(m.away_score)&&m.home_score!==m.away_score&&String(m.technical_result_type||'NONE')==='NONE');
+  const pmap=new Map(),tmap=new Map(),meta=new Map();
+  const norm=x=>String(x||'').trim().toLowerCase().replace(/ё/g,'е').replace(/\\s+/g,' ');
+  const isTeamPenalty=x=>/^(командн(?:ый|ого)\\s+штраф|team\\s+penalty)$/i.test(norm(x));
   for(const t of d.teams||[])tmap.set(Number(t.id),{team_id:Number(t.id),team:t.name,gp:0,gf:0,ga:0,gd:0,gf_per_game:0,pim:0,form:[]});
-  let goals=0,pims=0;
+  for(const m of played)for(const ev of eventsData.matches?.[String(m.id)]||[]){
+    const tid=Number(ev.side==='away'?m.away_team_id:m.home_team_id),name=ev.player;
+    if(name&&!isTeamPenalty(name)){const key=tid+'|'+norm(name),old=meta.get(key)||{};meta.set(key,{name,number:ev.number??old.number??null,photo:ev.player_photo||old.photo||''})}
+  }
+  const ensurePlayer=(name,tid)=>{
+    if(!name||isTeamPenalty(name))return null;
+    const key=tid+'|'+norm(name),m=meta.get(key)||{};
+    if(!pmap.has(key))pmap.set(key,{name:m.name||name,number:m.number??null,team_id:tid,team:team(d,tid).name,photo:m.photo||'',goals:0,assists:0,points:0,pim:0});
+    return pmap.get(key);
+  };
+  let goals=0,pims=0,penalties=0;
   for(const m of played){
-    const ht=tmap.get(Number(m.home_team_id)),at=tmap.get(Number(m.away_team_id));if(ht&&at){ht.gp++;at.gp++;ht.gf+=m.home_score;ht.ga+=m.away_score;at.gf+=m.away_score;at.ga+=m.home_score;const hw=m.home_score>m.away_score,ot=['OT','SO'].includes(String(m.finish_type||''));ht.form.push(hw?'W':ot?'OTL':'L');at.form.push(!hw?'W':ot?'OTL':'L')}
-    const evs=e.matches?.[String(m.id)]||[];
-    for(const ev of evs){
-      const side=ev.side==='away'?'away':'home',tid=Number(side==='away'?m.away_team_id:m.home_team_id),tn=team(d,tid).name;
-      if(String(ev.event_type).toUpperCase()==='GOAL'){
-        goals++;if(ev.player){const p=ensurePlayer(ev.player,tid,tn,ev.number,ev.player_photo);p.goals++}
-        for(const a of splitAssistants(ev.assistants))ensurePlayer(a,tid,tn,null,'').assists++;
-      }else if(String(ev.event_type).toUpperCase()==='PENALTY'){
-        const pm=Number(ev.penalty_minutes)||0;pims+=pm;if(ev.player)ensurePlayer(ev.player,tid,tn,ev.number,ev.player_photo).pim+=pm;const ts=tmap.get(tid);if(ts)ts.pim+=pm;
+    const ht=tmap.get(Number(m.home_team_id)),at=tmap.get(Number(m.away_team_id));
+    if(ht&&at){ht.gp++;at.gp++;ht.gf+=m.home_score;ht.ga+=m.away_score;at.gf+=m.away_score;at.ga+=m.home_score;const hw=m.home_score>m.away_score,ot=['OT','SO'].includes(String(m.finish_type||''));ht.form.push(hw?'W':ot?'OTL':'L');at.form.push(!hw?'W':ot?'OTL':'L')}
+    for(const ev of eventsData.matches?.[String(m.id)]||[]){
+      const tid=Number(ev.side==='away'?m.away_team_id:m.home_team_id),type=String(ev.event_type||'').toUpperCase();
+      if(type==='GOAL'&&String(ev.period||'').toUpperCase()!=='SO'){
+        goals++;const scorer=ensurePlayer(ev.player,tid);if(scorer)scorer.goals++;
+        for(const a of splitAssistants(ev.assistants)){const assistant=ensurePlayer(a,tid);if(assistant)assistant.assists++}
+      }else if(type==='PENALTY'){
+        const pm=Number(ev.penalty_minutes)||0;pims+=pm;penalties++;
+        const player=ensurePlayer(ev.player,tid);if(player)player.pim+=pm;
+        const t=tmap.get(tid);if(t)t.pim+=pm;
       }
     }
   }
-  const players=[...pmap.values()].map(p=>({...p,points:p.goals+p.assists}));
+  const players=[...pmap.values()].map(p=>({...p,points:p.goals+p.assists})).sort((a,b)=>b.points-a.points||b.goals-a.goals||a.pim-b.pim||a.name.localeCompare(b.name,'ru'));
   const teams=[...tmap.values()].filter(t=>t.gp>0).map(t=>({...t,gd:t.gf-t.ga,gf_per_game:t.gp?Number((t.gf/t.gp).toFixed(2)):0,form:t.form.slice(-5)}));
-  return {ok:true,stage:clone(d.stage),updated_at:s.generated_at||new Date().toISOString(),summary:{played_matches:played.length,goals,penalty_minutes:pims,players:players.length},players,teams,fallback:true};
+  return {ok:true,stage:all?{...d.stage,id:0,name:'Все туры · 1-й и 2-й'}:clone(d.stage),updated_at:snapshotData.generated_at||new Date().toISOString(),summary:{played_matches:played.length,goals,penalties,penalty_minutes:pims,players:players.length,teams:teams.length},players,teams,fallback:true};
 }
 async function news(tournamentId,limit=20){
   const n=await newsData();let items=(n.items||[]).filter(x=>!tournamentId||Number(x.tournament_id)===Number(tournamentId));items=items.slice(0,limit);return {ok:true,items:clone(items),fallback:true};
