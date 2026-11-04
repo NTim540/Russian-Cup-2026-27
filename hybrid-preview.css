@@ -179,3 +179,19 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
 #matches .pv-match-score strong{font-size:32px}
 #matches .pv-match-side .pv-match-logo{width:52px;height:52px}
 }
+
+/* Score treatment: only overtime/shootout labels appear directly below the score. */
+#matches .pv-match-score .pv-match-finish-note{
+  display:inline-block;
+  margin-top:9px;
+  padding:5px 10px;
+  border-radius:7px;
+  border:1px solid rgba(115,177,255,.25);
+  background:rgba(47,120,223,.15);
+  color:#a8d2ff;
+  font-size:12px;
+  font-weight:850;
+  line-height:1.1;
+  letter-spacing:.015em;
+  white-space:nowrap;
+}
