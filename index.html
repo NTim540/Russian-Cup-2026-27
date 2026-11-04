@@ -213,7 +213,7 @@ function activateReveal(){const els=document.querySelectorAll('.reveal:not(.obse
 let dataRefreshTimer=null;function scheduleDataRefresh(){clearTimeout(dataRefreshTimer);if(!D)return;const live=D.matches.some(m=>['WATCHING','ERROR'].includes(String(m.fhr_live_state||'').toUpperCase()));const delay=live?60000:300000;dataRefreshTimer=setTimeout(()=>{if(document.visibilityState==='visible')loadData(D.tournament.slug,D.stage.id).catch(()=>scheduleDataRefresh());else scheduleDataRefresh()},delay)}$('#tournament').onchange=e=>loadStages(e.target.value);$('#stage').onchange=e=>loadData($('#tournament').value,e.target.value);$('#gf').onchange=renderMatches;$('#sf').onchange=renderMatches;loadCatalog().catch(e=>$('#status').textContent='Ошибка загрузки: '+e.message);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&D)loadData(D.tournament.slug,D.stage.id).catch(()=>scheduleDataRefresh())});activateReveal();
 </script>
 <script src="/logos.js?v=20260820-4"></script>
-<script src="/stream.js?v=20261104-1"></script>
+<script src="/stream.js?v=20261104-2"></script>
 <script src="/theme.js?v=20260820-1"></script>
 <script src="/concept-v1.js?v=20260820-1"></script>
 <script src="/hotfix-v1.js?v=20260820-1"></script>
