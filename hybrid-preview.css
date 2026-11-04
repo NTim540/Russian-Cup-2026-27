@@ -198,3 +198,6 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
 
 /* Stronger score numerals only; keep their size and position unchanged. */
 #matches .pv-match-score strong{font-weight:1000!important;-webkit-text-stroke:.7px currentColor;paint-order:stroke fill}
+
+/* Upcoming matches: Moscow start time replaces the score. */
+#matches .pv-match-score .pv-match-timezone{display:block;margin-top:8px;font-size:12px;line-height:1.2;letter-spacing:.035em;font-weight:800;color:#9cc4f1;text-transform:none}
