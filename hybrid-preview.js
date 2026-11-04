@@ -184,10 +184,40 @@
       <div class="match-list">${games.map(card).join('')}</div>
     </section>`).join('');
   }
+  // The original async data load can finish before this preview script starts.
+  // Render the new cards immediately, not only on a subsequent data refresh.
   renderMatches=renderHybridMatches;
   document.querySelector('#gf').onchange=renderHybridMatches;
   document.querySelector('#sf').onchange=renderHybridMatches;
   const previousRender=render;
-  render=function(...args){const result=previousRender.apply(this,args);draw();return result};
-  if(typeof D!=='undefined'&&D?.matches)draw();
+  render=function(...args){
+    const result=previousRender.apply(this,args);
+    renderHybridMatches();
+    draw();
+    return result;
+  };
+  const ensureMatchCards=()=>{
+    if(typeof D==='undefined'||!D?.matches?.length)return;
+    const list=document.querySelector('#matchList');
+    if(list&&!list.querySelector('.pv-match-card'))renderHybridMatches();
+  };
+  // A few legacy enhancements may rebuild the original match list after load.
+  // Replace that markup if necessary without rerendering already-correct cards.
+  const list=document.querySelector('#matchList');
+  if(list){
+    let queued=false;
+    new MutationObserver(()=>{
+      if(queued)return;
+      queued=true;
+      requestAnimationFrame(()=>{queued=false;ensureMatchCards()});
+    }).observe(list,{childList:true});
+  }
+  if(typeof D!=='undefined'&&D?.matches){
+    renderHybridMatches();
+    draw();
+  }
+  // Covers async data arrival and pages restored from the mobile browser cache.
+  window.addEventListener('pageshow',ensureMatchCards);
+  setTimeout(ensureMatchCards,350);
+  setTimeout(ensureMatchCards,1500);
 })();
