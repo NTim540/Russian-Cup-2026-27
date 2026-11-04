@@ -158,18 +158,18 @@
       const finished=done(m);
       const time=typeof matchTime==='function'?matchTime(m):m.start_time||'';
       const venue=typeof matchPlace==='function'?matchPlace(m):'';
-      const result=finished?m.home_score+' : '+m.away_score:'— : —';
+      const result=finished?m.home_score+' : '+m.away_score:(time?String(time).trim().slice(0,5):'—:—');
       const finishNote=finished?(m.finish_type==='OT'?'Овертайм':m.finish_type==='SO'?'Буллиты':''):'';
       const resultType=finished?'Завершён':'Матч предстоит';
       return `<article class="match-row pv-match-card match-center-clickable" data-match-id="${Number(m.id)}" tabindex="0" role="button" aria-label="Открыть матч-центр: ${esc(home)} — ${esc(away)}">
         <div class="pv-match-top">
           <span class="pv-match-group">${esc(group(m.group_id))}</span>
           <span class="pv-match-number">МАТЧ №${esc(m.game_no??'—')}</span>
-          <span class="pv-match-time">${esc(time||'Время уточняется')}</span>
+          ${finished&&time?`<span class="pv-match-time">${esc(time)}</span>`:''}
         </div>
         <div class="pv-match-center">
           <div class="pv-match-side">${teamImg(home,'pv-match-logo')}<strong>${esc(home)}</strong></div>
-          <div class="pv-match-score"><strong>${result}</strong>${finishNote?`<span class="pv-match-finish-note">${finishNote}</span>`:''} </div>
+          <div class="pv-match-score"><strong>${esc(result)}</strong>${finished?(finishNote?`<span class="pv-match-finish-note">${finishNote}</span>`:''):`<span class="pv-match-timezone">${time?'(МСК)':'Время уточняется'}</span>`}</div>
           <div class="pv-match-side">${teamImg(away,'pv-match-logo')}<strong>${esc(away)}</strong></div>
         </div>
         <div class="pv-match-bottom">
