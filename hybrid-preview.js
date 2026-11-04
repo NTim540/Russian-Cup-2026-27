@@ -131,6 +131,61 @@
   document.addEventListener('keydown',e=>{
     if((e.key==='Enter'||e.key===' ')&&e.target.matches?.('.pv-game,.pv-scoreboard')){e.preventDefault();e.target.click()}
   });
+
+  // Match cards: three rounded, horizontal cards per row instead of a full-width match list.
+  function renderHybridMatches(){
+    if(typeof D==='undefined'||!D?.matches)return;
+    const gf=document.querySelector('#gf')?.value||'ALL';
+    const sf=document.querySelector('#sf')?.value||'ALL';
+    const currentDay=new Date().toISOString().slice(0,10);
+    const visible=[...D.matches]
+      .filter(m=>gf==='ALL'||String(m.group_id)===gf)
+      .filter(m=>sf==='ALL'||(sf==='TODAY'?m.game_date===currentDay:sf==='DONE'?done(m):!done(m)))
+      .sort(sort);
+    const list=document.querySelector('#matchList');
+    if(!list)return;
+    if(!visible.length){
+      list.innerHTML='<div class="card empty">Матчей по выбранному фильтру нет.</div>';
+      return;
+    }
+    const byDate=new Map();
+    for(const m of visible){
+      if(!byDate.has(m.game_date))byDate.set(m.game_date,[]);
+      byDate.get(m.game_date).push(m);
+    }
+    const card=m=>{
+      const home=team(m.home_team_id),away=team(m.away_team_id);
+      const finished=done(m);
+      const time=typeof matchTime==='function'?matchTime(m):m.start_time||'';
+      const venue=typeof matchPlace==='function'?matchPlace(m):'';
+      const result=finished?m.home_score+' : '+m.away_score:'— : —';
+      const resultType=finished?(typeof finishLabel==='function'?finishLabel(m.finish_type):'Завершён'):'Матч предстоит';
+      return `<article class="match-row pv-match-card match-center-clickable" data-match-id="${Number(m.id)}" tabindex="0" role="button" aria-label="Открыть матч-центр: ${esc(home)} — ${esc(away)}">
+        <div class="pv-match-top">
+          <span class="pv-match-group">${esc(group(m.group_id))}</span>
+          <span class="pv-match-number">МАТЧ №${esc(m.game_no??'—')}</span>
+          <span class="pv-match-time">${esc(time||'Время уточняется')}</span>
+        </div>
+        <div class="pv-match-center">
+          <div class="pv-match-side">${teamImg(home,'pv-match-logo')}<strong>${esc(home)}</strong></div>
+          <div class="pv-match-score"><strong>${result}</strong><span>${finished?'ИТОГ':'СКОРО'}</span></div>
+          <div class="pv-match-side">${teamImg(away,'pv-match-logo')}<strong>${esc(away)}</strong></div>
+        </div>
+        <div class="pv-match-bottom">
+          <span class="pv-match-result ${finished?'is-finished':''}"><i></i>${esc(resultType)}</span>
+          <span class="pv-match-open">Матч-центр <b>↗</b></span>
+        </div>
+        ${venue?`<div class="pv-match-venue" title="${esc(venue)}">${esc(venue)}</div>`:''}
+      </article>`;
+    };
+    list.innerHTML=[...byDate.entries()].map(([date,games])=>`<section class="pv-match-date-group">
+      <h3 class="date-heading">${esc(typeof fmtLong==='function'?fmtLong(date):date)} <span class="pv-match-count">${games.length} ${games.length===1?'матч':'матчей'}</span></h3>
+      <div class="match-list">${games.map(card).join('')}</div>
+    </section>`).join('');
+  }
+  renderMatches=renderHybridMatches;
+  document.querySelector('#gf').onchange=renderHybridMatches;
+  document.querySelector('#sf').onchange=renderHybridMatches;
   const previousRender=render;
   render=function(...args){const result=previousRender.apply(this,args);draw();return result};
   if(typeof D!=='undefined'&&D?.matches)draw();
