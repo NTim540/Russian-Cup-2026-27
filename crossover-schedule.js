@@ -16,7 +16,7 @@ function init(){
  const anchor=document.getElementById('matches'),selector=document.getElementById('stage');
  if(!anchor||!selector||document.getElementById('crossovers'))return;
  const section=document.createElement('section');section.id='crossovers';section.className='section wrap';
- section.innerHTML='<div class="section-head"><div><div class="section-kicker">Второй тур · дополнительные игры</div><h2>Стыковые матчи</h2><div class="section-sub">Расписание ФХР. Пары участников будут известны после завершения игр в группах. Стыковые матчи учитываются в общей таблице, но не влияют на места внутри групп.</div></div></div><div id="crossoverGrid"></div>';
+ section.innerHTML='<div class="section-head"><div><div class="section-kicker">Второй тур · дополнительные игры</div><h2>Стыковые матчи</h2><div class="section-sub">Расписание ФХР. Участники стыковых матчей групп В–Г определены. Стыковые матчи учитываются в общей таблице, но не влияют на места внутри групп.</div></div></div><div id="crossoverGrid"></div>';
  anchor.insertAdjacentElement('afterend',section);
  const style=document.createElement('style');style.textContent=`
  #crossoverGrid{display:grid;gap:20px}
