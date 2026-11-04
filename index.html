@@ -230,5 +230,437 @@ let dataRefreshTimer=null;function scheduleDataRefresh(){clearTimeout(dataRefres
 <script src="/vote.js?v=20260822-1"></script>
 <script src="/team-links.js?v=20260823-1"></script>
 <script src="/my-team.js?v=20260823-1"></script>
+<!-- Inline preview assets so Vercel protected preview links cannot block stylesheet/scripts -->
+<style id="hybrid-preview-inline-css">
+
+/* Кубок России U16 — HYBRID DESIGN PREVIEW. Only in the preview branch. */
+:root{--pv-bg:#060f20;--pv-panel:#0c1d37;--pv-panel2:#122745;--pv-line:rgba(147,190,255,.14);--pv-blue:#2378e8;--pv-red:#dc263e;--pv-muted:#9bb0cb}
+html{scroll-padding-top:90px}
+body{background:var(--pv-bg)!important;color:#f4f7ff}
+body:before{background:radial-gradient(ellipse at 18% 0%,rgba(28,79,152,.30),transparent 36%),radial-gradient(ellipse at 88% 0%,rgba(141,24,48,.14),transparent 28%),linear-gradient(180deg,#071225,#06101f 55%,#050d1b)!important}
+body:after{opacity:.12!important}
+.wrap{width:min(1500px,calc(100% - 48px))!important}
+.site-header{background:rgba(4,13,28,.94)!important;border-bottom:1px solid var(--pv-line)!important}
+.header-inner{min-height:76px!important}
+.nav{gap:4px!important}
+.nav a{font-size:12px!important;font-weight:750!important;color:#c3d2e6!important;border-radius:9px!important}
+.nav a:hover{background:#122c50!important;color:#fff!important}
+.brand-copy strong{font-size:16px!important;letter-spacing:-.025em}
+.brand-mark{background:rgba(33,95,178,.14)!important;border-color:rgba(117,179,255,.22)!important;border-radius:12px!important}
+.pv-preview-bar{position:relative;z-index:20;background:linear-gradient(90deg,#1761ba,#153966 65%,#8b1c32);padding:9px 0;color:#fff;font-size:12px}
+.pv-preview-bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pv-preview-bar strong{font-weight:850;letter-spacing:.02em}.pv-preview-bar a{color:#fff;text-decoration:underline;text-underline-offset:3px;font-weight:750}
+.hero{padding:28px 0 28px!important;min-height:0!important;display:block!important}
+.hero>div{width:100%!important}
+.hero:before,.hero:after{display:none!important}
+.hero h1{font-size:clamp(34px,4.5vw,64px)!important;line-height:.95!important;letter-spacing:-.055em!important;margin:16px 0 10px!important;max-width:none!important}
+.hero h1 br{display:none}
+.hero-subtitle{font-size:13px!important;max-width:780px!important;color:#a7b9d3!important}
+.hero-actions{display:none!important}
+.hero-controls{position:absolute;right:0;bottom:30px;margin:0!important}
+.hero.wrap{position:relative}
+.hero-stats{display:none!important}
+.hero .loading{font-size:10px!important;margin:10px 0 0!important;color:#7094b9!important}
+.hero .eyebrow{border-radius:7px!important;padding:7px 11px!important;font-size:10px!important;background:rgba(35,120,232,.12)!important;color:#91c6ff!important}
+.hero .filter{border-radius:9px!important;background-color:#0e223e!important}
+#upcoming{display:none!important}
+.pv-dashboard{padding:0 0 18px}
+.pv-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:4px 0 20px}
+.pv-stat{min-height:106px;padding:21px 23px;display:flex;align-items:center;gap:17px;border:1px solid var(--pv-line);border-radius:17px;background:linear-gradient(135deg,rgba(28,57,96,.94),rgba(11,28,51,.96));box-shadow:0 12px 34px rgba(0,0,0,.12)}
+.pv-stat-icon{display:grid;place-items:center;flex:0 0 55px;width:55px;height:55px;border-radius:14px;background:rgba(79,140,229,.17);font-size:27px}
+.pv-stat strong{display:block;font-size:34px;letter-spacing:-.06em;line-height:1;font-weight:950;font-variant-numeric:tabular-nums}
+.pv-stat span{display:block;color:#b6c9e3;font-size:12px;margin-top:8px}
+.pv-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(0,3.2fr);gap:16px;align-items:stretch}
+.pv-panel{border:1px solid var(--pv-line);background:linear-gradient(155deg,#0d203c,#09192e 92%);border-radius:19px;overflow:hidden;min-width:0;box-shadow:0 15px 42px rgba(0,0,0,.13)}
+.pv-panel-head{min-height:58px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(151,193,250,.09)}
+.pv-panel-head h2{font-size:17px!important;font-weight:850!important;letter-spacing:-.03em!important;margin:0!important;line-height:1.2!important}
+.pv-panel-head a{font-size:11px;color:#75c7ff;font-weight:750;white-space:nowrap}
+.pv-feature{padding:22px;min-height:340px;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 10%,rgba(33,96,175,.13),transparent 65%)}
+.pv-feature-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:#b1c7e4}
+.pv-pill{padding:7px 10px;border-radius:7px;background:rgba(23,165,118,.17);color:#8ef1ca;font-weight:800;font-size:10px}
+.pv-pill.future{background:rgba(56,118,222,.15);color:#a5c9ff}
+.pv-scoreboard{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,.8fr) minmax(0,1fr);align-items:center;gap:8px;margin:24px 0 16px;flex:1}
+.pv-team{min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:11px}
+.pv-team img{width:82px;height:82px;object-fit:contain;filter:drop-shadow(0 9px 15px rgba(0,0,0,.3))}
+.pv-team strong{font-size:14px;font-weight:850;line-height:1.3;overflow-wrap:anywhere}
+.pv-score{text-align:center}
+.pv-score strong{font-size:clamp(36px,4vw,59px);letter-spacing:-.075em;font-weight:950;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pv-score small{display:block;color:#829bb8;font-size:10px;margin-top:8px;letter-spacing:.07em;text-transform:uppercase}
+.pv-periods{display:flex;justify-content:center;gap:7px;margin-top:8px;color:#b1c7e4;font-size:11px}
+.pv-periods span{padding:5px 8px;border-radius:6px;background:rgba(255,255,255,.035)}
+.pv-feature-actions{display:flex;gap:10px;margin-top:15px}
+.pv-action{min-height:40px;border-radius:9px;border:1px solid rgba(151,193,250,.22);display:flex;align-items:center;justify-content:center;padding:9px 12px;font-size:11px;font-weight:800;flex:1;cursor:pointer;color:#e5efff;background:rgba(255,255,255,.025)}
+.pv-action.blue{background:#1c72d7;border-color:#1c72d7;color:#fff}
+.pv-action:hover{filter:brightness(1.15)}
+.pv-schedule-list{padding:3px 0}
+.pv-game{display:grid;grid-template-columns:64px minmax(0,1fr) 40px;align-items:center;gap:12px;min-height:80px;padding:12px 16px;border-bottom:1px solid rgba(151,193,250,.085);cursor:pointer;transition:background .18s}
+.pv-game:hover{background:rgba(49,114,211,.12)}
+.pv-game:last-child{border-bottom:0}
+.pv-game-time{font-size:11px;font-weight:900;color:#dce9ff;line-height:1.55}
+.pv-game-time span{display:block;font-size:10px;font-weight:600;color:#7897b9}
+.pv-game-names{display:grid;gap:7px;min-width:0}
+.pv-game-team{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:760;min-width:0}
+.pv-game-team img{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
+.pv-game-team span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-game-score{font-size:15px;font-weight:950;text-align:center;font-variant-numeric:tabular-nums}
+.pv-game-score span{display:block;font-size:9px;color:#80b9f5;margin-top:5px}
+.pv-groups{display:flex;gap:4px;padding:12px 14px 6px}
+.pv-group-btn{flex:1;min-width:0;padding:9px 4px;border-radius:8px;border:1px solid rgba(151,193,250,.10);background:rgba(255,255,255,.035);color:#bdcce0;font-size:10px;font-weight:850;cursor:pointer}
+.pv-group-btn.active{background:#1d72d5;color:#fff;border-color:#1d72d5}
+.pv-table{width:100%;min-width:0!important;border-collapse:collapse}
+.pv-table th{color:#8199b6;font-size:9px;text-transform:uppercase;padding:11px 8px!important;border-bottom:1px solid var(--pv-line);font-weight:700}
+.pv-table td{padding:10px 7px!important;font-size:11px!important;text-align:center!important;border-bottom:1px solid rgba(151,193,250,.07)}
+.pv-table tr:last-child td{border:0}
+.pv-table td:nth-child(2),.pv-table th:nth-child(2){text-align:left!important}
+.pv-table td:nth-child(2){font-weight:780}
+.pv-table td:last-child{color:#9fcaff;font-weight:950}
+.pv-table img{width:21px;height:21px;object-fit:contain;vertical-align:middle;margin-right:7px}
+.pv-table .pv-team-name{vertical-align:middle}
+.pv-panel-bottom{padding:13px 16px;text-align:right;border-top:1px solid rgba(151,193,250,.08);font-size:11px;color:#80c8ff}
+.pv-panel-bottom a{color:inherit;font-weight:750}
+.pv-lower{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin-top:16px}
+.pv-leaders{padding:0 14px 14px}
+.pv-leader{display:grid;grid-template-columns:34px 36px minmax(0,1fr) 56px;align-items:center;gap:11px;padding:11px 8px;border-bottom:1px solid rgba(151,193,250,.07)}
+.pv-leader:last-child{border-bottom:0}
+.pv-leader-rank{display:grid;place-items:center;width:29px;height:29px;background:#152d4c;border-radius:50%;font-size:12px;font-weight:900}
+.pv-leader-logo{width:31px;height:31px;object-fit:contain}
+.pv-leader-name{font-size:13px;font-weight:820}.pv-leader-team{display:block;font-size:11px;color:#8fa8c5;margin-top:4px}
+.pv-leader-pts{text-align:center;padding:8px 9px;border:1px solid rgba(151,193,250,.15);border-radius:10px;font-size:20px;font-weight:950;font-variant-numeric:tabular-nums}
+.pv-leader-pts small{display:block;color:#86a5c9;font-size:9px;font-weight:650}
+.pv-links{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:16px}
+.pv-link{min-height:85px;padding:15px;border-radius:13px;border:1px solid rgba(151,193,250,.13);background:linear-gradient(135deg,rgba(42,86,150,.15),rgba(10,28,49,.2));display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.pv-link strong{font-size:13px}.pv-link span{font-size:11px;color:#7fc6ff}.pv-link:hover{border-color:rgba(100,177,255,.45);background:rgba(33,96,175,.18)}
+#overall,#groups,#matches{padding-top:35px!important;padding-bottom:24px!important}
+#overall h2,#groups h2,#matches h2{font-size:30px!important}
+#overall .card,#groups .card{border-radius:16px!important;background:linear-gradient(145deg,#102541,#091a30)!important;box-shadow:none!important}
+#matches .match-row{border-radius:13px!important;background:#0e213b!important;border:1px solid rgba(151,193,250,.11)!important}
+#matches .match-row:hover{background:#163354!important}
+#matches .match-days{gap:17px!important}
+#matches .match-list{gap:8px!important}
+#overall .table-wrap{border:1px solid var(--pv-line)}
+#overall th,#groups th{background:#142b48!important}
+#overall td,#groups td{border-bottom-color:rgba(151,193,250,.08)!important}
+#overall .points,#groups .points{color:#80c6ff!important}
+#overall .section-head,#groups .section-head,#matches .section-head{margin-bottom:17px!important}
+#overall .section-kicker,#groups .section-kicker,#matches .section-kicker{color:#6faef5!important}
+#rules,#history{opacity:.9}
+html .mc-dialog{border-radius:18px!important;background:linear-gradient(180deg,#102441,#08182d)!important}
+html .mc-scoreboard{border-radius:15px!important}
+html .mc-tab{font-size:11px!important}
+html .mc-tab.active{border-bottom-color:#3189ed!important}
+@media(max-width:1280px){.pv-grid{grid-template-columns:1.1fr 1fr}.pv-grid>.pv-panel:last-child{grid-column:1/-1}.pv-table td:nth-child(2){width:60%}}
+@media(max-width:920px){.pv-stats{grid-template-columns:repeat(2,1fr)}.pv-grid{grid-template-columns:1fr 1fr}.pv-lower{grid-template-columns:1fr 1fr}.hero-controls{position:static;margin-top:16px!important}.hero{padding-bottom:22px!important}}
+@media(max-width:680px){
+.wrap{width:calc(100% - 24px)!important}
+.pv-preview-bar .wrap{font-size:10px;align-items:flex-start}
+.hero h1{font-size:38px!important}
+.hero .hero-subtitle{font-size:12px!important}
+.pv-stats{gap:9px;margin-bottom:12px}
+.pv-stat{min-height:90px;padding:13px;gap:9px;border-radius:13px}
+.pv-stat-icon{width:37px;height:37px;flex-basis:37px;font-size:19px;border-radius:9px}
+.pv-stat strong{font-size:26px}.pv-stat span{font-size:10px;line-height:1.25}
+.pv-grid,.pv-lower{grid-template-columns:1fr;gap:12px}
+.pv-grid>.pv-panel:last-child{grid-column:auto}
+.pv-panel{border-radius:15px}
+.pv-panel-head{padding:14px 15px;min-height:53px}
+.pv-panel-head h2{font-size:16px!important}
+.pv-feature{padding:15px;min-height:310px}
+.pv-scoreboard{grid-template-columns:minmax(0,1fr) minmax(90px,.9fr) minmax(0,1fr);gap:5px;margin:24px 0 10px}
+.pv-team img{width:61px;height:61px}.pv-team strong{font-size:12px}
+.pv-score strong{font-size:37px}.pv-score small{font-size:9px}
+.pv-feature-actions{gap:7px}.pv-action{font-size:10px}
+.pv-game{grid-template-columns:54px minmax(0,1fr) 32px;padding:11px 12px;gap:9px}
+.pv-links{gap:8px;padding:12px}
+.pv-link{padding:12px;min-height:77px}
+#overall h2,#groups h2,#matches h2{font-size:25px!important}
+}
+
+
+/* All matches: compact hockey cards, three per row on desktop. */
+#matches .match-days{gap:28px!important}
+#matches .pv-match-date-group{min-width:0}
+#matches .pv-match-date-group .date-heading{display:flex;align-items:center;gap:11px;margin:0 0 13px!important;font-size:13px!important;letter-spacing:.055em!important;color:#e1ebfb!important}
+#matches .pv-match-count{font-size:10px;font-weight:700;letter-spacing:0;color:#789cbe;padding:5px 9px;border-radius:100px;border:1px solid rgba(151,193,250,.13)}
+#matches .match-list{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important}
+#matches .pv-match-card{display:flex!important;flex-direction:column!important;gap:0!important;min-width:0;min-height:212px;padding:0!important;border-radius:20px!important;overflow:hidden;background:linear-gradient(155deg,#112946 0%,#0c1c32 82%)!important;border:1px solid rgba(136,181,245,.19)!important;box-shadow:0 12px 25px rgba(0,0,0,.10);cursor:pointer;transform:none!important;transition:background .2s,border-color .2s,box-shadow .2s,transform .2s!important}
+#matches .pv-match-card:hover{background:linear-gradient(145deg,#173658,#0e233f)!important;border-color:rgba(105,174,255,.53)!important;box-shadow:0 16px 30px rgba(0,0,0,.24);transform:translateY(-3px)!important}
+#matches .pv-match-card:focus-visible{outline:2px solid #86c4ff;outline-offset:3px}
+#matches .pv-match-top{display:flex;align-items:center;gap:8px;min-height:42px;padding:10px 14px;border-bottom:1px solid rgba(142,184,241,.10);font-size:10px}
+#matches .pv-match-group{padding:5px 8px;border-radius:7px;background:rgba(42,124,239,.18);color:#9bc8ff;font-weight:900;letter-spacing:.045em;white-space:nowrap}
+#matches .pv-match-number{font-size:10px;color:#7898b9;letter-spacing:.04em;font-weight:750;white-space:nowrap}
+#matches .pv-match-time{margin-left:auto;font-size:11px;font-weight:900;color:#e0ecff;text-align:right;white-space:nowrap}
+#matches .pv-match-center{display:grid;grid-template-columns:minmax(0,1fr) minmax(95px,.9fr) minmax(0,1fr);align-items:center;gap:4px;flex:1;padding:17px 12px 14px}
+#matches .pv-match-side{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center}
+#matches .pv-match-side .pv-match-logo{width:51px;height:51px;object-fit:contain;filter:drop-shadow(0 5px 9px rgba(0,0,0,.25))}
+#matches .pv-match-side strong{font-size:11px;line-height:1.25;min-height:28px;display:flex;align-items:center;justify-content:center;font-weight:820;overflow-wrap:anywhere;color:#eef5ff}
+#matches .pv-match-score{text-align:center;align-self:center}
+#matches .pv-match-score strong{display:block;font-size:clamp(24px,2.2vw,34px);font-weight:950;letter-spacing:-.06em;white-space:nowrap;line-height:1;font-variant-numeric:tabular-nums;color:#fff}
+#matches .pv-match-score span{display:block;margin-top:8px;font-size:9px;letter-spacing:.12em;font-weight:800;color:#7798be}
+#matches .pv-match-bottom{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:38px;padding:10px 14px;border-top:1px solid rgba(142,184,241,.10)}
+#matches .pv-match-result{display:flex;align-items:center;gap:6px;font-size:10px;color:#a9c1df;min-width:0}
+#matches .pv-match-result i{display:block;width:6px;height:6px;border-radius:50%;background:#5288c9;flex:0 0 6px}
+#matches .pv-match-result.is-finished i{background:#35c594;box-shadow:0 0 0 3px rgba(53,197,148,.12)}
+#matches .pv-match-open{font-size:10px;color:#7ec3ff;font-weight:800;white-space:nowrap}
+#matches .pv-match-open b{font-size:13px;margin-left:2px}
+#matches .pv-match-venue{padding:0 14px 10px;color:#6c8bab;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(min-width:1550px){#matches .pv-match-score strong{font-size:36px}}
+@media(max-width:1100px){#matches .match-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:680px){
+#matches .match-days{gap:25px!important}
+#matches .pv-match-date-group .date-heading{font-size:12px!important}
+#matches .match-list{display:flex!important;grid-template-columns:none!important;gap:10px!important;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;padding:2px 1px 13px;scrollbar-width:thin;scrollbar-color:#2b5886 transparent}
+#matches .pv-match-card{flex:0 0 min(86vw,345px);scroll-snap-align:start;min-height:213px}
+#matches .pv-match-score strong{font-size:32px}
+#matches .pv-match-side .pv-match-logo{width:52px;height:52px}
+}
+
+/* Score treatment: only overtime/shootout labels appear directly below the score. */
+#matches .pv-match-score .pv-match-finish-note{
+  display:inline-block;
+  margin-top:9px;
+  padding:5px 10px;
+  border-radius:7px;
+  border:1px solid rgba(115,177,255,.25);
+  background:rgba(47,120,223,.15);
+  color:#a8d2ff;
+  font-size:12px;
+  font-weight:850;
+  line-height:1.1;
+  letter-spacing:.015em;
+  white-space:nowrap;
+}
+
+/* Stronger score numerals only; keep their size and position unchanged. */
+#matches .pv-match-score strong{font-weight:1000!important;-webkit-text-stroke:.7px currentColor;paint-order:stroke fill}
+
+/* Upcoming matches: Moscow start time replaces the score. */
+#matches .pv-match-score .pv-match-timezone{display:block;margin-top:8px;font-size:12px;line-height:1.2;letter-spacing:.035em;font-weight:800;color:#9cc4f1;text-transform:none}
+
+</style>
+<script id="hybrid-preview-inline-js">
+(function hybridPreview(){
+  const LOGOS={"Динамо Москва":"https://drive.google.com/thumbnail?id=1I3KuJZEajmksDKtoBsdj4h_75fU0e_KY&sz=w512","МАХ":"https://drive.google.com/thumbnail?id=1Veii4NYgKc06nRtxKmCRQv1YCE164YZP&sz=w512","Торпедо":"https://drive.google.com/thumbnail?id=17NYLCFaSrX6q4g0T7jhBnmidrI1JzKl9&sz=w512","Локомотив":"https://drive.google.com/thumbnail?id=1D6wJnaawN4kMt-1ZWTSvf-trYkslzyKi&sz=w512","Авангард":"https://drive.google.com/thumbnail?id=1y6CZfZSXYDVqCAjOvv6xB_7Fwu1AQwvn&sz=w512","Локомотив 2004":"https://drive.google.com/thumbnail?id=1sq7UHtBq_xiexekxmzWawF3yVTaEl-J-&sz=w512","Крылья Советов":"https://drive.google.com/thumbnail?id=1n6ViHZhkRvq_R_Ul1PEHnFnX7HVNk6-p&sz=w512","Сибирь":"https://drive.google.com/thumbnail?id=1Xul8VXC7juk2NHQfb28Cl9Jt_Kj0Obw-&sz=w512","Лада":"https://drive.google.com/thumbnail?id=15mcwMoXT7OaH46jj8w90PCeTtJY54UAF&sz=w512","Трактор":"https://drive.google.com/thumbnail?id=1qWTRWy-p36RDSMlAy4AqA60PrrUTaczd&sz=w512","Ак Барс":"https://drive.google.com/thumbnail?id=1I09r6XwD-9L4r5ojPGKCHsJ5WGUyOFy1&sz=w512","Спартак":"https://drive.google.com/thumbnail?id=19kJ3uz-yyb1Z2y8qvRbFwuw_2kjUUD2f&sz=w512","Динамо СПБ":"https://drive.google.com/thumbnail?id=1x4KaAFMJ_qfmi26oVjnsc-huKpWtqBbh&sz=w512","СКА-Стрельна":"https://drive.google.com/thumbnail?id=1DH_sKpyVZsh6vnt8Q1_ovBpDuVkPHrNh&sz=w512","АКМ":"https://drive.google.com/thumbnail?id=1NmPj1OwI3C1yuNmgt2XX57HbEiiDauB7&sz=w512","ЦСКА":"https://drive.google.com/thumbnail?id=1bT6o4afTqonyA05keLbe_nfQ78sAmNda&sz=w512","Армия СКА":"https://drive.google.com/thumbnail?id=14XZX2FRyR5x_aVkU2SMLhW-Emk0RUkTo&sz=w512","Нефтехимик":"https://drive.google.com/thumbnail?id=1csEdtjesEvgAFSsfnfhmWUnUE23Tnqeg&sz=w512","Северсталь":"https://drive.google.com/thumbnail?id=10xBTOFy_ps1G3LNaHV3WpbQkuZ74pjRn&sz=w512","Красная Машина Юниор":"https://drive.google.com/thumbnail?id=1qATM0WxWDCgYfemDQvhdy30Ub0sWSWWV&sz=w512"};
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const safeUrl=v=>/^https:\/\//.test(String(v||''))?String(v):'';
+  const done=m=>Number.isInteger(m?.home_score)&&Number.isInteger(m?.away_score)&&m.home_score!==m.away_score;
+  const sort=(a,b)=>String(a.game_date).localeCompare(String(b.game_date))||Number(a.game_no||0)-Number(b.game_no||0);
+  const dateLabel=x=>{try{return new Date(x+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}catch{return x}};
+  const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Moscow',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const team=id=>D.teams.find(t=>Number(t.id)===Number(id))?.name||'Команда уточняется';
+  const group=id=>D.groups.find(g=>Number(g.id)===Number(id))?.code||'';
+  const logo=name=>safeUrl(LOGOS[name]||'');
+  const teamImg=(name,cls='')=>logo(name)?`<img class="${cls}" src="${esc(logo(name))}" alt="${esc(name)}" loading="lazy" onerror="this.style.visibility='hidden'">`:`<span class="pv-logo-placeholder">🏒</span>`;
+  const stream=m=>safeUrl(m.stream_url);
+  let groupIndex=0,statsFetchedAt=0,statsBusy=false,leaderData=null;
+  const root=document.createElement('section');root.className='pv-dashboard wrap';root.id='pvDashboard';
+  root.innerHTML=`
+    <div class="pv-stats" id="pvStats"></div>
+    <div class="pv-grid">
+      <article class="pv-panel">
+        <div class="pv-panel-head"><h2>Последний результат</h2><a href="#matches">Все матчи ›</a></div>
+        <div id="pvFeatured"></div>
+      </article>
+      <article class="pv-panel">
+        <div class="pv-panel-head"><h2>Ближайшие матчи</h2><a href="#matches">Календарь ›</a></div>
+        <div id="pvSchedule" class="pv-schedule-list"></div>
+      </article>
+      <article class="pv-panel">
+        <div class="pv-panel-head"><h2>Таблица группы</h2><a href="#groups">Все группы ›</a></div>
+        <div id="pvGroups"></div><div id="pvGroupTable"></div>
+        <div class="pv-panel-bottom"><a href="#overall">Общая таблица турнира ›</a></div>
+      </article>
+    </div>
+    <div class="pv-lower">
+      <article class="pv-panel">
+        <div class="pv-panel-head"><h2>Лидеры турнира</h2><a href="/stats">Полная статистика ›</a></div>
+        <div id="pvLeaders" class="pv-leaders"><div style="padding:20px;color:#8fa8c5">Загружаем статистику игроков…</div></div>
+      </article>
+      <article class="pv-panel">
+        <div class="pv-panel-head"><h2>Информация о турнире</h2><a href="/news.html">Новости ›</a></div>
+        <div class="pv-links">
+          <a class="pv-link" href="/tour-path.html"><strong>Путь в третий тур</strong><span>Система отбора ↗</span></a>
+          <a class="pv-link" href="/stats"><strong>Статистика игроков</strong><span>Бомбардиры и вратари ↗</span></a>
+          <a class="pv-link" href="/teams.html"><strong>Участники турнира</strong><span>Все команды ↗</span></a>
+          <a class="pv-link" href="/news.html"><strong>Новости Кубка</strong><span>Материалы и события ↗</span></a>
+        </div>
+      </article>
+    </div>`;
+  document.querySelector('#upcoming')?.before(root);
+  const bar=document.createElement('div');bar.className='pv-preview-bar';
+  bar.innerHTML='<div class="wrap"><strong>✦ ТЕСТОВЫЙ ДИЗАЙН · ГИБРИД KHL / FLASHSCORE</strong><a href="https://tournamentu16.ru/" target="_blank" rel="noopener noreferrer">Открыть действующий сайт ↗</a></div>';
+  document.querySelector('.site-header')?.after(bar);
+  document.querySelector('.nav a[href="#upcoming"]')?.setAttribute('href','#pvDashboard');
+  function statCard(symbol,num,label){return `<div class="pv-stat"><span class="pv-stat-icon">${symbol}</span><div><strong>${num}</strong><span>${label}</span></div></div>`}
+  function featured(m){
+    if(!m)return '<div class="pv-feature" style="justify-content:center;color:#a6bdd9">Матчи пока не добавлены.</div>';
+    const home=team(m.home_team_id),away=team(m.away_team_id),isDone=done(m);
+    const status=isDone?'<span class="pv-pill">✓ Завершён</span>':'<span class="pv-pill future">◉ Предстоит</span>';
+    const p=(a,b)=>Number.isInteger(a)&&Number.isInteger(b)?`<span>${a}:${b}</span>`:'';
+    const periods=isDone?[p(m.p1_home,m.p1_away),p(m.p2_home,m.p2_away),p(m.p3_home,m.p3_away)].join(''):'';
+    return `<div class="pv-feature">
+      <div class="pv-feature-meta"><span>${esc(group(m.group_id))} · ${esc(dateLabel(m.game_date))} · Матч №${esc(m.game_no)}</span>${status}</div>
+      <div class="pv-scoreboard match-center-clickable" data-match-id="${Number(m.id)}" tabindex="0" role="button" aria-label="Открыть матч-центр: ${esc(home)} — ${esc(away)}" style="cursor:pointer">
+        <div class="pv-team">${teamImg(home)}<strong>${esc(home)}</strong></div>
+        <div class="pv-score"><strong>${isDone?`${m.home_score} : ${m.away_score}`:'— : —'}</strong><small>${isDone?(m.finish_type==='OT'?'Овертайм':m.finish_type==='SO'?'Буллиты':'Основное время'):(esc(m.start_time||'Время уточняется'))}</small><div class="pv-periods">${periods}</div></div>
+        <div class="pv-team">${teamImg(away)}<strong>${esc(away)}</strong></div>
+      </div>
+      <div class="pv-feature-actions">
+        <button class="pv-action match-center-clickable" data-match-id="${Number(m.id)}" type="button">▤ Протокол матча</button>
+        ${stream(m)?`<a class="pv-action blue" href="${esc(stream(m))}" target="_blank" rel="noopener noreferrer">▶ ${isDone?'Смотреть запись':'Трансляция'}</a>`:`<a class="pv-action blue" href="https://vkvideo.ru/playlist/-133823152_14" target="_blank" rel="noopener noreferrer">▶ Эфиры тура</a>`}
+      </div></div>`;
+  }
+  function gameRow(m){
+    const h=team(m.home_team_id),a=team(m.away_team_id),f=done(m);
+    return `<div class="pv-game match-center-clickable" data-match-id="${Number(m.id)}" tabindex="0" role="button" aria-label="Открыть матч ${esc(h)} — ${esc(a)}">
+      <div class="pv-game-time">${esc(dateLabel(m.game_date))}<span>${esc(m.start_time||'—')}</span></div>
+      <div class="pv-game-names"><div class="pv-game-team">${teamImg(h)}<span>${esc(h)}</span></div><div class="pv-game-team">${teamImg(a)}<span>${esc(a)}</span></div></div>
+      <div class="pv-game-score">${f?`${m.home_score}<br>${m.away_score}`:'—<br>—'}<span>${esc(group(m.group_id))}</span></div>
+    </div>`;
+  }
+  function drawGroup(){
+    if(!D?.groups?.length)return;
+    const groups=[...D.groups].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+    groupIndex=Math.min(groupIndex,groups.length-1);
+    const selected=groups[groupIndex];
+    document.querySelector('#pvGroups').innerHTML='<div class="pv-groups">'+groups.map((g,i)=>`<button type="button" class="pv-group-btn ${i===groupIndex?'active':''}" data-pv-group="${i}">${esc(g.code||g.name)}</button>`).join('')+'</div>';
+    let rows=[];
+    try{rows=groupRows(selected,D.settings)}catch(e){console.warn('Preview group table',e)}
+    document.querySelector('#pvGroupTable').innerHTML=`<table class="pv-table"><thead><tr><th>№</th><th>Команда</th><th>И</th><th>О</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${teamImg(r.team)}<span class="pv-team-name">${esc(r.team)}</span></td><td>${Number(r.gp||0)}</td><td>${Number(r.pts||0)}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function drawLeaders(){
+    const el=document.querySelector('#pvLeaders');if(!el)return;
+    if(!leaderData){el.innerHTML='<div style="padding:18px;color:#9cb4d2">Статистика игроков загружается…</div>';return}
+    const rows=leaderData.slice(0,3);
+    el.innerHTML=rows.length?rows.map((p,i)=>`<div class="pv-leader">
+      <span class="pv-leader-rank">${i+1}</span>${safeUrl(p.team_logo)?`<img class="pv-leader-logo" src="${esc(safeUrl(p.team_logo))}" alt="">`:teamImg(p.team,'pv-leader-logo')}
+      <div><div class="pv-leader-name">${esc(p.name)}</div><span class="pv-leader-team">${esc(p.team)} · ${Number(p.goals||0)}+${Number(p.assists||0)}</span></div>
+      <div class="pv-leader-pts">${Number(p.points||0)}<small>очков</small></div></div>`).join(''):'<div style="padding:18px;color:#9cb4d2">Пока нет статистики игроков.</div>';
+  }
+  async function fetchLeaders(){
+    if(statsBusy||Date.now()-statsFetchedAt<90000)return;
+    statsBusy=true;statsFetchedAt=Date.now();
+    try{
+      const r=await fetch('https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-stats?stage_id=all',{cache:'no-store'});
+      if(!r.ok)throw Error('stats '+r.status);
+      const json=await r.json();if(!json.ok||!Array.isArray(json.players))throw Error('stats unavailable');
+      leaderData=json.players;drawLeaders();
+    }catch(e){console.warn('Hybrid preview leaders',e);document.querySelector('#pvLeaders').innerHTML='<div style="padding:18px;color:#9cb4d2">Статистика временно недоступна. <a href="/stats">Открыть раздел ↗</a></div>'}
+    finally{statsBusy=false}
+  }
+  function draw(){
+    if(typeof D==='undefined'||!D?.matches||!D?.teams)return;
+    document.querySelector('#heroTitle').textContent=D.tournament.name;
+    const ms=[...D.matches].sort(sort),finished=ms.filter(done),future=ms.filter(m=>!done(m));
+    const scored=finished.reduce((s,m)=>s+Number(m.home_score||0)+Number(m.away_score||0),0);
+    document.querySelector('#pvStats').innerHTML=[
+      statCard('▦',finished.length,'матчей сыграно · этот тур'),
+      statCard('◉',scored,'заброшено шайб · этот тур'),
+      statCard('♧',D.teams.length,'команд в текущем туре'),
+      statCard('▤',D.groups.length,'группы турнира')
+    ].join('');
+    document.querySelector('#pvFeatured').innerHTML=featured(finished.length?finished[finished.length-1]:ms[0]);
+    const near=future.length?future.slice(0,4):finished.slice(-4).reverse();
+    document.querySelector('#pvSchedule').innerHTML=near.length?near.map(gameRow).join(''):'<div style="padding:20px;color:#a4b8d2">Матчей нет.</div>';
+    const title=document.querySelector('.pv-grid>.pv-panel:nth-child(2) h2');if(title)title.textContent=future.length?'Ближайшие матчи':'Последние матчи';
+    drawGroup();drawLeaders();fetchLeaders();
+  }
+  document.addEventListener('click',e=>{
+    const b=e.target.closest?.('[data-pv-group]');if(!b)return;
+    groupIndex=Number(b.dataset.pvGroup);drawGroup();
+  });
+  document.addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key===' ')&&e.target.matches?.('.pv-game,.pv-scoreboard')){e.preventDefault();e.target.click()}
+  });
+
+  // Match cards: three rounded, horizontal cards per row instead of a full-width match list.
+  function renderHybridMatches(){
+    if(typeof D==='undefined'||!D?.matches)return;
+    const gf=document.querySelector('#gf')?.value||'ALL';
+    const sf=document.querySelector('#sf')?.value||'ALL';
+    const currentDay=new Date().toISOString().slice(0,10);
+    const visible=[...D.matches]
+      .filter(m=>gf==='ALL'||String(m.group_id)===gf)
+      .filter(m=>sf==='ALL'||(sf==='TODAY'?m.game_date===currentDay:sf==='DONE'?done(m):!done(m)))
+      .sort(sort);
+    const list=document.querySelector('#matchList');
+    if(!list)return;
+    if(!visible.length){
+      list.innerHTML='<div class="card empty">Матчей по выбранному фильтру нет.</div>';
+      return;
+    }
+    const byDate=new Map();
+    for(const m of visible){
+      if(!byDate.has(m.game_date))byDate.set(m.game_date,[]);
+      byDate.get(m.game_date).push(m);
+    }
+    const card=m=>{
+      const home=team(m.home_team_id),away=team(m.away_team_id);
+      const finished=done(m);
+      const time=typeof matchTime==='function'?matchTime(m):m.start_time||'';
+      const venue=typeof matchPlace==='function'?matchPlace(m):'';
+      const result=finished?m.home_score+' : '+m.away_score:(time?String(time).trim().slice(0,5):'—:—');
+      const finishNote=finished?(m.finish_type==='OT'?'Овертайм':m.finish_type==='SO'?'Буллиты':''):'';
+      const resultType=finished?'Завершён':'Матч предстоит';
+      return `<article class="match-row pv-match-card match-center-clickable" data-match-id="${Number(m.id)}" tabindex="0" role="button" aria-label="Открыть матч-центр: ${esc(home)} — ${esc(away)}">
+        <div class="pv-match-top">
+          <span class="pv-match-group">${esc(group(m.group_id))}</span>
+          <span class="pv-match-number">МАТЧ №${esc(m.game_no??'—')}</span>
+          ${finished&&time?`<span class="pv-match-time">${esc(time)}</span>`:''}
+        </div>
+        <div class="pv-match-center">
+          <div class="pv-match-side">${teamImg(home,'pv-match-logo')}<strong>${esc(home)}</strong></div>
+          <div class="pv-match-score"><strong>${esc(result)}</strong>${finished?(finishNote?`<span class="pv-match-finish-note">${finishNote}</span>`:''):`<span class="pv-match-timezone">${time?'(МСК)':'Время уточняется'}</span>`}</div>
+          <div class="pv-match-side">${teamImg(away,'pv-match-logo')}<strong>${esc(away)}</strong></div>
+        </div>
+        <div class="pv-match-bottom">
+          <span class="pv-match-result ${finished?'is-finished':''}"><i></i>${esc(resultType)}</span>
+          <span class="pv-match-open">Матч-центр <b>↗</b></span>
+        </div>
+        ${venue?`<div class="pv-match-venue" title="${esc(venue)}">${esc(venue)}</div>`:''}
+      </article>`;
+    };
+    list.innerHTML=[...byDate.entries()].map(([date,games])=>`<section class="pv-match-date-group">
+      <h3 class="date-heading">${esc(typeof fmtLong==='function'?fmtLong(date):date)} <span class="pv-match-count">${games.length} ${games.length===1?'матч':'матчей'}</span></h3>
+      <div class="match-list">${games.map(card).join('')}</div>
+    </section>`).join('');
+  }
+  // The original async data load can finish before this preview script starts.
+  // Render the new cards immediately, not only on a subsequent data refresh.
+  renderMatches=renderHybridMatches;
+  document.querySelector('#gf').onchange=renderHybridMatches;
+  document.querySelector('#sf').onchange=renderHybridMatches;
+  const previousRender=render;
+  render=function(...args){
+    const result=previousRender.apply(this,args);
+    renderHybridMatches();
+    draw();
+    return result;
+  };
+  const ensureMatchCards=()=>{
+    if(typeof D==='undefined'||!D?.matches?.length)return;
+    const list=document.querySelector('#matchList');
+    if(list&&!list.querySelector('.pv-match-card'))renderHybridMatches();
+  };
+  // A few legacy enhancements may rebuild the original match list after load.
+  // Replace that markup if necessary without rerendering already-correct cards.
+  const list=document.querySelector('#matchList');
+  if(list){
+    let queued=false;
+    new MutationObserver(()=>{
+      if(queued)return;
+      queued=true;
+      requestAnimationFrame(()=>{queued=false;ensureMatchCards()});
+    }).observe(list,{childList:true});
+  }
+  if(typeof D!=='undefined'&&D?.matches){
+    renderHybridMatches();
+    draw();
+  }
+  // Covers async data arrival and pages restored from the mobile browser cache.
+  window.addEventListener('pageshow',ensureMatchCards);
+  setTimeout(ensureMatchCards,350);
+  setTimeout(ensureMatchCards,1500);
+})();
+</script>
 </body>
 </html>
