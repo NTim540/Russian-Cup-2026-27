@@ -109,6 +109,7 @@
   }
   function draw(){
     if(typeof D==='undefined'||!D?.matches||!D?.teams)return;
+    document.querySelector('#heroTitle').textContent=D.tournament.name;
     const ms=[...D.matches].sort(sort),finished=ms.filter(done),future=ms.filter(m=>!done(m));
     const scored=finished.reduce((s,m)=>s+Number(m.home_score||0)+Number(m.away_score||0),0);
     document.querySelector('#pvStats').innerHTML=[
