@@ -195,3 +195,6 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
   letter-spacing:.015em;
   white-space:nowrap;
 }
+
+/* Stronger score numerals only; keep their size and position unchanged. */
+#matches .pv-match-score strong{font-weight:1000!important;-webkit-text-stroke:.7px currentColor;paint-order:stroke fill}
