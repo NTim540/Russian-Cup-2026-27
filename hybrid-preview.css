@@ -1,5 +1,5 @@
 
-/* Кубок России U16 — HYBRID DESIGN PREVIEW. Only in the preview branch. */
+/* Кубок России U16 — hybrid dashboard design. */
 :root{--pv-bg:#060f20;--pv-panel:#0c1d37;--pv-panel2:#122745;--pv-line:rgba(147,190,255,.14);--pv-blue:#2378e8;--pv-red:#dc263e;--pv-muted:#9bb0cb}
 html{scroll-padding-top:90px}
 body{background:var(--pv-bg)!important;color:#f4f7ff}
@@ -13,9 +13,6 @@ body:after{opacity:.12!important}
 .nav a:hover{background:#122c50!important;color:#fff!important}
 .brand-copy strong{font-size:16px!important;letter-spacing:-.025em}
 .brand-mark{background:rgba(33,95,178,.14)!important;border-color:rgba(117,179,255,.22)!important;border-radius:12px!important}
-.pv-preview-bar{position:relative;z-index:20;background:linear-gradient(90deg,#1761ba,#153966 65%,#8b1c32);padding:9px 0;color:#fff;font-size:12px}
-.pv-preview-bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.pv-preview-bar strong{font-weight:850;letter-spacing:.02em}.pv-preview-bar a{color:#fff;text-decoration:underline;text-underline-offset:3px;font-weight:750}
 .hero{padding:28px 0 28px!important;min-height:0!important;display:block!important}
 .hero>div{width:100%!important}
 .hero:before,.hero:after{display:none!important}
@@ -33,7 +30,8 @@ body:after{opacity:.12!important}
 .pv-dashboard{padding:0 0 18px}
 .pv-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:4px 0 20px}
 .pv-stat{min-height:106px;padding:21px 23px;display:flex;align-items:center;gap:17px;border:1px solid var(--pv-line);border-radius:17px;background:linear-gradient(135deg,rgba(28,57,96,.94),rgba(11,28,51,.96));box-shadow:0 12px 34px rgba(0,0,0,.12)}
-.pv-stat-icon{display:grid;place-items:center;flex:0 0 55px;width:55px;height:55px;border-radius:14px;background:rgba(79,140,229,.17);font-size:27px}
+.pv-stat .pv-stat-icon{display:grid;place-items:center;flex:0 0 55px;width:55px;height:55px;margin:0;border-radius:14px;background:rgba(79,140,229,.17);color:#cce5ff;font-size:27px;line-height:1}
+.pv-stat .pv-stat-icon svg{width:27px;height:27px;display:block;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .pv-stat strong{display:block;font-size:34px;letter-spacing:-.06em;line-height:1;font-weight:950;font-variant-numeric:tabular-nums}
 .pv-stat span{display:block;color:#b6c9e3;font-size:12px;margin-top:8px}
 .pv-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(0,3.2fr);gap:16px;align-items:stretch}
@@ -118,12 +116,12 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
 @media(max-width:920px){.pv-stats{grid-template-columns:repeat(2,1fr)}.pv-grid{grid-template-columns:1fr 1fr}.pv-lower{grid-template-columns:1fr 1fr}.hero-controls{position:static;margin-top:16px!important}.hero{padding-bottom:22px!important}}
 @media(max-width:680px){
 .wrap{width:calc(100% - 24px)!important}
-.pv-preview-bar .wrap{font-size:10px;align-items:flex-start}
 .hero h1{font-size:38px!important}
 .hero .hero-subtitle{font-size:12px!important}
 .pv-stats{gap:9px;margin-bottom:12px}
 .pv-stat{min-height:90px;padding:13px;gap:9px;border-radius:13px}
-.pv-stat-icon{width:37px;height:37px;flex-basis:37px;font-size:19px;border-radius:9px}
+.pv-stat .pv-stat-icon{width:37px;height:37px;flex-basis:37px;border-radius:9px}
+.pv-stat .pv-stat-icon svg{width:21px;height:21px}
 .pv-stat strong{font-size:26px}.pv-stat span{font-size:10px;line-height:1.25}
 .pv-grid,.pv-lower{grid-template-columns:1fr;gap:12px}
 .pv-grid>.pv-panel:last-child{grid-column:auto}
@@ -201,3 +199,4 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
 
 /* Upcoming matches: Moscow start time replaces the score. */
 #matches .pv-match-score .pv-match-timezone{display:block;margin-top:8px;font-size:12px;line-height:1.2;letter-spacing:.035em;font-weight:800;color:#9cc4f1;text-transform:none}
+
