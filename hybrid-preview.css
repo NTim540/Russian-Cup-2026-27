@@ -140,3 +140,42 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
 .pv-link{padding:12px;min-height:77px}
 #overall h2,#groups h2,#matches h2{font-size:25px!important}
 }
+
+
+/* All matches: compact hockey cards, three per row on desktop. */
+#matches .match-days{gap:28px!important}
+#matches .pv-match-date-group{min-width:0}
+#matches .pv-match-date-group .date-heading{display:flex;align-items:center;gap:11px;margin:0 0 13px!important;font-size:13px!important;letter-spacing:.055em!important;color:#e1ebfb!important}
+#matches .pv-match-count{font-size:10px;font-weight:700;letter-spacing:0;color:#789cbe;padding:5px 9px;border-radius:100px;border:1px solid rgba(151,193,250,.13)}
+#matches .match-list{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important}
+#matches .pv-match-card{display:flex!important;flex-direction:column!important;gap:0!important;min-width:0;min-height:212px;padding:0!important;border-radius:20px!important;overflow:hidden;background:linear-gradient(155deg,#112946 0%,#0c1c32 82%)!important;border:1px solid rgba(136,181,245,.19)!important;box-shadow:0 12px 25px rgba(0,0,0,.10);cursor:pointer;transform:none!important;transition:background .2s,border-color .2s,box-shadow .2s,transform .2s!important}
+#matches .pv-match-card:hover{background:linear-gradient(145deg,#173658,#0e233f)!important;border-color:rgba(105,174,255,.53)!important;box-shadow:0 16px 30px rgba(0,0,0,.24);transform:translateY(-3px)!important}
+#matches .pv-match-card:focus-visible{outline:2px solid #86c4ff;outline-offset:3px}
+#matches .pv-match-top{display:flex;align-items:center;gap:8px;min-height:42px;padding:10px 14px;border-bottom:1px solid rgba(142,184,241,.10);font-size:10px}
+#matches .pv-match-group{padding:5px 8px;border-radius:7px;background:rgba(42,124,239,.18);color:#9bc8ff;font-weight:900;letter-spacing:.045em;white-space:nowrap}
+#matches .pv-match-number{font-size:10px;color:#7898b9;letter-spacing:.04em;font-weight:750;white-space:nowrap}
+#matches .pv-match-time{margin-left:auto;font-size:11px;font-weight:900;color:#e0ecff;text-align:right;white-space:nowrap}
+#matches .pv-match-center{display:grid;grid-template-columns:minmax(0,1fr) minmax(95px,.9fr) minmax(0,1fr);align-items:center;gap:4px;flex:1;padding:17px 12px 14px}
+#matches .pv-match-side{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center}
+#matches .pv-match-side .pv-match-logo{width:51px;height:51px;object-fit:contain;filter:drop-shadow(0 5px 9px rgba(0,0,0,.25))}
+#matches .pv-match-side strong{font-size:11px;line-height:1.25;min-height:28px;display:flex;align-items:center;justify-content:center;font-weight:820;overflow-wrap:anywhere;color:#eef5ff}
+#matches .pv-match-score{text-align:center;align-self:center}
+#matches .pv-match-score strong{display:block;font-size:clamp(24px,2.2vw,34px);font-weight:950;letter-spacing:-.06em;white-space:nowrap;line-height:1;font-variant-numeric:tabular-nums;color:#fff}
+#matches .pv-match-score span{display:block;margin-top:8px;font-size:9px;letter-spacing:.12em;font-weight:800;color:#7798be}
+#matches .pv-match-bottom{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:38px;padding:10px 14px;border-top:1px solid rgba(142,184,241,.10)}
+#matches .pv-match-result{display:flex;align-items:center;gap:6px;font-size:10px;color:#a9c1df;min-width:0}
+#matches .pv-match-result i{display:block;width:6px;height:6px;border-radius:50%;background:#5288c9;flex:0 0 6px}
+#matches .pv-match-result.is-finished i{background:#35c594;box-shadow:0 0 0 3px rgba(53,197,148,.12)}
+#matches .pv-match-open{font-size:10px;color:#7ec3ff;font-weight:800;white-space:nowrap}
+#matches .pv-match-open b{font-size:13px;margin-left:2px}
+#matches .pv-match-venue{padding:0 14px 10px;color:#6c8bab;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(min-width:1550px){#matches .pv-match-score strong{font-size:36px}}
+@media(max-width:1100px){#matches .match-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:680px){
+#matches .match-days{gap:25px!important}
+#matches .pv-match-date-group .date-heading{font-size:12px!important}
+#matches .match-list{display:flex!important;grid-template-columns:none!important;gap:10px!important;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;padding:2px 1px 13px;scrollbar-width:thin;scrollbar-color:#2b5886 transparent}
+#matches .pv-match-card{flex:0 0 min(86vw,345px);scroll-snap-align:start;min-height:213px}
+#matches .pv-match-score strong{font-size:32px}
+#matches .pv-match-side .pv-match-logo{width:52px;height:52px}
+}
