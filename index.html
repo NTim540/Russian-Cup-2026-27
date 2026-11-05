@@ -224,7 +224,7 @@ let dataRefreshTimer=null;function scheduleDataRefresh(){clearTimeout(dataRefres
 <script>
 (()=>{if(window.__baseMobileMenu)return;window.__baseMobileMenu=true;const b=document.getElementById('mobileMenuToggle'),n=document.querySelector('.header-inner .nav');if(!b||!n)return;const close=()=>{n.classList.remove('mobile-open');b.classList.remove('open');b.setAttribute('aria-expanded','false');document.body.classList.remove('mobile-menu-open')};b.addEventListener('click',()=>{const open=!n.classList.contains('mobile-open');n.classList.toggle('mobile-open',open);b.classList.toggle('open',open);b.setAttribute('aria-expanded',String(open));document.body.classList.toggle('mobile-menu-open',open)});n.addEventListener('click',e=>{if(e.target.closest('a'))close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});window.addEventListener('resize',()=>{if(innerWidth>1100)close()})})();
 </script>
-<script src="/crossover-schedule.js?v=20261104-2"></script>
+<script src="/crossover-schedule.js?v=20261105-1"></script>
 <script src="/analytics.js?v=20260820-1"></script>
 <script src="/maintenance.js?v=20260827-1"></script>
 <script src="/vote.js?v=20260822-1"></script>
