@@ -6,7 +6,16 @@
   const hasNumericScore=m=>Number.isInteger(m?.home_score)&&Number.isInteger(m?.away_score)&&m.home_score!==m.away_score;
   const technicalType=m=>TECH_TYPES.has(String(m?.technical_result_type||'').toUpperCase())?String(m.technical_result_type).toUpperCase():'NONE';
   const isTechnical=m=>technicalType(m)!=='NONE'&&m?.technical_winner_team_id!==null&&m?.technical_winner_team_id!==undefined;
-  const done=m=>isTechnical(m)||hasNumericScore(m);
+  // An in-progress FHR match may already have a non-draw score. Do not award points until FINAL.
+  const done=m=>{
+    if(isTechnical(m))return true;
+    if(!hasNumericScore(m))return false;
+    const state=String(m?.fhr_live_state||'').toUpperCase();
+    if(state==='FINAL'||m?.fhr_live_final_at)return true;
+    if(state==='WATCHING'||(m?.fhr_live_started_at&&!m?.fhr_live_final_at))return false;
+    if(m?.protocol_last_good_payload?.final===false)return false;
+    return true; // Legacy and manually entered results without FHR live tracking
+  };
   const finish=m=>isTechnical(m)?'REG':(m?.finish_type==='OT'||m?.finish_type==='SO'?m.finish_type:'REG');
   const winnerId=m=>isTechnical(m)?m.technical_winner_team_id:(hasNumericScore(m)?(m.home_score>m.away_score?m.home_team_id:m.away_team_id):null);
   const goalsCount=m=>!isTechnical(m)||Boolean(m?.technical_goals_count);
