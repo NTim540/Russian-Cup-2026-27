@@ -76,11 +76,11 @@
       </div></div>`;
   }
   function gameRow(m){
-    const h=team(m.home_team_id),a=team(m.away_team_id),f=done(m);
+    const h=team(m.home_team_id),a=team(m.away_team_id),f=done(m),onAir=live(m)&&!f;
     return `<div class="pv-game match-center-clickable" data-match-id="${Number(m.id)}" tabindex="0" role="button" aria-label="Открыть матч ${esc(h)} — ${esc(a)}">
       <div class="pv-game-time">${esc(dateLabel(m.game_date))}<span>${esc(m.start_time||'—')}</span></div>
       <div class="pv-game-names"><div class="pv-game-team">${teamImg(h)}<span>${esc(h)}</span></div><div class="pv-game-team">${teamImg(a)}<span>${esc(a)}</span></div></div>
-      <div class="pv-game-score">${f?`${m.home_score}<br>${m.away_score}`:'—<br>—'}<span>${esc(group(m.group_id))}</span></div>
+      <div class="pv-game-score">${(f||onAir)&&hasScore(m)?`${m.home_score}<br>${m.away_score}`:'—<br>—'}<span>${onAir?'LIVE':esc(group(m.group_id))}</span></div>
     </div>`;
   }
   function drawGroup(){
@@ -117,7 +117,7 @@
     if(typeof D==='undefined'||!D?.matches||!D?.teams)return;
     document.querySelector('#heroTitle').textContent=D.tournament.name;
     const ms=[...D.matches].sort(sort),finished=ms.filter(done),future=ms.filter(m=>!done(m));
-    const scored=finished.reduce((s,m)=>s+Number(m.home_score||0)+Number(m.away_score||0),0);
+    const scored=ms.reduce((s,m)=>s+Number(m.home_score||0)+Number(m.away_score||0),0);
     document.querySelector('#pvStats').innerHTML=[
       statCard('▦',finished.length,'матчей сыграно · этот тур'),
       statCard('◉',scored,'заброшено шайб · этот тур'),
@@ -127,7 +127,7 @@
     document.querySelector('#pvFeatured').innerHTML=featured(finished.length?finished[finished.length-1]:ms[0]);
     const near=future.length?future.slice(0,4):finished.slice(-4).reverse();
     document.querySelector('#pvSchedule').innerHTML=near.length?near.map(gameRow).join(''):'<div style="padding:20px;color:#a4b8d2">Матчей нет.</div>';
-    const title=document.querySelector('.pv-grid>.pv-panel:nth-child(2) h2');if(title)title.textContent=future.length?'Ближайшие матчи':'Последние матчи';
+    const title=document.querySelector('.pv-grid>.pv-panel:nth-child(2) h2');if(title)title.textContent=future.some(live)?'Сейчас на льду и ближайшие матчи':future.length?'Ближайшие матчи':'Последние матчи';
     drawGroup();drawLeaders();fetchLeaders();
   }
   document.addEventListener('click',e=>{
@@ -164,9 +164,9 @@
       const finished=done(m);
       const time=typeof matchTime==='function'?matchTime(m):m.start_time||'';
       const venue=typeof matchPlace==='function'?matchPlace(m):'';
-      const result=finished?m.home_score+' : '+m.away_score:(time?String(time).trim().slice(0,5):'—:—');
+      const result=(finished||live(m))&&hasScore(m)?m.home_score+' : '+m.away_score:(time?String(time).trim().slice(0,5):'—:—');
       const finishNote=finished?(m.finish_type==='OT'?'Овертайм':m.finish_type==='SO'?'Буллиты':''):'';
-      const resultType=finished?'Завершён':'Матч предстоит';
+      const resultType=finished?'Завершён':live(m)?'Идёт матч':'Матч предстоит';
       return `<article class="match-row pv-match-card match-center-clickable" data-match-id="${Number(m.id)}" tabindex="0" role="button" aria-label="Открыть матч-центр: ${esc(home)} — ${esc(away)}">
         <div class="pv-match-top">
           <span class="pv-match-group">${esc(m.is_crossover && m.game_date==='2026-11-05' ? 'СТЫКОВОЙ МАТЧ В2 - Г2' : group(m.group_id))}</span>
@@ -175,11 +175,11 @@
         </div>
         <div class="pv-match-center">
           <div class="pv-match-side">${teamImg(home,'pv-match-logo')}<strong>${esc(home)}</strong></div>
-          <div class="pv-match-score"><strong>${esc(result)}</strong>${finished?(finishNote?`<span class="pv-match-finish-note">${finishNote}</span>`:''):`<span class="pv-match-timezone">${time?'(МСК)':'Время уточняется'}</span>`}</div>
+          <div class="pv-match-score"><strong>${esc(result)}</strong>${finished?(finishNote?`<span class="pv-match-finish-note">${finishNote}</span>`:''):live(m)?`<span class="pv-match-timezone">ПРЯМОЙ ЭФИР</span>`:`<span class="pv-match-timezone">${time?'(МСК)':'Время уточняется'}</span>`}</div>
           <div class="pv-match-side">${teamImg(away,'pv-match-logo')}<strong>${esc(away)}</strong></div>
         </div>
         <div class="pv-match-bottom">
-          <span class="pv-match-result ${finished?'is-finished':''}"><i></i>${esc(resultType)}</span>
+          <span class="pv-match-result ${finished?'is-finished':live(m)?'is-live':''}"><i></i>${esc(resultType)}</span>
           <span class="pv-match-actions">${stream(m)?`<a class="pv-match-stream" href="${esc(stream(m))}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" aria-label="${esc(m.game_no===65?'Открыть эфиры тура':'Смотреть трансляцию матча')}">▶ ${m.game_no===65?'Эфиры тура':'Трансляция'}</a>`:''}<span class="pv-match-open">Матч-центр <b>↗</b></span></span>
         </div>
         ${venue?`<div class="pv-match-venue" title="${esc(venue)}">${esc(venue)}</div>`:''}
