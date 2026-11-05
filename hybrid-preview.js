@@ -180,7 +180,7 @@
         </div>
         <div class="pv-match-bottom">
           <span class="pv-match-result ${finished?'is-finished':''}"><i></i>${esc(resultType)}</span>
-          <span class="pv-match-open">Матч-центр <b>↗</b></span>
+          <span class="pv-match-actions">${stream(m)?`<a class="pv-match-stream" href="${esc(stream(m))}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" aria-label="${esc(m.game_no===65?'Открыть эфиры тура':'Смотреть трансляцию матча')}">▶ ${m.game_no===65?'Эфиры тура':'Трансляция'}</a>`:''}<span class="pv-match-open">Матч-центр <b>↗</b></span></span>
         </div>
         ${venue?`<div class="pv-match-venue" title="${esc(venue)}">${esc(venue)}</div>`:''}
       </article>`;
