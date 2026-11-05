@@ -169,7 +169,7 @@
       const resultType=finished?'Завершён':'Матч предстоит';
       return `<article class="match-row pv-match-card match-center-clickable" data-match-id="${Number(m.id)}" tabindex="0" role="button" aria-label="Открыть матч-центр: ${esc(home)} — ${esc(away)}">
         <div class="pv-match-top">
-          <span class="pv-match-group">${esc(group(m.group_id))}</span>
+          <span class="pv-match-group">${esc(m.is_crossover && m.game_date==='2026-11-05' ? 'СТЫКОВОЙ МАТЧ В2 - Г2' : group(m.group_id))}</span>
           <span class="pv-match-number">МАТЧ №${esc(m.game_no??'—')}</span>
           ${finished&&time?`<span class="pv-match-time">${esc(time)}</span>`:''}
         </div>
