@@ -164,6 +164,9 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
 #matches .pv-match-result{display:flex;align-items:center;gap:6px;font-size:10px;color:#a9c1df;min-width:0}
 #matches .pv-match-result i{display:block;width:6px;height:6px;border-radius:50%;background:#5288c9;flex:0 0 6px}
 #matches .pv-match-result.is-finished i{background:#35c594;box-shadow:0 0 0 3px rgba(53,197,148,.12)}
+#matches .pv-match-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+#matches .pv-match-stream{display:inline-flex;align-items:center;gap:4px;padding:5px 7px;border-radius:6px;background:rgba(224,41,61,.18);border:1px solid rgba(245,88,106,.3);color:#ffb6bf;font-size:10px;font-weight:900;white-space:nowrap;text-decoration:none}
+#matches .pv-match-stream:hover{background:rgba(224,41,61,.32)}
 #matches .pv-match-open{font-size:10px;color:#7ec3ff;font-weight:800;white-space:nowrap}
 #matches .pv-match-open b{font-size:13px;margin-left:2px}
 #matches .pv-match-venue{padding:0 14px 10px;color:#6c8bab;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
