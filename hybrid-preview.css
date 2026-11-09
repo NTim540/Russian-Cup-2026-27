@@ -31,7 +31,7 @@ body:after{opacity:.12!important}
 .pv-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:4px 0 20px}
 .pv-stat{min-height:106px;padding:21px 23px;display:flex;align-items:center;gap:17px;border:1px solid var(--pv-line);border-radius:17px;background:linear-gradient(135deg,rgba(28,57,96,.94),rgba(11,28,51,.96));box-shadow:0 12px 34px rgba(0,0,0,.12)}
 .pv-stat .pv-stat-icon{display:grid;place-items:center;flex:0 0 55px;width:55px;height:55px;margin:0;border-radius:14px;background:rgba(79,140,229,.17);color:#cce5ff;font-size:27px;line-height:1}
-.pv-stat .pv-stat-icon svg{width:27px;height:27px;display:block;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pv-stat .pv-stat-icon svg{width:33px;height:33px;display:block;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}.pv-stat .pv-stat-icon svg[viewBox="0 0 24 24"]{width:28px;height:28px;stroke-width:1.8}
 .pv-stat strong{display:block;font-size:34px;letter-spacing:-.06em;line-height:1;font-weight:950;font-variant-numeric:tabular-nums}
 .pv-stat span{display:block;color:#b6c9e3;font-size:12px;margin-top:8px}
 .pv-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(0,3.2fr);gap:16px;align-items:stretch}
