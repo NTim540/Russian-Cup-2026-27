@@ -55,12 +55,13 @@
   document.querySelector('.nav a[href="#upcoming"]')?.setAttribute('href','#pvDashboard');
   const STAT_ICONS={
     '▦':'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M7 13h3M14 13h3M7 17h3"/>',
-    '◉':'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>',
-    '♧':'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
-    '▤':'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M13 13h4M13 17h4"/>'
+    // SVGs supplied for the tournament: flying puck, three hockey players, group-stage list.
+    '◉':'<path d="M8 24h11M4 32h14M10 40h10"/><path d="M25 30v10c0 4 7 7 15 7s15-3 15-7V30"/><ellipse cx="40" cy="30" rx="15" ry="7"/><path d="M25 40c3 4 9 6 15 6s12-2 15-6"/>',
+    '♧':'<path d="M8 22a7 7 0 0 1 14 0v4H8z"/><path d="M9 26v2a6 6 0 0 0 10 4v-6M10 26h9"/><path d="M9 35c-3 1-5 5-5 9v8h14"/><path d="M7 43v8"/><path d="M42 22a7 7 0 0 1 14 0v4H42z"/><path d="M43 26v2a6 6 0 0 0 10 4v-6M44 26h10"/><path d="M55 35c3 1 5 5 5 9v8H46"/><path d="M57 43v8"/><path d="M22 20a10 10 0 0 1 20 0v6H22z"/><path d="M24 26v4a8 8 0 0 0 16 0v-4"/><path d="M24 26h16M27 31h10"/><path d="M29 15h6"/><path d="M25 38c-7 1-11 5-11 12v8h36v-8c0-7-4-11-11-12"/><path d="m27 38 5 5 5-5"/><path d="M20 48v10M44 48v10"/><path d="M25 51h14"/>',
+    '▤':'<rect x="10" y="10" width="44" height="44" rx="6"/><path d="M18 20h28"/><circle cx="19" cy="29" r="2.5"/><path d="M26 29h18"/><circle cx="19" cy="38" r="2.5"/><path d="M26 38h18"/><circle cx="19" cy="47" r="2.5"/><path d="M26 47h18"/>'
   };
   function statCard(symbol,num,label){
-    const svg=STAT_ICONS[symbol]?'<svg viewBox="0 0 24 24" aria-hidden="true">'+STAT_ICONS[symbol]+'</svg>':esc(symbol);
+    const svg=STAT_ICONS[symbol]?'<svg viewBox="0 0 '+(symbol==='▦'?'24 24':'64 64')+'" stroke-width="'+(symbol==='▦'?'1.8':'2.8')+'" aria-hidden="true">'+STAT_ICONS[symbol]+'</svg>':esc(symbol);
     return `<div class="pv-stat"><span class="pv-stat-icon" aria-hidden="true">${svg}</span><div><strong>${num}</strong><span>${label}</span></div></div>`;
   }
   function featured(m){
@@ -119,6 +120,19 @@
     }catch(e){console.warn('Hybrid preview leaders',e);document.querySelector('#pvLeaders').innerHTML='<div style="padding:18px;color:#9cb4d2">Статистика временно недоступна. <a href="/stats">Открыть раздел ↗</a></div>'}
     finally{statsBusy=false}
   }
+  let leadersObserver=null;
+  function scheduleLeaders(){
+    const el=document.querySelector('#pvLeaders');
+    if(!el||leaderData||statsBusy||leadersObserver)return;
+    if(!('IntersectionObserver' in window)){fetchLeaders();return}
+    leadersObserver=new IntersectionObserver(entries=>{
+      if(entries.some(e=>e.isIntersecting)){
+        leadersObserver.disconnect();leadersObserver=null;
+        fetchLeaders();
+      }
+    },{rootMargin:'250px'});
+    leadersObserver.observe(el);
+  }
   function draw(){
     if(typeof D==='undefined'||!D?.matches||!D?.teams)return;
     document.querySelector('#heroTitle').textContent=D.tournament.name;
@@ -134,7 +148,7 @@
     const near=future.length?future.slice(0,4):finished.slice(-4).reverse();
     document.querySelector('#pvSchedule').innerHTML=near.length?near.map(gameRow).join(''):'<div style="padding:20px;color:#a4b8d2">Матчей нет.</div>';
     const title=document.querySelector('.pv-grid>.pv-panel:nth-child(2) h2');if(title)title.textContent=future.some(live)?'Сейчас на льду и ближайшие матчи':future.length?'Ближайшие матчи':'Последние матчи';
-    drawGroup();drawLeaders();fetchLeaders();
+    drawGroup();drawLeaders();scheduleLeaders();
   }
   document.addEventListener('click',e=>{
     const b=e.target.closest?.('[data-pv-group]');if(!b)return;
