@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#07111f">
+  <link rel="preconnect" href="https://wcucbtdfkghjirpbqzzk.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://drive.google.com">
   <title>КУБОК РОССИИ U16</title>
   <style>
     :root{
@@ -214,9 +216,56 @@ function renderUpcoming(){const ms=[...D.matches].filter(m=>!done(m)).sort((a,b)
 function renderMatches(){const gf=$('#gf').value,sf=$('#sf').value,today=new Date().toISOString().slice(0,10);let ms=[...D.matches].filter(m=>gf==='ALL'||String(m.group_id)===gf).filter(m=>sf==='ALL'||(sf==='TODAY'?m.game_date===today:sf==='DONE'?done(m):!done(m))).sort((a,b)=>a.game_date.localeCompare(b.game_date)||(a.game_no||0)-(b.game_no||0));if(!ms.length){$('#matchList').innerHTML='<div class="card empty">Матчей по выбранному фильтру нет.</div>';return}const byDate=new Map;for(const m of ms){if(!byDate.has(m.game_date))byDate.set(m.game_date,[]);byDate.get(m.game_date).push(m)}$('#matchList').innerHTML=[...byDate.entries()].map(([date,list])=>'<section><h3 class="date-heading">'+fmtLong(date)+'</h3><div class="match-list">'+list.map(m=>{const g=groupById(m.group_id),finished=done(m),time=matchTime(m),place=matchPlace(m);return'<div class="match-row"><div class="match-meta"><strong>'+esc(g?.code||'')+'</strong><br>Матч №'+(m.game_no??'—')+(time?'<br>'+esc(time):'')+'</div><div class="match-team">'+esc(teamName(m.home_team_id))+'</div><div class="score-box"><strong>'+(finished?m.home_score+':'+m.away_score:'—')+'</strong><span>'+(finished?finishLabel(m.finish_type):'предстоит')+'</span></div><div class="match-team away">'+esc(teamName(m.away_team_id))+'</div><div class="venue">'+(place?esc(place):'Место уточняется')+(m.fhr_match_url?'<div><a href="'+esc(m.fhr_match_url)+'" target="_blank" rel="noopener noreferrer" style="color:#78a9ff;text-decoration:underline">Протокол ФХР ↗</a></div>':'')+'</div></div>'}).join('')+'</div></section>').join('')}
 function renderWinner(rows){const section=$('#winnerSection'),card=$('#winnerCard');section.style.display='none';const fifth=Number(D.stage.sort_order)===5;const golden=D.groups.find(g=>/золот/i.test(g.name||''));if(!fifth||!golden)return;const matches=D.matches.filter(m=>String(m.group_id)===String(golden.id));if(!matches.length||!matches.every(done))return;const w=groupRows(golden,D.settings)[0];if(!w||w.unresolved)return;section.style.display='block';card.classList.add('show');$('#winnerLabel').textContent='Победитель Кубка России U16';$('#winnerName').textContent=w.team;$('#winnerStats').textContent=w.gp+' матчей · '+w.w+' побед · '+w.pts+' очков · шайбы '+w.gf+':'+w.ga}
 function render(){const s=D.settings;document.title=D.tournament.name;$('#name').textContent=D.tournament.name;$('#season').textContent=D.tournament.season||'Турнир';$('#heroTitle').innerHTML=esc(D.tournament.name).replace(' U16','<br>U16');$('#stageLabel').textContent=D.stage.name+(D.stage.start_date&&D.stage.end_date?' · '+fmtShort(D.stage.start_date)+' — '+fmtShort(D.stage.end_date):'');const o=overall(s);const finished=D.matches.filter(done).length;$('#heroStats').innerHTML='<div class="stat"><strong>'+D.teams.length+'</strong><span>команд</span></div><div class="stat"><strong>'+D.groups.length+'</strong><span>группы</span></div><div class="stat"><strong>'+D.matches.length+'</strong><span>матчей</span></div><div class="stat"><strong>'+finished+'</strong><span>сыграно</span></div>';$('#tourName').textContent=D.stage.name;$('#tourDates').textContent=D.stage.start_date&&D.stage.end_date?fmtLong(D.stage.start_date)+' — '+fmtLong(D.stage.end_date):'Даты этапа уточняются';$('#tourFacts').innerHTML='<div class="fact"><strong>'+D.teams.length+'</strong><span>команд</span></div><div class="fact"><strong>'+D.groups.length+'</strong><span>группы</span></div><div class="fact"><strong>'+D.matches.length+'</strong><span>матчей</span></div><div class="fact"><strong>'+finished+'</strong><span>завершено</span></div>';$('#overallTable').innerHTML=table(o,true);const groups=[...D.groups].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));$('#groupTables').innerHTML=groups.map(g=>{const rows=groupRows(g,s),doneCount=D.matches.filter(m=>m.group_id===g.id&&done(m)).length,total=D.matches.filter(m=>m.group_id===g.id).length;return'<article class="card group-card hover-card" data-code="'+esc(g.code)+'"><div class="group-card-head"><strong>'+esc(g.name||'Группа '+g.code)+'</strong><span>'+doneCount+' / '+total+' матчей</span></div><div class="table-wrap"><table>'+table(rows,true)+'</table></div></article>'}).join('');$('#gf').innerHTML='<option value="ALL">Все группы</option>'+groups.map(g=>'<option value="'+g.id+'">'+esc(g.name||g.code)+'</option>').join('');$('#pointsRule').textContent='Победа — '+s.win_points+' очк., поражение в ОТ/по буллитам — '+s.ot_loss_points+' очк., поражение в основное время — '+s.regulation_loss_points+' очк.';renderUpcoming();renderMatches();renderWinner(o);$('#status').textContent='Данные обновляются автоматически.';activateReveal()}
-async function loadCatalog(){C=await j('/api/catalog');$('#tournament').innerHTML=C.tournaments.map(t=>'<option value="'+t.slug+'">'+esc(t.name)+' '+esc(t.season||'')+'</option>').join('');const q=new URLSearchParams(location.search);let slug=q.get('t')||C.tournaments[0]?.slug;if(!C.tournaments.some(t=>t.slug===slug))slug=C.tournaments[0]?.slug;$('#tournament').value=slug;loadStages(slug)}
-function loadStages(slug){const t=C.tournaments.find(x=>x.slug===slug),ss=C.stages.filter(s=>s.tournament_id===t.id).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));$('#stage').innerHTML=ss.map(s=>'<option value="'+s.id+'">'+esc(s.name)+'</option>').join('');const q=new URLSearchParams(location.search);let sid=Number(q.get('stage'))||ss[ss.length-1]?.id;if(!ss.some(s=>s.id===sid))sid=ss[ss.length-1]?.id;$('#stage').value=String(sid);loadData(slug,sid)}
-async function loadData(slug,sid){D=await j('/api/data?tournament_slug='+encodeURIComponent(slug)+'&stage_id='+encodeURIComponent(sid));const u=new URL(location.href);u.searchParams.set('t',slug);u.searchParams.set('stage',sid);history.replaceState(null,'',u);render();scheduleDataRefresh()}
+// Render recently viewed data immediately on repeat visits, then always refresh from the live API.
+const HOME_CACHE_VERSION='v3';
+function readHomeCache(key,maxAge){
+  try{const x=JSON.parse(sessionStorage.getItem('cup:home:'+HOME_CACHE_VERSION+':'+key)||'null');return x&&Date.now()-x.at<maxAge?x.value:null}catch{return null}
+}
+function writeHomeCache(key,value){
+  try{sessionStorage.setItem('cup:home:'+HOME_CACHE_VERSION+':'+key,JSON.stringify({at:Date.now(),value}))}catch{}
+}
+const initialParams=new URLSearchParams(location.search);
+const initialSlug=initialParams.get('t')||'kubok-rossii-2026-27';
+const initialStage=Number(initialParams.get('stage'))||2;
+const initialDataKey=initialSlug+':'+initialStage;
+// Start the match-data request alongside the catalog instead of waiting for the catalog.
+const initialDataPromise=j('/api/data?tournament_slug='+encodeURIComponent(initialSlug)+'&stage_id='+encodeURIComponent(initialStage)).catch(()=>null);
+let homeLoadSerial=0;
+async function loadCatalog(){
+  C=readHomeCache('catalog',5*60*1000);
+  if(!C){C=await j('/api/catalog');writeHomeCache('catalog',C)}
+  $('#tournament').innerHTML=C.tournaments.map(t=>'<option value="'+t.slug+'">'+esc(t.name)+' '+esc(t.season||'')+'</option>').join('');
+  const q=new URLSearchParams(location.search);let slug=q.get('t')||C.tournaments[0]?.slug;
+  if(!C.tournaments.some(t=>t.slug===slug))slug=C.tournaments[0]?.slug;
+  $('#tournament').value=slug;loadStages(slug);
+}
+function loadStages(slug){
+  const t=C.tournaments.find(x=>x.slug===slug),ss=C.stages.filter(s=>s.tournament_id===t.id).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+  $('#stage').innerHTML=ss.map(s=>'<option value="'+s.id+'">'+esc(s.name)+'</option>').join('');
+  const q=new URLSearchParams(location.search);let sid=Number(q.get('stage'))||ss[ss.length-1]?.id;
+  if(!ss.some(s=>s.id===sid))sid=ss[ss.length-1]?.id;
+  $('#stage').value=String(sid);loadData(slug,sid).catch(e=>$('#status').textContent='Ошибка загрузки: '+e.message);
+}
+async function loadData(slug,sid){
+  const serial=++homeLoadSerial,key=slug+':'+sid;
+  const cached=readHomeCache('data:'+key,3*60*1000);
+  const show=data=>{
+    if(serial!==homeLoadSerial)return;
+    D=data;
+    const u=new URL(location.href);u.searchParams.set('t',slug);u.searchParams.set('stage',sid);
+    history.replaceState(null,'',u);render();scheduleDataRefresh();
+  };
+  if(cached){show(cached);$('#status').textContent='Проверяем свежие результаты…'}
+  try{
+    const fresh=(key===initialDataKey?await initialDataPromise:null)||await j('/api/data?tournament_slug='+encodeURIComponent(slug)+'&stage_id='+encodeURIComponent(sid));
+    if(serial!==homeLoadSerial)return;
+    writeHomeCache('data:'+key,fresh);show(fresh);
+  }catch(e){
+    if(!cached)throw e;
+    $('#status').textContent='Показаны сохранённые результаты. Не удалось проверить обновления.';
+    scheduleDataRefresh();
+  }
+}
 function activateReveal(){const els=document.querySelectorAll('.reveal:not(.observed)');const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}}),{threshold:.08});els.forEach(el=>{el.classList.add('observed');io.observe(el)})}
 let dataRefreshTimer=null;function scheduleDataRefresh(){clearTimeout(dataRefreshTimer);if(!D)return;const live=D.matches.some(m=>['WATCHING','ERROR'].includes(String(m.fhr_live_state||'').toUpperCase()));const delay=live?60000:300000;dataRefreshTimer=setTimeout(()=>{if(document.visibilityState==='visible')loadData(D.tournament.slug,D.stage.id).catch(()=>scheduleDataRefresh());else scheduleDataRefresh()},delay)}$('#tournament').onchange=e=>loadStages(e.target.value);$('#stage').onchange=e=>loadData($('#tournament').value,e.target.value);$('#gf').onchange=renderMatches;$('#sf').onchange=renderMatches;loadCatalog().catch(e=>$('#status').textContent='Ошибка загрузки: '+e.message);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&D)loadData(D.tournament.slug,D.stage.id).catch(()=>scheduleDataRefresh())});activateReveal();
 </script>
@@ -273,7 +322,7 @@ body:after{opacity:.12!important}
 .pv-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:4px 0 20px}
 .pv-stat{min-height:106px;padding:21px 23px;display:flex;align-items:center;gap:17px;border:1px solid var(--pv-line);border-radius:17px;background:linear-gradient(135deg,rgba(28,57,96,.94),rgba(11,28,51,.96));box-shadow:0 12px 34px rgba(0,0,0,.12)}
 .pv-stat .pv-stat-icon{display:grid;place-items:center;flex:0 0 55px;width:55px;height:55px;margin:0;border-radius:14px;background:rgba(79,140,229,.17);color:#cce5ff;font-size:27px;line-height:1}
-.pv-stat .pv-stat-icon svg{width:27px;height:27px;display:block;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pv-stat .pv-stat-icon svg{width:33px;height:33px;display:block;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}.pv-stat .pv-stat-icon svg[viewBox="0 0 24 24"]{width:28px;height:28px;stroke-width:1.8}
 .pv-stat strong{display:block;font-size:34px;letter-spacing:-.06em;line-height:1;font-weight:950;font-variant-numeric:tabular-nums}
 .pv-stat span{display:block;color:#b6c9e3;font-size:12px;margin-top:8px}
 .pv-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(0,3.2fr);gap:16px;align-items:stretch}
@@ -446,7 +495,6 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
 
 /* Upcoming matches: Moscow start time replaces the score. */
 #matches .pv-match-score .pv-match-timezone{display:block;margin-top:8px;font-size:12px;line-height:1.2;letter-spacing:.035em;font-weight:800;color:#9cc4f1;text-transform:none}
-
 </style>
 <script id="hybrid-preview-inline-js">
 (function hybridPreview(){
@@ -506,12 +554,13 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
   document.querySelector('.nav a[href="#upcoming"]')?.setAttribute('href','#pvDashboard');
   const STAT_ICONS={
     '▦':'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M7 13h3M14 13h3M7 17h3"/>',
-    '◉':'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>',
-    '♧':'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
-    '▤':'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M13 13h4M13 17h4"/>'
+    // SVGs supplied for the tournament: flying puck, three hockey players, group-stage list.
+    '◉':'<path d="M8 24h11M4 32h14M10 40h10"/><path d="M25 30v10c0 4 7 7 15 7s15-3 15-7V30"/><ellipse cx="40" cy="30" rx="15" ry="7"/><path d="M25 40c3 4 9 6 15 6s12-2 15-6"/>',
+    '♧':'<path d="M8 22a7 7 0 0 1 14 0v4H8z"/><path d="M9 26v2a6 6 0 0 0 10 4v-6M10 26h9"/><path d="M9 35c-3 1-5 5-5 9v8h14"/><path d="M7 43v8"/><path d="M42 22a7 7 0 0 1 14 0v4H42z"/><path d="M43 26v2a6 6 0 0 0 10 4v-6M44 26h10"/><path d="M55 35c3 1 5 5 5 9v8H46"/><path d="M57 43v8"/><path d="M22 20a10 10 0 0 1 20 0v6H22z"/><path d="M24 26v4a8 8 0 0 0 16 0v-4"/><path d="M24 26h16M27 31h10"/><path d="M29 15h6"/><path d="M25 38c-7 1-11 5-11 12v8h36v-8c0-7-4-11-11-12"/><path d="m27 38 5 5 5-5"/><path d="M20 48v10M44 48v10"/><path d="M25 51h14"/>',
+    '▤':'<rect x="10" y="10" width="44" height="44" rx="6"/><path d="M18 20h28"/><circle cx="19" cy="29" r="2.5"/><path d="M26 29h18"/><circle cx="19" cy="38" r="2.5"/><path d="M26 38h18"/><circle cx="19" cy="47" r="2.5"/><path d="M26 47h18"/>'
   };
   function statCard(symbol,num,label){
-    const svg=STAT_ICONS[symbol]?'<svg viewBox="0 0 24 24" aria-hidden="true">'+STAT_ICONS[symbol]+'</svg>':esc(symbol);
+    const svg=STAT_ICONS[symbol]?'<svg viewBox="0 0 '+(symbol==='▦'?'24 24':'64 64')+'" stroke-width="'+(symbol==='▦'?'1.8':'2.8')+'" aria-hidden="true">'+STAT_ICONS[symbol]+'</svg>':esc(symbol);
     return `<div class="pv-stat"><span class="pv-stat-icon" aria-hidden="true">${svg}</span><div><strong>${num}</strong><span>${label}</span></div></div>`;
   }
   function featured(m){
@@ -570,6 +619,19 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
     }catch(e){console.warn('Hybrid preview leaders',e);document.querySelector('#pvLeaders').innerHTML='<div style="padding:18px;color:#9cb4d2">Статистика временно недоступна. <a href="/stats">Открыть раздел ↗</a></div>'}
     finally{statsBusy=false}
   }
+  let leadersObserver=null;
+  function scheduleLeaders(){
+    const el=document.querySelector('#pvLeaders');
+    if(!el||leaderData||statsBusy||leadersObserver)return;
+    if(!('IntersectionObserver' in window)){fetchLeaders();return}
+    leadersObserver=new IntersectionObserver(entries=>{
+      if(entries.some(e=>e.isIntersecting)){
+        leadersObserver.disconnect();leadersObserver=null;
+        fetchLeaders();
+      }
+    },{rootMargin:'250px'});
+    leadersObserver.observe(el);
+  }
   function draw(){
     if(typeof D==='undefined'||!D?.matches||!D?.teams)return;
     document.querySelector('#heroTitle').textContent=D.tournament.name;
@@ -585,7 +647,7 @@ html .mc-tab.active{border-bottom-color:#3189ed!important}
     const near=future.length?future.slice(0,4):finished.slice(-4).reverse();
     document.querySelector('#pvSchedule').innerHTML=near.length?near.map(gameRow).join(''):'<div style="padding:20px;color:#a4b8d2">Матчей нет.</div>';
     const title=document.querySelector('.pv-grid>.pv-panel:nth-child(2) h2');if(title)title.textContent=future.some(live)?'Сейчас на льду и ближайшие матчи':future.length?'Ближайшие матчи':'Последние матчи';
-    drawGroup();drawLeaders();fetchLeaders();
+    drawGroup();drawLeaders();scheduleLeaders();
   }
   document.addEventListener('click',e=>{
     const b=e.target.closest?.('[data-pv-group]');if(!b)return;
