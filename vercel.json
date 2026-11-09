@@ -1,7 +1,26 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/enhanced" },
-    { "source": "/base-source", "destination": "/index" }
+    {
+      "source": "/",
+      "destination": "/enhanced"
+    },
+    {
+      "source": "/base-source",
+      "destination": "/index"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "russian-cup-2627.vercel.app"
+        }
+      ],
+      "destination": "https://tournamentu16.ru/:path*",
+      "permanent": true
+    }
   ]
 }
