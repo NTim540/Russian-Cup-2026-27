@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/enhanced"
+      "destination": "/index"
     },
     {
       "source": "/base-source",
