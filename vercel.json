@@ -12,6 +12,17 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "russian-cup-2627.vercel.app"
+        }
+      ],
+      "destination": "https://tournamentu16.ru/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
