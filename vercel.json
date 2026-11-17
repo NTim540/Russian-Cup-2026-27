@@ -2,12 +2,8 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/index"
-    },
-    {
-      "source": "/base-source",
-      "destination": "/index"
+      "source": "/:path*",
+      "destination": "/maintenance-november.html"
     }
   ],
   "redirects": [
@@ -32,6 +28,17 @@
       ],
       "destination": "https://tournamentu16.ru/:path*",
       "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     }
   ]
 }
