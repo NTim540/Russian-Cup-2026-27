@@ -20,10 +20,11 @@
   window.rcAnalyticsVisitor=visitor;
   window.rcAnalyticsSession=session;
   function currentMatch(){const overlay=document.querySelector('#matchCenterOverlay.open,.mc-overlay.open');if(!overlay)return null;const marker=overlay.querySelector('#mcH2H[data-match-id]');const match_id=Number(marker?.dataset.matchId);if(!Number.isInteger(match_id)||match_id<1)return null;const match_label=(overlay.querySelector('#mcTitle')?.textContent||'').trim();return{match_id,match_label}}
-  function heartbeat(){if(document.visibilityState==='hidden')return;send('heartbeat',currentMatch()||{})}
+  let lastHeartbeat=0;
+  function heartbeat(){if(document.visibilityState==='hidden'||Date.now()-lastHeartbeat<60000)return;lastHeartbeat=Date.now();send('heartbeat',currentMatch()||{})}
   send('pageview',entry);
-  heartbeat();
-  setInterval(heartbeat,30000);
+  lastHeartbeat=Date.now();
+  setInterval(heartbeat,60000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')heartbeat()});
 
   let openKey='';
