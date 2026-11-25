@@ -1,10 +1,10 @@
 (()=>{
-  const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup';
+  const API='/public-api/russian-cup';
   const teamId=Number(new URL(location.href).searchParams.get('team'));
   if(!Number.isInteger(teamId)||teamId<1)return;
 
   const done=m=>Number.isInteger(m?.home_score)&&Number.isInteger(m?.away_score)&&m.home_score!==m.away_score;
-  async function get(path){const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
+  async function get(path){const r=await fetch(API+path,{cache:'default'});if(!r.ok)throw Error(await r.text());return r.json()}
 
 
 

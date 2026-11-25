@@ -1,6 +1,6 @@
 (()=>{
-  const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup';
-  const EDGE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-fhr-roster';
+  const API='/public-api/russian-cup';
+  const EDGE='/public-api/russian-cup-fhr-roster';
   const PHOTO_PREFIX='__PP_';
   const teamId=Number(new URL(location.href).searchParams.get('team'));
   if(!Number.isInteger(teamId)||teamId<1)return;
@@ -85,7 +85,7 @@
 
   async function loadAutoPhotos(){
     try{
-      const r=await fetch(`${EDGE}?team=${teamId}`,{mode:'cors',cache:'no-store'});if(!r.ok)return;
+      const r=await fetch(`${EDGE}?team=${teamId}`,{mode:'cors',cache:'default'});if(!r.ok)return;
       const b=await r.json(),out={};
       (Array.isArray(b.players)?b.players:[]).forEach(p=>{const k=key(p?.name),u=validUrl(p?.photo);if(k&&u)out[k]=u});
       AUTO_MAP=out;apply();
@@ -94,9 +94,9 @@
 
   async function init(){
     try{
-      const cat=await fetch(API+'/api/catalog',{cache:'no-store'}).then(r=>r.json()),t=cat.tournaments?.[0];if(!t)return;
+      const cat=await fetch(API+'/api/catalog',{cache:'default'}).then(r=>r.json()),t=cat.tournaments?.[0];if(!t)return;
       const stages=(cat.stages||[]).filter(s=>Number(s.tournament_id)===Number(t.id)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)),stage=stages[0];if(!stage)return;
-      const data=await fetch(API+'/api/data?tournament_slug='+encodeURIComponent(t.slug)+'&stage_id='+stage.id,{cache:'no-store'}).then(r=>r.json()),team=data.teams?.find(x=>Number(x.id)===teamId);if(!team)return;
+      const data=await fetch(API+'/api/data?tournament_slug='+encodeURIComponent(t.slug)+'&stage_id='+stage.id,{cache:'default'}).then(r=>r.json()),team=data.teams?.find(x=>Number(x.id)===teamId);if(!team)return;
       const arenas=Array.isArray(team.arenas)?team.arenas:[],real=arenas.filter(a=>!isHiddenStorage(a));
       MANUAL_MAP=decodeMap(arenas);
       const arenaEl=document.querySelector('#teamArena');if(arenaEl){const text=real.map(a=>[a.name,a.address].filter(Boolean).join(' — ')).filter(Boolean).join(' · ');if(text)arenaEl.textContent=text;else if(team.city)arenaEl.textContent=team.city+' · адрес арены будет добавлен'}

@@ -2,7 +2,7 @@
   const R=window.CupStandings;
   if(!R)return;
   const path=location.pathname.replace(/\/+$/,'')||'/';
-  const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup';
+  const API='/public-api/russian-cup';
   const h=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   function injectStyle(){
@@ -45,9 +45,9 @@
   async function loadTeamData(){
     try{
       const id=Number(new URL(location.href).searchParams.get('team'));if(!id)return;
-      const c=await fetch(API+'/api/catalog',{cache:'no-store'}).then(r=>r.json()),t=c.tournaments?.[0];if(!t)return;
+      const c=await fetch(API+'/api/catalog',{cache:'default'}).then(r=>r.json()),t=c.tournaments?.[0];if(!t)return;
       const stages=(c.stages||[]).filter(s=>Number(s.tournament_id)===Number(t.id)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)),stage=stages[0];if(!stage)return;
-      const data=await fetch(API+'/api/data?tournament_slug='+encodeURIComponent(t.slug)+'&stage_id='+stage.id,{cache:'no-store'}).then(r=>r.json());
+      const data=await fetch(API+'/api/data?tournament_slug='+encodeURIComponent(t.slug)+'&stage_id='+stage.id,{cache:'default'}).then(r=>r.json());
       patchTeamPage(id,data);
       let last=0;new MutationObserver(()=>{const now=Date.now();if(now-last<120)return;last=now;patchTeamPage(id,data)}).observe(document.body,{childList:true,subtree:true});
       setInterval(()=>patchTeamPage(id,data),2500);

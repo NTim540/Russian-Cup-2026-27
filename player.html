@@ -16,14 +16,14 @@
 <footer class="footer"><div class="wrap">Статистика формируется на основе протоколов и отмеченных составов на матч.</div></footer>
 <script>
 (()=>{
-const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup';
-const FHR='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-fhr-roster';
+const API='/public-api/russian-cup';
+const FHR='/public-api/russian-cup-fhr-roster';
 const q=new URLSearchParams(location.search),TEAM_ID=Number(q.get('team')),NAME=(q.get('name')||'').trim(),NUMBER=q.get('number')||'',POS=q.get('pos')||'';
 const $=s=>document.querySelector(s),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean=x=>String(x||'').toLocaleLowerCase('ru-RU').replace(/ё/g,'е').replace(/[^a-zа-я0-9]+/gi,' ').replace(/\s+/g,' ').trim();
 const displayPos=p=>({G:'Вратарь',D:'Защитник',F:'Нападающий',U:'Игрок'}[p]||p||'Игрок');
 const initials=n=>String(n||'').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'—';
-async function get(path){const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error('Ошибка загрузки данных');return r.json()}
+async function get(path){const r=await fetch(API+path,{cache:'default'});if(!r.ok)throw Error('Ошибка загрузки данных');return r.json()}
 function isPhotoStorage(a){return String(a?.name||'').startsWith('__PP_')}
 function isLineupStorage(a){return String(a?.name||'').startsWith('__LU_')}
 function unpackPhoto(s){s=String(s||'');if(s.startsWith('~0:'))return'https://img.fhr.ru/players/'+s.slice(3);if(s.startsWith('~1:'))return'https://junior.fhr.ru/players/'+s.slice(3);return s}
@@ -41,7 +41,7 @@ function fmtDate(d){return new Date(d+'T12:00:00').toLocaleDateString('ru-RU',{d
 function scoreText(m){return done(m)?`${m.home_score}:${m.away_score}`:'—'}
 function opponent(m,teamId,data){const oid=Number(m.home_team_id)===Number(teamId)?m.away_team_id:m.home_team_id;return data.teams.find(t=>Number(t.id)===Number(oid))?.name||'—'}
 function manualPhoto(team){const map=photoMap(team?.arenas);const exact=Object.entries(map).find(([n])=>clean(n)===clean(NAME));return exact?.[1]||''}
-async function autoPhoto(){try{const r=await fetch(FHR+'?team='+TEAM_ID,{cache:'no-store'});if(!r.ok)return'';const b=await r.json(),p=(b.players||[]).find(x=>samePlayer(x.name));return p?.photo||''}catch{return''}}
+async function autoPhoto(){try{const r=await fetch(FHR+'?team='+TEAM_ID,{cache:'default'});if(!r.ok)return'';const b=await r.json(),p=(b.players||[]).find(x=>samePlayer(x.name));return p?.photo||''}catch{return''}}
 function renderPhoto(url){const box=$('#playerPhoto');if(!box)return;if(!url){box.innerHTML='<div class="initials">'+esc(initials(NAME))+'</div>';return}const proxy=url.includes('fhr.ru')?FHR+'?photo='+encodeURIComponent(url):url;box.innerHTML='<img src="'+esc(proxy)+'" alt="'+esc(NAME)+'" referrerpolicy="no-referrer">';box.querySelector('img').onerror=()=>box.innerHTML='<div class="initials">'+esc(initials(NAME))+'</div>'}
 async function init(){try{
  if(!TEAM_ID||!NAME)throw Error('Игрок не выбран');

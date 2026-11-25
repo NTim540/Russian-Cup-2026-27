@@ -20,7 +20,7 @@
 <script src="/news-richtext.js?v=20260909-1" data-news-richtext="1"></script>
 <script src="/cup-fallback.js?v=20260929-3"></script>
 <script>
-const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-news';
+const API='/public-api/russian-cup-news';
 async function newsReq(q){try{const r=await fetch(API+q,{cache:'default'}),b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Ошибка');return b}catch(e){if(!window.CupFallback)throw e;const u=new URL(q,location.origin),id=Number(u.searchParams.get('id')),limit=Number(u.searchParams.get('limit'))||50;if(Number.isInteger(id)&&id>0){const b=await CupFallback.news(null,500);return{ok:true,item:(b.items||[]).find(x=>Number(x.id)===id)}}return CupFallback.news(null,limit)}}
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=x=>{try{return new Date(x).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}catch{return ''}};

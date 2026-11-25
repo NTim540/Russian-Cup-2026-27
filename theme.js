@@ -2,14 +2,14 @@
   if(!/\/match(?:\.html)?\/?$/i.test(location.pathname)||window.__cupMatchFetchBootstrap)return;
   window.__cupMatchFetchBootstrap=true;
   const nativeFetch=window.fetch.bind(window);
-  const FAST='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-match-center-v3';
+  const FAST='/public-api/russian-cup-match-center-v3';
   window.fetch=(input,init)=>{
     try{
       const raw=typeof input==='string'?input:input instanceof URL?input.toString():input?.url||'';
-      if(/\/functions\/v1\/russian-cup-match-center(?:-v2)?(?:\?|$)/.test(raw)){
+      if(/\/(?:functions\/v1|public-api)\/russian-cup-match-center(?:-v2)?(?:\?|$)/.test(raw)){
         const u=new URL(raw,location.href),id=u.searchParams.get('match_id');
         if(id){
-          const next=`${FAST}?match_id=${encodeURIComponent(id)}&_=${Date.now()}`;
+          const next=`${FAST}?match_id=${encodeURIComponent(id)}`;
           if(typeof input==='string'||input instanceof URL)return nativeFetch(next,init);
           return nativeFetch(new Request(next,input),init);
         }

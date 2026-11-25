@@ -1,5 +1,5 @@
 (()=>{
-  const NEWS_API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-news';
+  const NEWS_API='/public-api/russian-cup-news';
   const STYLE_ID='home-news-style';
   if(document.getElementById('homeNewsSection'))return;
 

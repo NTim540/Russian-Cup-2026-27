@@ -1,6 +1,6 @@
 /* News widgets for one selected match: announcement + result. */
 (()=>{
-  const CORE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup';
+  const CORE='/public-api/russian-cup';
   const RESULT='match_result';
   const ANNOUNCE='match_announce';
   const TYPES=new Set([RESULT,ANNOUNCE]);

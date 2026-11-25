@@ -1,10 +1,19 @@
 {
   "cleanUrls": true,
-  "rewrites": [],
+  "rewrites": [
+    {
+      "source": "/base-source",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/public-api/:resource/:route*",
+      "destination": "/api/public-data?resource=:resource&route=:route*"
+    }
+  ],
   "redirects": [
     {
-      "source": "/:path((?!maintenance-november).*)",
-      "destination": "/maintenance-november",
+      "source": "/maintenance-november",
+      "destination": "/",
       "permanent": false
     },
     {

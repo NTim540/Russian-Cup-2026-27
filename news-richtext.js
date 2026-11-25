@@ -1,5 +1,5 @@
 (()=>{
-  const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-news';
+  const API='/public-api/russian-cup-news';
   const ALLOWED_STYLES=new Set(['body','subtitle','heading']);
   let item=null,loading=false;
 

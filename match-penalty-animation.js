@@ -31,7 +31,7 @@ css();queue();const main=document.getElementById('main');if(main)new MutationObs
 (()=>{
 'use strict';
 if(!/\/match\.html$/i.test(location.pathname))return;
-const EDGE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-match-center-v2';
+const EDGE='/public-api/russian-cup-match-center-v2';
 const matchId=Number(new URL(location.href).searchParams.get('id'));
 let protocol={ot:false,so:false};
 function normalizeMarkers(){
@@ -62,7 +62,7 @@ function applyLiveScore(b){
 async function refreshProtocol(){
   if(!Number.isInteger(matchId)||matchId<1)return;
   try{
-    const r=await fetch(`${EDGE}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(!r.ok)return;
+    const r=await fetch(`${EDGE}?match_id=${matchId}`,{cache:'default'}),b=await r.json();if(!r.ok)return;
     const events=Array.isArray(b?.live?.events)?b.live.events:[],current=String(b?.live?.current_period||'').toUpperCase(),ft=String(b?.match?.finish_type||'').toUpperCase();
     const eventOT=events.some(e=>String(e?.period||'').toUpperCase()==='OT'),eventSO=events.some(e=>String(e?.period||'').toUpperCase()==='SO');
     const p1=Array.isArray(b?.live?.period_scores?.[0])?b.live.period_scores[0]:[b?.match?.p1_home,b?.match?.p1_away],p2=Array.isArray(b?.live?.period_scores?.[1])?b.live.period_scores[1]:[b?.match?.p2_home,b?.match?.p2_away],p3=Array.isArray(b?.live?.period_scores?.[2])?b.live.period_scores[2]:[b?.match?.p3_home,b?.match?.p3_away];

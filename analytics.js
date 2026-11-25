@@ -15,7 +15,7 @@
     return p;
   }
   const base=()=>({visitor_id:visitor,session_id:session,path:trackedPath(),device_type:device});
-  function send(action,extra={}){const body=JSON.stringify({...base(),action,...extra});fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true}).catch(()=>{})}
+  function send(action,extra={}){if(action!=='pageview')return;const body=JSON.stringify({...base(),action,...extra});fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true}).catch(()=>{})}
   window.rcAnalyticsSend=send;
   window.rcAnalyticsVisitor=visitor;
   window.rcAnalyticsSession=session;
@@ -24,7 +24,7 @@
   function heartbeat(){if(document.visibilityState==='hidden'||Date.now()-lastHeartbeat<60000)return;lastHeartbeat=Date.now();send('heartbeat',currentMatch()||{})}
   send('pageview',entry);
   lastHeartbeat=Date.now();
-  setInterval(heartbeat,60000);
+  // Economy trial: no recurring presence heartbeat.
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')heartbeat()});
 
   let openKey='';

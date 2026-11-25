@@ -1,6 +1,6 @@
 (()=>{
 'use strict';
-const EDGE='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-match-center-v3';
+const EDGE='/public-api/russian-cup-match-center-v3';
 const matchId=Number(new URL(location.href).searchParams.get('id'));
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -160,7 +160,7 @@ function applyMarkers(){
   if(fin)timeline.prepend(marker('final','60:00','КОНЕЦ МАТЧА',finalPair(),finishSuffix()));
   if(activeState()||fin)timeline.appendChild(marker('start','00:00','НАЧАЛО МАТЧА'));
 }
-async function refreshRules(){if(!Number.isInteger(matchId)||matchId<1)return;try{const r=await fetch(`${EDGE}?match_id=${matchId}&_=${Date.now()}`,{cache:'no-store'}),b=await r.json();if(r.ok){D=b;applyPregame();applyMarkers()}}catch{}}
+async function refreshRules(){if(!Number.isInteger(matchId)||matchId<1)return;try{const r=await fetch(`${EDGE}?match_id=${matchId}`,{cache:'default'}),b=await r.json();if(r.ok){D=b;applyPregame();applyMarkers()}}catch{}}
 
 function applyLayout(){normalizeExtraPeriods();ensureMainScore();ensureStream();applyPregame();applyMarkers()}
 let queued=false;const main=$('#main');if(main){new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;applyLayout()})}).observe(main,{childList:true});main.addEventListener('cup:soft-refresh',()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;applyLayout()})})}

@@ -113,7 +113,7 @@
     if(statsBusy||Date.now()-statsFetchedAt<90000)return;
     statsBusy=true;statsFetchedAt=Date.now();
     try{
-      const r=await fetch('https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup-stats?stage_id=all',{cache:'no-store'});
+      const r=await fetch('/public-api/russian-cup-stats?stage_id=all',{cache:'default'});
       if(!r.ok)throw Error('stats '+r.status);
       const json=await r.json();if(!json.ok||!Array.isArray(json.players))throw Error('stats unavailable');
       leaderData=json.players;drawLeaders();

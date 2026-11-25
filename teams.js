@@ -1,5 +1,5 @@
 (()=>{
-  const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup';
+  const API='/public-api/russian-cup';
   const TEAM_LOGOS={
     'Динамо Москва':'https://drive.google.com/thumbnail?id=1I3KuJZEajmksDKtoBsdj4h_75fU0e_KY&sz=w512',
     'МАХ':'https://drive.google.com/thumbnail?id=1Veii4NYgKc06nRtxKmCRQv1YCE164YZP&sz=w512',

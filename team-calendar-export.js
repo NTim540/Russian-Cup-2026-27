@@ -1,5 +1,5 @@
 (()=>{
-  const API='https://wcucbtdfkghjirpbqzzk.supabase.co/functions/v1/russian-cup';
+  const API='/public-api/russian-cup';
   const params=new URL(location.href).searchParams;
   const teamId=Number(params.get('team'));
   if(!Number.isInteger(teamId)||teamId<1)return;
@@ -25,7 +25,7 @@
   };
   const slug=s=>String(s||'team').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я0-9]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,70)||'team';
 
-  async function get(path){const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
+  async function get(path){const r=await fetch(API+path,{cache:'default'});if(!r.ok)throw Error(await r.text());return r.json()}
 
   const style=document.createElement('style');
   style.textContent=`
